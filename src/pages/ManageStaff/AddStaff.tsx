@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import styles from "./AddStaff.module.css";
 import { motion } from "framer-motion";
 import axios from "axios";
-import Alert from "../../components/Alert/Alert"; // Import Alert component
+import Alert from "../../components/Alert/Alert";
 
-// Componente reutilizable para los campos del formulario
 interface InputFieldProps {
   type: string;
   name: string;
   placeholder: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -31,11 +30,11 @@ const InputField: React.FC<InputFieldProps> = ({
   />
 );
 
-// Componente reutilizable para el botón
 interface ButtonProps {
-  type: "submit" | "button";
+  type: "button" | "submit" | "reset";
   onClick?: () => void;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({ type, onClick, children }) => (
@@ -56,13 +55,18 @@ const ManageStaff: React.FC = () => {
     nombre: "",
     apellidoPaterno: "",
     apellidoMaterno: "",
-    rol: "", // Valor por defecto
+    rol: "",
   });
 
-  const [archivo, setArchivo] = useState<File | null>(null);
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "success" | "error" | "warning" | "info";
+  } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const datosFormulario = {
       curp: formData.curp,
@@ -74,82 +78,40 @@ const ManageStaff: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/ManageStaff", // Asegúrate de que esta ruta coincida con el servidor
-        datosFormulario, // Enviar como JSON
-        {
-          headers: { "Content-Type": "application/json" }, // Especificar el tipo de contenido
-        }
-      );
-      console.log("Respuesta del servidor:", response.data);
-      alert("Personal registrado exitosamente");
-    } catch (error) {
-      console.error("Error al enviar los datos:", error);
-      alert("Error al registrar personal");
-    }
-  };
-
-  const handleFileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!archivo) {
-      alert("No se ha seleccionado ningún archivo");
-      return;
-    }
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("archivo", archivo);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/procesar-pdf",
-        formDataToSend,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      console.log("Respuesta del servidor:", response.data);
-      alert("Archivo procesado exitosamente");
-    } catch (error) {
-      console.error("Error al enviar el archivo:", error);
-      alert("Error al procesar el archivo");
-    }
-  };
-
-  // Manejar cambios en los campos del formulario
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const submitData = async () => {
-    const formDataToSend = new FormData();
-    formDataToSend.append("nombre", formData.nombre);
-    formDataToSend.append("apellidoPaterno", formData.apellidoPaterno);
-    formDataToSend.append("apellidoMaterno", formData.apellidoMaterno);
-    formDataToSend.append("rol", formData.rol);
-    if (archivo) formDataToSend.append("archivo", archivo);
-
-    try {
-      const response = await axios.post(
         "http://localhost:5000/ManageStaff",
-        formDataToSend,
+        datosFormulario,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "application/json" },
         }
       );
-      console.log("Respuesta del servidor:", response.data);
-    } catch (error) {
-      console.error("Error al enviar los datos:", error);
-    }
-  };
 
-  // Manejar la selección de archivos
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setArchivo(e.target.files[0]);
-      console.log("Archivo seleccionado:", e.target.files[0].name);
+      setAlert({
+        message: `Personal registrado exitosamente. Rol: ${response.data.rol}, Contraseña: ${response.data.contrasena}`,
+        type: "success",
+      });
+
+      setFormData({
+        curp: "",
+        nombre: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+        rol: "",
+      });
+    } catch (error: any) {
+      console.error("Error al enviar los datos:", error);
+      let errorMessage = "Ocurrió un error al registrar personal.";
+      if (error.response) {
+        errorMessage =
+          error.response.data.message || "Error desconocido del servidor.";
+      } else if (error.request) {
+        errorMessage = "No se recibió respuesta del servidor.";
+      }
+      setAlert({
+        message: errorMessage,
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -162,22 +124,14 @@ const ManageStaff: React.FC = () => {
     >
       <h1>Gestionar Personal</h1>
 
-      {/* Carga de archivo */}
-      <div className={styles.containerLeft}>
-        <h2>Ingresar de manera automatizada</h2>
-        <h5>Se admiten archivos Excel y PDF</h5>
-        <input
-          type="file"
-          name="excelStaff"
-          id="excelStaff"
-          accept=".xlsx, .xls, .pdf"
-          onChange={handleFileChange}
-          className={styles.inputFile}
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
         />
-        <Button type="submit">Guardar</Button>
-      </div>
+      )}
 
-      {/* Formulario para ingresar personal */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
@@ -193,34 +147,44 @@ const ManageStaff: React.FC = () => {
               name="curp"
               placeholder="CURP"
               value={formData.curp}
-              onChange={handleChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, curp: e.target.value })
+              }
             />
             <InputField
               type="text"
               name="nombre"
               placeholder="Nombre"
               value={formData.nombre}
-              onChange={handleChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, nombre: e.target.value })
+              }
             />
             <InputField
               type="text"
               name="apellidoPaterno"
               placeholder="Apellido Paterno"
               value={formData.apellidoPaterno}
-              onChange={handleChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, apellidoPaterno: e.target.value })
+              }
             />
             <InputField
               type="text"
               name="apellidoMaterno"
               placeholder="Apellido Materno"
               value={formData.apellidoMaterno}
-              onChange={handleChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, apellidoMaterno: e.target.value })
+              }
             />
             <legend>Información Laboral</legend>
             <motion.select
               name="rol"
               value={formData.rol}
-              onChange={handleChange}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setFormData({ ...formData, rol: e.target.value })
+              }
               whileFocus={{ scale: 1.05 }}
               className={styles.select}
             >
@@ -229,7 +193,9 @@ const ManageStaff: React.FC = () => {
               <option value="DOCENTE">DOCENTE</option>
               <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
             </motion.select>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Guardando..." : "Guardar"}
+            </Button>
           </fieldset>
         </form>
       </motion.div>

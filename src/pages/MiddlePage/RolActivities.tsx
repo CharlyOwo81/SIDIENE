@@ -78,34 +78,10 @@ function RolActivities({}: Props) {
 
   // Define role-based permissions
   const rolePermissions = {
-    DIRECTIVO: [
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f6",
-      "f7",
-      "f8",
-      "f9",
-      "f10",
-      "f11",
-      "f12",
-      "f13",
-    ], // Admin can access all functions
-    DOCENTE: ["f1", "f2"], // User can access only function 1 and 2
+    DIRECTIVO: ["f1", "f2", "f5", "f6", "f7", "f8", "f9", "f11", "f12", "f13"], // Admin can access all functions
+    DOCENTE: ["f7"], // User can access only function 1 and 2
     PREFECTO: ["f3", "f4", "f5", "f6"], // Manager can access function 1, 2, and 3
-    "TRABAJADOR SOCIAL": [
-      "f1",
-      "f4",
-      "f7",
-      "f8",
-      "f9",
-      "f10",
-      "f11",
-      "f12",
-      "f13",
-    ], // Social worker can access function 1 and 4
+    "TRABAJADOR SOCIAL": ["f3", "f4", "f5", "f8", "f11", "f12", "f13"], // Social worker can access function 1 and 4
   };
 
   // Get the allowed functions for the current user role
@@ -154,7 +130,7 @@ function RolActivities({}: Props) {
             <FunctionButton
               id="f2"
               label="Alumnado"
-              onClick={() => navigate("/page2")}
+              onClick={() => navigate("/ManageStudents")}
               icon={
                 <img
                   src={alumnadoIcon}

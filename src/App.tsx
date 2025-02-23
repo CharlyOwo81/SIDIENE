@@ -6,6 +6,7 @@ import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
 import ManageIncidents from "./pages/manageIncidents/ManageIncidents";
 import RolActivities from "./pages/MiddlePage/RolActivities";
+import ManageStudents from "./pages/ManageStudents/ManageStudents";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ManageStaff />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageStudents"
+          element={
+            <ProtectedRoute>
+              <ManageStudents />
             </ProtectedRoute>
           }
         />

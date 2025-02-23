@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Alert from "../components/Alert/Alert"; // Import Alert component
+import Alert from "../components/Alert/Alert";
 
 const Login: React.FC = () => {
   const [curp, setCurp] = useState<string>("");
@@ -11,11 +11,12 @@ const Login: React.FC = () => {
     message: string;
     type: "success" | "error" | "warning" | "info";
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    console.log("Sending login request:", { curp, contrasena });
+    setIsSubmitting(true);
 
     axios
       .post("http://localhost:5000/login", { curp, contrasena })
@@ -26,29 +27,25 @@ const Login: React.FC = () => {
           setAlert({ message: "Inicio de sesión exitoso!", type: "success" });
 
           setTimeout(() => {
-            setAlert(null); // Ocultar la alerta después de 3 segundos
+            setAlert(null);
+            const role = res.data.user.rol;
             navigate("/RolActivities");
           }, 3000);
         }
       })
       .catch((err) => {
         console.error("Login error:", err);
+        let errorMessage = "Ocurrió un error al iniciar sesión.";
         if (err.response) {
-          setAlert({
-            message: err.response.data.message || "Error desconocido",
-            type: "error",
-          });
+          errorMessage =
+            err.response.data.message || "Error desconocido del servidor.";
         } else if (err.request) {
-          setAlert({
-            message: "No se recibió respuesta del servidor.",
-            type: "warning",
-          });
-        } else {
-          setAlert({
-            message: "Ocurrió un error al iniciar sesión.",
-            type: "error",
-          });
+          errorMessage = "No se recibió respuesta del servidor.";
         }
+        setAlert({ message: errorMessage, type: "error" });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   }
 
@@ -76,7 +73,9 @@ const Login: React.FC = () => {
           value={contrasena}
           onChange={(e) => setContrasena(e.target.value)}
         />
-        <button type="submit">Iniciar Sesión</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+        </button>
       </form>
     </div>
   );
