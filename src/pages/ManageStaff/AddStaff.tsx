@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./ManageStaff.module.css";
+import styles from "./AddStaff.module.css";
 import { motion } from "framer-motion";
 import axios from "axios";
 import Alert from "../../components/Alert/Alert"; // Import Alert component

@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    /* Distribuye el espacio entre los elementos */
+    align-items: center;
+    /* Centra verticalmente los elementos */
+    /* Asegura que ocupe todo el ancho disponible */
+    /* Añade un poco de padding para que no esté pegado a los bordes */
+}
+
+.header h2 {
+    margin: 0;
+    /* Elimina el margen predeterminado */
+    flex-grow: 1;
+    /* Permite que el título ocupe el espacio restante */
+    text-align: center;
+    /* Centra el texto del título */
+}
+
+
+.header {
+    position: relative;
+    /* Necesario para que el div anidado se posicione relativo a este contenedor */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    background-color: #f0f0f0;
+    /* Color de fondo para visualización */
+    height: 60px;
+    /* Altura del header */
+}
+
+.overlayDiv button {
+    background-color: #891547;
+    border: none;
+    border-radius: 50px;
+    padding: 5px;
+    cursor: pointer;
+    width: 20vh;
+    /* Default width */
+    height: 8vh;
+    /* Default height */
+    font-size: 1em;
+    /* Default font size */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.overlayDiv button:hover {
+    background-color: #a51754;
+    transition: background-color 0.3s ease;
+}
+
+/* Media Queries for Responsive Design */
+
+/* For tablets and smaller screens */
+@media (max-width: 768px) {
+    .overlayDiv button {
+        width: 15vh;
+        /* Smaller width */
+        height: 6vh;
+        /* Smaller height */
+        font-size: 0.9em;
+        /* Smaller font size */
+    }
+}
+
+/* For mobile devices */
+@media (max-width: 480px) {
+    .overlayDiv button {
+        width: 12vh;
+        /* Even smaller width */
+        height: 5vh;
+        /* Even smaller height */
+        font-size: 0.8em;
+        /* Even smaller font size */
+        padding: 3px;
+        /* Smaller padding */
+    }
+}
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Columnas flexibles */
+    gap: 20px;
+    /* Espacio entre grupos */
+    padding: 20px;
+    /* Espaciado interno */
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    /* Center icon and label vertically */
+    justify-content: center;
+    /* Center icon and label horizontally */
+    gap: 8px;
+    /* Space between icon and label */
+    padding: 10px 20px;
+    /* Adjust padding as needed */
+    background-color: #891547;
+    /* Example button color */
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #C26444;
+    /* Darker shade on hover */
+}
+
+.icon{
+    height: 8vh;
+    filter: invert(1);
+}
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label {
+    margin-top: 8px;
+    /* Space between button and label */
+    font-size: 1.2em;
+    color: #f9f9f9;
+}
+.topicGroup {
+    background-color: #f9f9f9;
+    /* Fondo para cada grupo */
+    border: 1px solid #ddd;
+    /* Borde sutil */
+    border-radius: 8px;
+    /* Esquinas redondeadas */
+    padding: 16px;
+    /* Espaciado interno */
+}
+
+.topicGroup h3 {
+    margin-top: 0;
+    /* Elimina el margen superior del título */
+    margin-bottom: 12px;
+    /* Espacio debajo del título */
+    font-size: 1.2em;
+    /* Tamaño del título */
+    color: #333;
+    /* Color del texto */
+}
+
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    /* Botones en columna */
+    gap: 10px;
+    /* Espacio entre botones */
+}
