@@ -5,7 +5,7 @@ type Props = {};
 function Footer({}: Props) {
   return (
     <footer className={styles.footer}>
-      <p>Footer</p>
+      <p>Escuela Secundaria Técnica No. 56 "José Luis Osuna Villa"</p>
     </footer>
   );
 }

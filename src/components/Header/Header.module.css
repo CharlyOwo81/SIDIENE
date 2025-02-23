@@ -1,0 +1,25 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #891547;
+}
+
+.logoLeft,
+.logoRight {
+    width: clamp(6em, 7vw, 7.2em);
+    height: clamp(6em, 7vw, 7.2em);
+}
+
+.logoRight {
+    filter: invert(1);
+}
+
+.headertext {
+    flex-grow: 1;
+    text-align: center;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: bold;
+    color: white;
+}
