@@ -80,7 +80,7 @@ function RolActivities({}: Props) {
   const rolePermissions = {
     DIRECTIVO: ["f1", "f2", "f5", "f6", "f7", "f8", "f9", "f11", "f12", "f13"], // Admin can access all functions
     DOCENTE: ["f7"], // User can access only function 1 and 2
-    PREFECTO: ["f3", "f4", "f5", "f6"], // Manager can access function 1, 2, and 3
+    PREFECTO: ["f7", "f8", "f9"], // Manager can access function 1, 2, and 3
     "TRABAJADOR SOCIAL": ["f3", "f4", "f5", "f8", "f11", "f12", "f13"], // Social worker can access function 1 and 4
   };
 

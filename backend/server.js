@@ -67,127 +67,189 @@ app.post('/ManageStaff', async (req, res) => {
   }
 });
 
-// Endpoint para iniciar sesión
 app.post('/login', async (req, res) => {
   const { curp, contrasena } = req.body;
 
+  // Validación de entrada
   if (!curp || !contrasena) {
     return res.status(400).json({ message: 'CURP y contraseña son requeridos' });
   }
 
-  const sql = 'SELECT * FROM personal WHERE curp = ?';
-  const values = [curp];
+  try {
+    const sql = 'SELECT * FROM personal WHERE curp = ?';
+    const values = [curp];
 
-  db.query(sql, values, async (err, results) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ message: 'Error en el servidor' });
-    }
-    if (results.length === 0) {
-      return res.status(401).json({ message: 'CURP no encontrada' });
-    }
+    db.query(sql, values, async (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: 'Error en el servidor' });
+      }
 
-    const user = results[0];
+      if (results.length === 0) {
+        return res.status(401).json({ message: 'CURP no encontrada' });
+      }
 
-    const isPasswordValid = await bcrypt.compare(contrasena, user.contrasena);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
-    }
+      const user = results[0];
 
-    return res.json({ message: 'Inicio de sesión exitoso', user: { rol: user.rol } });
-  });
+      // Verificar la contraseña
+      const isPasswordValid = await bcrypt.compare(contrasena, user.contrasena);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Contraseña incorrecta' });
+      }
+
+      // Respuesta exitosa
+      return res.json({
+        message: 'Inicio de sesión exitoso',
+        user: {
+          id: user.id,
+          curp: user.curp,
+          rol: user.rol,
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Error en el servidor:", error);
+    return res.status(500).json({ message: 'Error en el servidor' });
+  }
 });
+
 
 // Configuración de multer para manejar la carga de archivos
 const upload = multer({ dest: 'uploads/' });
 
 // Endpoint para manejar la carga de archivos PDF
+// Endpoint para manejar la carga de archivos PDF y datos del formulario
 app.post('/uploadStudents', upload.single('file'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
-  }
+  const { curp, nombre, apellidoPaterno, apellidoMaterno, grado, grupo } = req.body;
 
   try {
-    // Leer el archivo PDF
-    const dataBuffer = fs.readFileSync(req.file.path);
-    const data = await pdf(dataBuffer);
+    if (req.file) {
+      // Si se cargó un archivo, procesarlo
+      const dataBuffer = fs.readFileSync(req.file.path);
+      const data = await pdf(dataBuffer);
 
-    // Procesar el contenido del PDF
-    const students = parseStudentsFromPDF(data.text);
+      // Procesar el contenido del PDF
+      const students = parseStudentsFromPDF(data.text);
 
-    if (students.length === 0) {
-      return res.status(400).json({ message: 'No valid students found in the PDF' });
-    }
-
-    // Crear la consulta SQL para insertar múltiples filas
-    const sql = `
-      INSERT INTO students (curp, nombre, apellido_paterno, apellido_materno, grado, grupo)
-      VALUES ?
-    `;
-    const values = students.map(student => [
-      student.curp,
-      student.nombre,
-      student.apellidoPaterno,
-      student.apellidoMaterno,
-      student.grado,
-      student.grupo,
-    ]);
-
-    // Ejecutar la consulta SQL
-    db.query(sql, [values], (err, results) => {
-      if (err) {
-        console.error("Error inserting students:", err);
-        return res.status(500).json({ message: 'Error inserting students' });
+      if (students.length === 0) {
+        return res.status(400).json({ message: 'No valid students found in the PDF' });
       }
-      return res.json({ message: 'Students registered successfully', students });
-    });
+
+      // Crear la consulta SQL para insertar múltiples filas
+      const sql = `
+        INSERT INTO alumnado (curp, nombre, apellido_paterno, apellido_materno, grado, grupo)
+        VALUES ?
+      `;
+      const values = students.map(student => [
+        student.curp,
+        student.nombre,
+        student.apellidoPaterno,
+        student.apellidoMaterno,
+        student.grado,
+        student.grupo,
+      ]);
+
+      // Ejecutar la consulta SQL
+      db.query(sql, [values], (err, results) => {
+        if (err) {
+          console.error("Error inserting students:", err);
+          return res.status(500).json({ message: 'Error inserting students' });
+        }
+        return res.json({ message: 'Students registered successfully', students });
+      });
+    } else {
+      // Si no se cargó un archivo, procesar los datos del formulario
+      if (!curp || !nombre || !apellidoPaterno || !apellidoMaterno || !grado || !grupo) {
+        return res.status(400).json({ message: 'Todos los campos son requeridos' });
+      }
+
+      const sql = `
+        INSERT INTO alumnado (curp, nombre, apellido_paterno, apellido_materno, grado, grupo)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      const values = [curp, nombre, apellidoPaterno, apellidoMaterno, grado, grupo];
+
+      db.query(sql, values, (err, results) => {
+        if (err) {
+          console.error("Error al agregar estudiantes:", err);
+          return res.status(500).json({ message: 'Error al agregar estudiantes' });
+        }
+        return res.json({ message: 'Estudiante registrado exitosamente', curp });
+      });
+    }
   } catch (error) {
-    console.error("Error processing PDF:", error);
-    return res.status(500).json({ message: 'Error processing PDF' });
+    console.error("Error processing request:", error);
+    return res.status(500).json({ message: 'Error processing request' });
   } finally {
-    // Eliminar el archivo temporal
-    fs.unlinkSync(req.file.path);
+    // Eliminar el archivo temporal si existe
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 });
 
 const parseStudentsFromPDF = (text) => {
-  const lines = text.split('\n'); // Dividir el texto en líneas
+  const lines = text.split('\n'); // Divide el texto en líneas
   const students = [];
 
-  console.log("Contenido del PDF:", text); // Depuración: Ver el contenido del PDF
+  console.log("Contenido del PDF:", text); // Debug: Ver contenido crudo
 
-  // Expresión regular para extraer los datos de cada línea
-  const studentPattern = /([A-Z0-9]{18})([A-Za-zÁÉÍÓÚáéíóúñÑ\s]+)([A-Za-zÁÉÍÓÚáéíóúñÑ]+)([A-Za-zÁÉÍÓÚáéíóúñÑ]+)(\d+)([A-Za-z])/;
-
-  // Ignorar la primera línea (encabezados)
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line) {
-      console.log("Línea procesada:", line); // Depuración: Ver cada línea procesada
-
-      // Aplicar la expresión regular a la línea
-      const match = line.match(studentPattern);
-
-      if (match) {
-        const [_, curp, nombre, apellidoPaterno, apellidoMaterno, grado, grupo] = match;
-
-        students.push({
-          curp,
-          nombre: nombre.trim(),
-          apellidoPaterno: apellidoPaterno.trim(),
-          apellidoMaterno: apellidoMaterno.trim(),
-          grado: parseInt(grado, 10), // Convertir a número
-          grupo,
-        });
-      } else {
-        console.warn("Línea ignorada (formato incorrecto):", line);
-      }
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+    if (!line || line.startsWith("CURP") || line.startsWith("Apellido")) {
+      continue; // Ignorar encabezados
     }
+
+    console.log("Línea original:", line); // Debugging
+
+    // Extraer CURP (18 caracteres exactos al inicio)
+    const curpMatch = line.match(/^([A-Z0-9]{18})/);
+    if (!curpMatch) {
+      console.warn("Línea ignorada (CURP inválido):", line);
+      continue;
+    }
+    const curp = curpMatch[1];
+
+    // Extraer grado y grupo (últimos caracteres)
+    const gradoGrupoMatch = line.match(/(\d)([A-Z])$/);
+    if (!gradoGrupoMatch) {
+      console.warn("Línea ignorada (grado/grupo inválidos):", line);
+      continue;
+    }
+    const grado = parseInt(gradoGrupoMatch[1], 10);
+    const grupo = gradoGrupoMatch[2];
+
+    // Extraer nombres y apellidos (parte intermedia)
+    const rawNameSection = line.substring(18, line.length - 2).trim();
+
+    // Separar nombres y apellidos con una mejor estrategia
+    const words = rawNameSection.split(/(?=[A-ZÁÉÍÓÚÑ])/); // Separar cuando hay mayúsculas
+    const cleanWords = words.map(w => w.trim()).filter(w => w.length > 0);
+
+    if (cleanWords.length < 3) {
+      console.warn("Línea ignorada (nombre incompleto):", line);
+      continue;
+    }
+
+    const apellidoMaterno = cleanWords.pop(); // Última palabra es el apellido materno
+    const apellidoPaterno = cleanWords.pop(); // Penúltima palabra es el apellido paterno
+    const nombre = cleanWords.join(" "); // Lo demás es el nombre
+
+    students.push({
+      curp,
+      nombre,
+      apellidoPaterno,
+      apellidoMaterno,
+      grado,
+      grupo,
+    });
   }
 
-  console.log("Estudiantes extraídos:", students); // Depuración: Ver los estudiantes extraídos
+  console.log("Estudiantes extraídos:", students); // Debug: Ver estudiantes extraídos
   return students;
 };
+
+
 
 // Endpoint para agregar un estudiante manualmente
 app.post('/ManageStudents', async (req, res) => {
@@ -205,10 +267,10 @@ app.post('/ManageStudents', async (req, res) => {
 
   db.query(sql, values, (err, results) => {
     if (err) {
-      console.error("Error inserting student:", err);
-      return res.status(500).json({ message: 'Error inserting student' });
+      console.error("Error al agregar estudiantes:", err);
+      return res.status(500).json({ message: 'Error al agregar estudiantes' });
     }
-    return res.json({ message: 'Student registered successfully', curp });
+    return res.json({ message: 'Estudiante registrado exitosamente', curp });
   });
 });
 

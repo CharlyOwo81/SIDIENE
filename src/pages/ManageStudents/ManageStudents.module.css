@@ -77,3 +77,27 @@
     /* Borde para visualización */
     padding: 20px;
 }
+
+/* Estilos para el contenedor flexible */
+.row {
+    display: flex;
+    gap: 10px;
+    /* Espacio entre los campos */
+    margin-bottom: 10px;
+    /* Espacio entre filas */
+}
+
+/* Ajustes para los campos dentro del contenedor flexible */
+.row input {
+    flex: 1;
+    /* Hace que los campos ocupen el espacio disponible */
+}
+
+/* Estilos para el campo de carga de archivos */
+.fileUpload {
+    margin-top: 20px;
+}
+
+.fileUpload input[type="file"] {
+    margin-top: 5px;
+}
