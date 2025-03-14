@@ -7,7 +7,7 @@ import personalIcon from "../../../public/chalkboard-user.svg";
 import alumnadoIcon from "../../../public/student.svg";
 import reportesIcon from "../../../public/exclamation.svg";
 import funcion4Icon from "../../../public/paper-plane-launch.svg";
-
+ 
 // Reusable FunctionButton Component
 interface FunctionButtonProps {
   id: string;
