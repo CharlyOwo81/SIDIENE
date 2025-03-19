@@ -1,6 +1,6 @@
-import styles from "./Header.module.css";
-import gobSon from "../../../public/GobSonora.svg";
-import logoEsc from "../../../public/Tecnica 56.svg";
+import styles from "././Header.module.css";
+import gobSon from "../../../../public/GobSonora.svg";
+import logoEsc from "../../../../public/Tecnica 56.svg";
 
 type Props = {};
 

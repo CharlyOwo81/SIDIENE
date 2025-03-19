@@ -1,8 +1,8 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import Alert from "../../../components/Alert/Alert";
-import Modal from "../../../components/Modal/Modal";
+import Alert from "../../../assets/components/Alert/Alert";
+import Modal from "../../../assets/components/Modal/Modal";
 import styles from "./CreateIncidents.module.css";
 
 // InputField component for input elements

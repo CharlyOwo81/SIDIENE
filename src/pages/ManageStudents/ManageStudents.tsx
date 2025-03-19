@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import styles from "./ManageStudents.module.css";
 import { motion } from "framer-motion";
 import axios from "axios";
-import Alert from "../../components/Alert/Alert";
+import Alert from "../../assets/components/Alert/Alert";
 
 interface InputFieldProps {
   type: string;
@@ -145,7 +145,14 @@ const ManageStudents: React.FC = () => {
       transition={{ duration: 0.5 }}
       className={styles.mainContainer}
     >
-      <h1>Manage Students Elementary School</h1>
+      <div className={styles.navbar}>
+        <h1>Gestionar estudiantes</h1>
+        <div>
+          <a href="/ManageStudents">Agregar</a>
+          <a href="/QueryStudents">Consultar</a>
+          <a href="/UpdateStudents">Actualizar</a>
+        </div>
+      </div>
 
       {alert && (
         <Alert
@@ -165,17 +172,18 @@ const ManageStudents: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <fieldset className={styles.fieldset}>
             <legend>Información del o la Estudiante</legend>
-            <InputField
-              type="text"
-              name="curp"
-              placeholder="CURP"
-              value={formData.curp}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, curp: e.target.value })
-              }
-            />
-
-            {/* Contenedor flexible para Nombres, Apellido Paterno y Apellido Materno */}
+            <h3>Información personal</h3>
+            <div className={styles.row}>
+              <InputField
+                type="text"
+                name="curp"
+                placeholder="CURP"
+                value={formData.curp}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, curp: e.target.value })
+                }
+              />
+            </div>
             <div className={styles.row}>
               <InputField
                 type="text"
@@ -206,7 +214,7 @@ const ManageStudents: React.FC = () => {
               />
             </div>
 
-            {/* Contenedor flexible para Grado y Grupo */}
+            <h3>Información escolar</h3>
             <div className={styles.row}>
               <InputField
                 type="text"
@@ -239,7 +247,7 @@ const ManageStudents: React.FC = () => {
 
             <div className={styles.fileUpload}>
               <label htmlFor="file-upload">
-                Upload PDF with Students Data:
+                Subir PDF con los datos de los Estudiantes:
               </label>
               <input
                 id="file-upload"

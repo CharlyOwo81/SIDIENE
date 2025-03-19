@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import styles from "./AddStaff.module.css";
 import { motion } from "framer-motion";
 import axios from "axios";
-import Alert from "../../components/Alert/Alert";
+import Alert from "../../assets/components/Alert/Alert";
 
 interface InputFieldProps {
   type: string;
@@ -37,13 +37,19 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ type, onClick, children }) => (
+const Button: React.FC<ButtonProps> = ({
+  type,
+  onClick,
+  children,
+  disabled,
+}) => (
   <motion.button
     type={type}
     whileHover={{ scale: 1.01 }}
     whileTap={{ scale: 0.9 }}
     className={styles.button}
     onClick={onClick}
+    disabled={disabled}
   >
     {children}
   </motion.button>
@@ -55,6 +61,7 @@ const ManageStaff: React.FC = () => {
     nombre: "",
     apellidoPaterno: "",
     apellidoMaterno: "",
+    telefono: "",
     rol: "",
   });
 
@@ -73,12 +80,13 @@ const ManageStaff: React.FC = () => {
       nombre: formData.nombre,
       apellidoPaterno: formData.apellidoPaterno,
       apellidoMaterno: formData.apellidoMaterno,
+      telefono: formData.telefono,
       rol: formData.rol,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/ManageStaff",
+        "http://localhost:5000/api/staff/addStaff",
         datosFormulario,
         {
           headers: { "Content-Type": "application/json" },
@@ -86,7 +94,8 @@ const ManageStaff: React.FC = () => {
       );
 
       setAlert({
-        message: `Personal registrado exitosamente. Rol: ${response.data.rol}, Contraseña: ${response.data.contrasena}`,
+        message: `Personal registrado exitosamente.
+        Contraseña: ${response.data.contrasenia}`,
         type: "success",
       });
 
@@ -95,6 +104,7 @@ const ManageStaff: React.FC = () => {
         nombre: "",
         apellidoPaterno: "",
         apellidoMaterno: "",
+        telefono: "",
         rol: "",
       });
     } catch (error: any) {
@@ -178,6 +188,15 @@ const ManageStaff: React.FC = () => {
                 setFormData({ ...formData, apellidoMaterno: e.target.value })
               }
             />
+            <InputField
+              type="text"
+              name="telefono"
+              placeholder="Teléfono"
+              value={formData.telefono}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, telefono: e.target.value })
+              }
+            />
             <legend>Información Laboral</legend>
             <motion.select
               name="rol"
@@ -188,6 +207,7 @@ const ManageStaff: React.FC = () => {
               whileFocus={{ scale: 1.05 }}
               className={styles.select}
             >
+              <option value="">Seleccione un rol</option>
               <option value="DIRECTIVO">DIRECTIVO</option>
               <option value="PREFECTO">PREFECTO</option>
               <option value="DOCENTE">DOCENTE</option>

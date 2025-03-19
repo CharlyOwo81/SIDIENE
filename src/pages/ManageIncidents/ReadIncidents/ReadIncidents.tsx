@@ -1,10 +1,10 @@
 import React, { useState, useEffect, FormEvent, useCallback } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import Alert from "../../../components/Alert/Alert";
-import Modal from "../../../components/Modal/Modal";
+import Alert from "../../../assets/components/Alert/Alert";
+import Modal from "../../../assets/components/Modal/Modal";
 import styles from "./ReadIncidents.module.css";
-import PDFViewer from "../../../components/PDFViewer/PDFViewer";
+import PDFViewer from "../../../assets/components/PDFViewer/PDFViewer";
 import jsPDF from "jspdf";
 import { pdfjs } from "react-pdf";
 

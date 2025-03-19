@@ -1,21 +1,16 @@
-import express from 'express';
 import db from '../config/db.js';
 import bcrypt from 'bcrypt';
 
-const router = express.Router(); // Initialize the router
+export const loginUser = async (req, res) => {
+  const { telefono, contrasenia } = req.body;
 
-router.post('/login', async (req, res) => {
-  const { telefono, contrasena } = req.body;
-
-  if (!telefono || !contrasena) {
+  if (!telefono || !contrasenia) {
     return res.status(400).json({ message: 'Teléfono y contraseña son requeridos' });
   }
 
   try {
     const sql = 'SELECT * FROM personal WHERE telefono = ?';
-    const values = [telefono];
-
-    db.query(sql, values, async (err, results) => {
+    db.query(sql, [telefono], async (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ message: 'Error en el servidor' });
@@ -28,7 +23,7 @@ router.post('/login', async (req, res) => {
       const user = results[0];
 
       // Verificar la contraseña
-      const isPasswordValid = await bcrypt.compare(contrasena, user.contrasena);
+      const isPasswordValid = await bcrypt.compare(contrasenia, user.contrasenia);
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Contraseña incorrecta' });
       }
@@ -51,6 +46,4 @@ router.post('/login', async (req, res) => {
     console.error("Error en el servidor:", error);
     return res.status(500).json({ message: 'Error en el servidor' });
   }
-});
-
-export default router; // Export the router
+};
