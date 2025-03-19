@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Alert from "../components/Alert/Alert";
+import Alert from "../../components/Alert/Alert";
 
 const Login: React.FC = () => {
   const [curp, setCurp] = useState<string>("");

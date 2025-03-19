@@ -1,7 +1,12 @@
 import React from "react";
 import styles from "./RolActivities.module.css";
 import { useNavigate } from "react-router-dom";
-import { functionalities } from "./ConfigActivities"; // Importar la configuración
+
+// Import local images
+import personalIcon from "../../../public/chalkboard-user.svg";
+import alumnadoIcon from "../../../public/student.svg";
+import reportesIcon from "../../../public/exclamation.svg";
+import funcion4Icon from "../../../public/paper-plane-launch.svg";
 
 // Reusable FunctionButton Component
 interface FunctionButtonProps {
