@@ -19,16 +19,22 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
 
     axios
-      .post("http://localhost:5000/login", { curp, contrasena })
+      .post("http://localhost:5000/api/auth/login", { curp, contrasena })
       .then((res) => {
-        console.log("Login response:", res.data);
+        console.log("Respuesta del backend:", res.data);
         if (res.data.message === "Inicio de sesión exitoso") {
+          // Almacenar el rol y el nombre completo en localStorage
           localStorage.setItem("rol", res.data.user.rol);
+          localStorage.setItem(
+            "nombreCompleto",
+            `${res.data.user.nombre} ${res.data.user.apellidoPaterno} ${res.data.user.apellidoMaterno}`
+          );
+          localStorage.setItem("curp", res.data.user.curp);
+
           setAlert({ message: "Inicio de sesión exitoso!", type: "success" });
 
           setTimeout(() => {
             setAlert(null);
-            const role = res.data.user.rol;
             navigate("/RolActivities");
           }, 3000);
         }

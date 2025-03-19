@@ -4,10 +4,11 @@ import Login from "./pages/Login";
 import ManageStaff from "./pages/ManageStaff/AddStaff";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
-import ManageIncidents from "./pages/manageIncidents/ManageIncidents";
+import CreateIncidents from "./pages/ManageIncidents/CreateIncidents/CreateIncidents";
 import RolActivities from "./pages/MiddlePage/RolActivities";
 import ManageStudents from "./pages/ManageStudents/ManageStudents";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import ReadIncidents from "./pages/ManageIncidents/ReadIncidents/ReadIncidents";
 
 function App() {
   return (
@@ -36,6 +37,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ManageStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/CreateIncidents"
+          element={
+            <ProtectedRoute>
+              <CreateIncidents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ReadIncidents"
+          element={
+            <ProtectedRoute>
+              <ReadIncidents />
             </ProtectedRoute>
           }
         />

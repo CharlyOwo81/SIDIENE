@@ -63,6 +63,7 @@ const ManageStudents: React.FC = () => {
     apellidoMaterno: "",
     grado: "",
     grupo: "",
+    anio_ingreso: "",
   });
 
   const [file, setFile] = useState<File | null>(null);
@@ -78,76 +79,64 @@ const ManageStudents: React.FC = () => {
     }
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  const studentData = {
-    curp: formData.curp,
-    nombres: formData.nombres,
-    apellidoPaterno: formData.apellidoPaterno,
-    apellidoMaterno: formData.apellidoMaterno,
-    grado: formData.grado,
-    grupo: formData.grupo,
-  };
+    const formDataToSend = new FormData();
 
-  try {
-    let response;
     if (file) {
-      // Si se cargó un archivo, enviarlo junto con los datos del formulario
-      const formDataToSend = new FormData();
       formDataToSend.append("file", file);
-      formDataToSend.append("data", JSON.stringify(studentData));
+    } else {
+      formDataToSend.append("curp", formData.curp);
+      formDataToSend.append("nombres", formData.nombres);
+      formDataToSend.append("apellidoPaterno", formData.apellidoPaterno);
+      formDataToSend.append("apellidoMaterno", formData.apellidoMaterno);
+      formDataToSend.append("grado", formData.grado);
+      formDataToSend.append("grupo", formData.grupo);
+      formDataToSend.append("anio_ingreso", formData.anio_ingreso);
+    }
 
-      response = await axios.post(
+    try {
+      const response = await axios.post(
         "http://localhost:5000/uploadStudents",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-    } else {
-      // Si no se cargó un archivo, enviar solo los datos del formulario
-      response = await axios.post(
-        "http://localhost:5000/ManageStudents",
-        studentData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
 
-    setAlert({
-      message: response.data.message,
-      type: "success",
-    });
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
 
-    setFormData({
-      curp: "",
-      nombres: "",
-      apellidoPaterno: "",
-      apellidoMaterno: "",
-      grado: "",
-      grupo: "",
-    });
-    setFile(null);
-  } catch (error: any) {
-    console.error("Error registrando los datos:", error);
-    let errorMessage = "Un error ocurrió cuando se procesaba la petición.";
-    if (error.response) {
-      errorMessage =
-        error.response.data.message || "Error desconocido del servidor.";
-    } else if (error.request) {
-      errorMessage = "Sin respuesta del servidor.";
+      setFormData({
+        curp: "",
+        nombres: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+        grado: "",
+        grupo: "",
+        anio_ingreso: "",
+      });
+      setFile(null);
+    } catch (error: any) {
+      let errorMessage = "Un error ocurrió cuando se procesaba la petición.";
+      if (error.response) {
+        errorMessage =
+          error.response.data.message || "Error desconocido del servidor.";
+      } else if (error.request) {
+        errorMessage = "Sin respuesta del servidor.";
+      }
+      setAlert({
+        message: errorMessage,
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    setAlert({
-      message: errorMessage,
-      type: "error",
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <motion.section
@@ -222,7 +211,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               <InputField
                 type="text"
                 name="grado"
-                placeholder="Grade"
+                placeholder="Grado"
                 value={formData.grado}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, grado: e.target.value })
@@ -231,10 +220,19 @@ const handleSubmit = async (e: React.FormEvent) => {
               <InputField
                 type="text"
                 name="grupo"
-                placeholder="Section"
+                placeholder="Grupo"
                 value={formData.grupo}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, grupo: e.target.value })
+                }
+              />
+              <InputField
+                type="text"
+                name="anio_ingreso"
+                placeholder="Año de ingreso"
+                value={formData.anio_ingreso}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, anio_ingreso: e.target.value })
                 }
               />
             </div>

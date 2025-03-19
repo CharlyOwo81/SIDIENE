@@ -1,0 +1,61 @@
+/* Modal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.studentList {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.studentTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.studentTable th,
+.studentTable td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.studentTable th {
+    background-color: #f9f9f9;
+}
+
+.studentRow:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
