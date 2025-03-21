@@ -1,5 +1,5 @@
 import db from '../config/db.js';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 
 export const loginUser = async (req, res) => {
   const { telefono, contrasenia } = req.body;
@@ -23,7 +23,7 @@ export const loginUser = async (req, res) => {
       const user = results[0];
 
       // Verificar la contraseña
-      const isPasswordValid = await bcrypt.compare(contrasenia, user.contrasenia);
+      const isPasswordValid = await bcryptjs.compare(contrasenia, user.contrasenia);
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Contraseña incorrecta' });
       }

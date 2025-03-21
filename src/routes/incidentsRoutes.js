@@ -1,5 +1,6 @@
 import express from 'express';
 import { searchIncidents } from '../controllers/incidentsController';
+import { uploadIncidents } from '../controllers/incidentsController';
 import db from '../config/db.js';
 
 const router = express.Router();

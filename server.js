@@ -1,22 +1,13 @@
-import app from './app.js'; // Use .js extension
+import app from './src/app.js'; // Use .js extension
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3306;
 
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
-
-// Importar las dependencias necesarias
-// const express = require('express');
-// const mysql = require('mysql2');
-// const cors = require('cors');
-// const bcrypt = require('bcrypt');
-// const multer = require('multer');
-// const fs = require('fs');
-// const pdf = require('pdf-parse');
 
 // Crear una instancia de la aplicación Express
 // const app = express();
