@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const port = process.env.PORT || 3306;
+const port = process.env.PORT || 3307;
 
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);

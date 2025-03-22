@@ -4,9 +4,14 @@
     import staffRouter from './routes/staffRoutes.js'; // Use .js extension
 
     const app = express();
+    // Configura CORS para permitir solicitudes desde tu frontend
+    app.use(cors({
+        origin: 'http://localhost:5137', // Cambia esto si tu frontend está en otro puerto o dominio
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    }));
 
     app.use(express.json());
-    app.use(cors());
 
     app.use('/api/auth', authRouter);
     app.use('/api/staff', staffRouter);
