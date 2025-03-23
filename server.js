@@ -1,13 +1,39 @@
-import app from './src/app.js'; // Use .js extension
+import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import authRoutes from './src/routes/authRoutes.js'; // Adjust the path as needed
 
+// Load environment variables
 dotenv.config();
 
-const port = process.env.PORT || 3307;
+// Initialize the app
+const app = express();
 
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Enable CORS
+app.use(cors());
+
+// Middleware to log incoming requests
+app.use((req, res, next) => {
+  console.log(`🔍 Request received: ${req.method} ${req.url}`);
+  next();
+});
+
+
+// Define the base URL for API routes
+app.use('/api/auth', authRoutes);
+
+// Start the server
+const port = process.env.PORT || 3307;
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
+
+
+
+
 
 // Crear una instancia de la aplicación Express
 // const app = express();

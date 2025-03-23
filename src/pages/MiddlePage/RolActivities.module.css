@@ -1,168 +1,207 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    /* Distribuye el espacio entre los elementos */
-    align-items: center;
-    /* Centra verticalmente los elementos */
-    /* Asegura que ocupe todo el ancho disponible */
-    /* Añade un poco de padding para que no esté pegado a los bordes */
+/* Page Container */
+.pageContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e0e4e8 100%);
+  font-family: 'Montserrat', sans-serif;
+  padding: 2rem;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.header h2 {
-    margin: 0;
-    /* Elimina el margen predeterminado */
-    flex-grow: 1;
-    /* Permite que el título ocupe el espacio restante */
-    text-align: center;
-    /* Centra el texto del título */
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(120deg, #891547 0%, #a51754 60%, #C26444 100%);
+  color: white;
+  height: 80px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(5px);
 }
 
-
-.header {
-    position: relative;
-    /* Necesario para que el div anidado se posicione relativo a este contenedor */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    background-color: #f0f0f0;
-    /* Color de fondo para visualización */
-    height: 60px;
-    /* Altura del header */
+.title {
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .overlayDiv button {
-    background-color: #891547;
-    border: none;
-    border-radius: 50px;
-    padding: 5px;
-    cursor: pointer;
-    width: 20vh;
-    /* Default width */
-    height: 8vh;
-    /* Default height */
-    font-size: 1em;
-    /* Default font size */
-    color: white;
-    transition: background-color 0.3s ease;
+  background: linear-gradient(to bottom, #E5823E, #C26444);
+  border: none;
+  border-radius: 50px;
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .overlayDiv button:hover {
-    background-color: #a51754;
-    transition: background-color 0.3s ease;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 130, 62, 0.4);
 }
 
-/* Media Queries for Responsive Design */
-
-/* For tablets and smaller screens */
-@media (max-width: 768px) {
-    .overlayDiv button {
-        width: 15vh;
-        /* Smaller width */
-        height: 6vh;
-        /* Smaller height */
-        font-size: 0.9em;
-        /* Smaller font size */
-    }
+/* Content */
+.content {
+  padding: 2.5rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 2rem auto;
+  transition: transform 0.3s ease;
 }
 
-/* For mobile devices */
-@media (max-width: 480px) {
-    .overlayDiv button {
-        width: 12vh;
-        /* Even smaller width */
-        height: 5vh;
-        /* Even smaller height */
-        font-size: 0.8em;
-        /* Even smaller font size */
-        padding: 3px;
-        /* Smaller padding */
-    }
+.content:hover {
+  transform: translateY(-5px);
 }
 
-.gridContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    /* Columnas flexibles */
-    gap: 20px;
-    /* Espacio entre grupos */
-    padding: 20px;
-    /* Espaciado interno */
-}
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.entityTitle {
+  font-size: 2.5rem;
+  color: #891547;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(137, 21, 71, 0.2);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.button {
-    display: flex;
-    align-items: center;
-    /* Center icon and label vertically */
-    justify-content: center;
-    /* Center icon and label horizontally */
-    gap: 8px;
-    /* Space between icon and label */
-    padding: 10px 20px;
-    /* Adjust padding as needed */
-    background-color: #891547;
-    /* Example button color */
-    color: white;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.functionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-.button:hover {
-    background-color: #C26444;
-    /* Darker shade on hover */
+.functionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #891547 0%, #a51754 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(137, 21, 71, 0.2);
 }
 
-.icon{
-    height: 8vh;
-    filter: invert(1);
+.functionButton:hover {
+  background: linear-gradient(135deg, #C26444 0%, #E5823E 100%);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 130, 62, 0.4);
 }
+
+.icon {
+  height: 28px;
+  filter: invert(1);
+  transition: transform 0.3s ease;
+}
+
+.functionButton:hover .icon {
+  transform: rotate(15deg);
+}
+
 .iconContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.label {
-    margin-top: 8px;
-    /* Space between button and label */
-    font-size: 1.2em;
-    color: #f9f9f9;
-}
-.topicGroup {
-    background-color: #f9f9f9;
-    /* Fondo para cada grupo */
-    border: 1px solid #ddd;
-    /* Borde sutil */
-    border-radius: 8px;
-    /* Esquinas redondeadas */
-    padding: 16px;
-    /* Espaciado interno */
+.noSelection,
+.noFunctions {
+  font-size: 1.3rem;
+  color: #666;
+  padding: 2rem;
+  font-style: italic;
 }
 
-.topicGroup h3 {
-    margin-top: 0;
-    /* Elimina el margen superior del título */
-    margin-bottom: 12px;
-    /* Espacio debajo del título */
-    font-size: 1.2em;
-    /* Tamaño del título */
-    color: #333;
-    /* Color del texto */
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.buttonGroup {
-    display: flex;
-    flex-direction: column;
-    /* Botones en columna */
-    gap: 10px;
-    /* Espacio entre botones */
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 1.5rem;
+  }
+
+  .header {
+    padding: 1rem 1.5rem;
+    height: 70px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .overlayDiv button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .content {
+    padding: 1.5rem;
+  }
+
+  .entityTitle {
+    font-size: 2rem;
+  }
+
+  .functionGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .functionButton {
+    padding: 0.9rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .overlayDiv button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .entityTitle {
+    font-size: 1.7rem;
+  }
+
+  .functionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .functionButton {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
 }

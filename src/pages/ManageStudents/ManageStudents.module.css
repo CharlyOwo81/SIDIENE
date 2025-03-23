@@ -1,165 +1,70 @@
 /* Main Container */
 .mainContainer {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f8f9fa;
-    padding: 2rem;
-    font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
 }
 
-/* Navbar */
-.navbar {
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-    font-size: 1.2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Container */
+.container {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 0 auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.navbar a {
-    color: #C26444;
-    text-decoration: none;
-    margin: 0 1rem;
-    transition: color 0.3s ease;
-}
-
-.navbar a:hover {
-    color: #891547;
-}
-
-/* Container Right */
-.containerRight {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 2rem auto;
-    transition: all 0.3s ease;
-}
-
-.containerRight:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Headings */
-h1 {
-    text-align: center;
-    color: #891547;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    transition: color 0.3s ease;
-}
-
-h1:hover {
-    color: #C26444;
-}
-
-h2 {
-    color: #C26444;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    transition: color 0.3s ease;
-}
-
-h2:hover {
-    color: #E5823E;
-}
-
-/* Fieldset */
-.fieldset {
-    border: 2px solid #E5823E;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.fieldset:hover {
-    border-color: #C26444;
-    box-shadow: 0 0 10px rgba(229, 130, 62, 0.5);
-}
-
-/* Input Fields */
-.input {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.input:focus {
-    border-color: #F3C44D;
-    box-shadow: 0 0 5px rgba(243, 196, 77, 0.5);
-    outline: none;
-}
-
-/* Row Layout */
-.row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.row .input {
-    flex: 1;
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 /* File Upload */
 .fileUpload {
-    margin-bottom: 1.5rem;
+  margin: 1.5rem 0;
 }
 
-.fileUpload label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #C26444;
-    font-weight: bold;
-    transition: color 0.3s ease;
+.fileLabel {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #C26444;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
 }
 
-.fileUpload label:hover {
-    color: #E5823E;
-}
-
-.fileUpload input[type="file"] {
-    width: 95%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.fileUpload input[type="file"]:focus {
-    border-color: #F3C44D;
-    box-shadow: 0 0 5px rgba(243, 196, 77, 0.5);
+.fileLabel:hover {
+  color: #E5823E;
 }
 
 /* Button */
 .button {
-    background-color: #E5823E;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+  background: linear-gradient(to bottom, #E5823E, #C26444);
+  color: white;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.button:hover {
-    background-color: #C26444;
-    transform: scale(1.05);
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
 }
 
-.button:disabled {
-    background-color: #ddd;
-    cursor: not-allowed;
-}
+/* Rest of the styles remain unchanged */

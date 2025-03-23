@@ -1,19 +1,35 @@
-    import express from 'express';
-    import cors from 'cors';
-    import authRouter from './routes/authRoutes.js'; // Use .js extension
-    import staffRouter from './routes/staffRoutes.js'; // Use .js extension
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import authRoutes from './src/routes/authRoutes.js'; // Adjust the path as needed
 
-    const app = express();
-    // Configura CORS para permitir solicitudes desde tu frontend
-    app.use(cors({
-        origin: 'http://localhost:5137', // Cambia esto si tu frontend está en otro puerto o dominio
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-    }));
+// Load environment variables
+dotenv.config();
 
-    app.use(express.json());
+// Initialize the app
+const app = express();
 
-    app.use('/api/auth', authRouter);
-    app.use('/api/staff', staffRouter);
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-    export default app; // Use export default
+// Enable CORS
+app.use(cors({
+  origin: 'http://localhost:5137', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Middleware to log incoming requests
+app.use((req, res, next) => {
+  console.log(`🔍 Request received: ${req.method} ${req.url}`);
+  next();
+});
+
+// Define the base URL for API routes
+app.use('/api/auth', authRoutes);
+
+// Start the server
+const port = process.env.PORT || 3307;
+app.listen(port, () => {
+  console.log(`Backend server is running on http://localhost:${port}`);
+});

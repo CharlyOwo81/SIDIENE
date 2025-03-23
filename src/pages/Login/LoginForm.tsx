@@ -1,7 +1,8 @@
 import React from "react";
+import styles from "./Login.module.css";
 
 interface LoginFormProps {
-  telefono: string; // Asegúrate de que esta prop esté definida
+  telefono: string;
   setTelefono: (value: string) => void;
   contrasenia: string;
   setContrasenia: (value: string) => void;
@@ -18,21 +19,41 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
 }) => {
   return (
-    <form onSubmit={onSubmit}>
-      <input
-        type="text"
-        placeholder="Teléfono"
-        value={telefono} // Usa la prop `telefono`
-        onChange={(e) => setTelefono(e.target.value)} // Usa la prop `setTelefono`
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={contrasenia}
-        onChange={(e) => setContrasenia(e.target.value)}
-      />
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+    <form onSubmit={onSubmit} className={styles.loginForm}>
+      <div className={styles.inputGroup}>
+        <label htmlFor="telefono" className={styles.label}>
+          Teléfono
+        </label>
+        <input
+          id="telefono"
+          type="text"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+          placeholder="Ingresa tu teléfono"
+          className={styles.input}
+          disabled={isSubmitting}
+          required
+        />
+      </div>
+
+      <div className={styles.inputGroup}>
+        <label htmlFor="contrasenia" className={styles.label}>
+          Contraseña
+        </label>
+        <input
+          id="contrasenia"
+          type="password"
+          value={contrasenia}
+          onChange={(e) => setContrasenia(e.target.value)}
+          placeholder="Ingresa tu contraseña"
+          className={styles.input}
+          disabled={isSubmitting}
+          required
+        />
+      </div>
+
+      <button type="submit" disabled={isSubmitting} className={styles.button}>
+        {isSubmitting ? "Iniciando sesión" : "Iniciar Sesión"}
       </button>
     </form>
   );

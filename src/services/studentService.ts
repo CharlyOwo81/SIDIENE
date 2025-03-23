@@ -3,7 +3,7 @@ import axios from 'axios';
 export const authService = async (telefono: string, contrasenia: string) => {
   console.log('Sending request:', { telefono, contrasenia });
   try {
-    const response = await axios.post("http://localhost:3307/api/auth/authController", {
+    const response = await axios.post("http://localhost:3307/api/student/studentController", {
       telefono,
       contrasenia,
     }, {

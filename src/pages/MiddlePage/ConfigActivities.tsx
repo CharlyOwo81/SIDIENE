@@ -18,7 +18,7 @@ export const functionalities = [
     label: "Alumnado",
     icon: alumnadoIcon,
     roles: ["DIRECTIVO"],
-    path: "/ManageStudents",
+    path: "/RegisterStudents",
   },
 
   // Grupo 2: Gestión de Canalizaciones

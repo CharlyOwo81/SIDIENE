@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./RolActivities.module.css";
+import navbarStyles from "./Navbar.module.css";
 import { useNavigate } from "react-router-dom";
-import { functionalities } from "./ConfigActivities"; // Importar la configuración
+import { functionalities } from "./ConfigActivities";
 
-// Reusable FunctionButton Component
 interface FunctionButtonProps {
   id: string;
   label: string;
   onClick: () => void;
-  icon?: string; // Cambiar a string para la ruta del icono
+  icon?: string;
 }
 
 const FunctionButton: React.FC<FunctionButtonProps> = ({
@@ -18,29 +18,14 @@ const FunctionButton: React.FC<FunctionButtonProps> = ({
   icon,
 }) => (
   <div className={styles.container}>
-    <button id={id} className={styles.button} onClick={onClick}>
+    <button id={id} className={styles.functionButton} onClick={onClick}>
       {icon && (
         <span className={styles.iconContainer}>
           <img src={icon} alt={label} className={styles.icon} />
         </span>
       )}
-      <label htmlFor={id} className={styles.label}>
-        {label}
-      </label>
+      <span>{label}</span>
     </button>
-  </div>
-);
-
-// Reusable TopicGroup Component
-interface TopicGroupProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-const TopicGroup: React.FC<TopicGroupProps> = ({ title, children }) => (
-  <div className={styles.topicGroup}>
-    <h3>{title}</h3>
-    <div className={styles.buttonGroup}>{children}</div>
   </div>
 );
 
@@ -53,22 +38,30 @@ function RolActivities() {
     | "TRABAJADOR SOCIAL"
     | null;
 
-  // Filtrar funcionalidades permitidas para el rol actual
+  const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
+
+  const entities = [
+    { name: "Personal", keywords: ["Personal"] },
+    { name: "Alumnado", keywords: ["Alumnado"] },
+    { name: "Canalizaciones", keywords: ["canalización", "Channel"] },
+    { name: "Incidencias", keywords: ["incidencias", "Incidents"] },
+    { name: "Expedientes", keywords: ["expediente", "Record"] },
+    { name: "Tutores", keywords: ["Tutors"] },
+  ];
+
   const allowedFunctionalities = functionalities.filter((func) =>
     func.roles.includes(userRole || "")
   );
 
-  // Agrupar funcionalidades por título
-  const groupedFunctionalities = allowedFunctionalities.reduce((acc, func) => {
-    const groupTitle = func.label.split(" ")[0]; // Ejemplo: "Gestión de Personal"
-    if (!acc[groupTitle]) {
-      acc[groupTitle] = [];
-    }
-    acc[groupTitle].push(func);
-    return acc;
-  }, {} as Record<string, typeof functionalities>);
+  const getEntityFunctions = (entityName: string) => {
+    const entity = entities.find((e) => e.name === entityName);
+    return allowedFunctionalities.filter((func) =>
+      entity?.keywords.some((keyword) =>
+        func.label.toLowerCase().includes(keyword.toLowerCase())
+      )
+    );
+  };
 
-  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("rol");
     localStorage.removeItem("nombreCompleto");
@@ -76,32 +69,76 @@ function RolActivities() {
   };
 
   return (
-    <>
-      <div className={styles.header}>
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
         <h2 className={styles.title}>Funciones de {userRole}</h2>
         <div className={styles.overlayDiv}>
           <button className={styles.logoutButton} onClick={handleLogout}>
             Cerrar sesión
           </button>
         </div>
-      </div>
+      </header>
 
-      <div className={styles.gridContainer}>
-        {Object.entries(groupedFunctionalities).map(([title, funcs]) => (
-          <TopicGroup key={title} title={title}>
-            {funcs.map((func) => (
-              <FunctionButton
-                key={func.id}
-                id={func.id}
-                label={func.label}
-                onClick={() => navigate(func.path)}
-                icon={func.icon}
-              />
-            ))}
-          </TopicGroup>
-        ))}
-      </div>
-    </>
+      <nav className={navbarStyles.navbar}>
+        {entities.map((entity) => {
+          const entityFunctions = getEntityFunctions(entity.name);
+          return (
+            <div className={navbarStyles.navItem} key={entity.name}>
+              <button
+                className={`${navbarStyles.navButton} ${
+                  selectedEntity === entity.name ? navbarStyles.active : ""
+                }`}
+                onClick={() => setSelectedEntity(entity.name)}
+              >
+                {entity.name}
+              </button>
+              {entityFunctions.length > 0 && (
+                <div className={navbarStyles.dropdown}>
+                  {entityFunctions.map((func) => (
+                    <button
+                      key={func.id}
+                      className={navbarStyles.dropdownItem}
+                      onClick={() => navigate(func.path)}
+                    >
+                      {func.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+
+      <main className={styles.content}>
+        {selectedEntity ? (
+          <>
+            <h3 className={styles.entityTitle}>{selectedEntity}</h3>
+            <div className={styles.functionGrid}>
+              {getEntityFunctions(selectedEntity).length > 0 ? (
+                getEntityFunctions(selectedEntity).map((func) => (
+                  <FunctionButton
+                    key={func.id}
+                    id={func.id}
+                    label={func.label}
+                    onClick={() => navigate(func.path)}
+                    icon={func.icon}
+                  />
+                ))
+              ) : (
+                <p className={styles.noFunctions}>
+                  No hay funciones disponibles para este rol.
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className={styles.noSelection}>
+            Selecciona una opción para ver sus funciones.
+          </p>
+        )}
+      </main>
+    </div>
   );
 }
 

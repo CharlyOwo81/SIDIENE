@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService";
+import { authService } from "../services/authService";
 
 export const useLogin = () => {
   const [telefono, setTelefono] = useState<string>("");
@@ -16,8 +16,8 @@ export const useLogin = () => {
 
     try {
       console.log("Teléfono:", telefono, "Contraseña:", contrasenia);
-      const response = await login(telefono, contrasenia);
-      if (response.message === "Inicio de sesión exitoso") {
+      const response = await authService(telefono, contrasenia);
+      if (response.message == "Inicio de sesión exitoso") {
         localStorage.setItem("rol", response.user.rol);
         localStorage.setItem(
           "nombreCompleto",

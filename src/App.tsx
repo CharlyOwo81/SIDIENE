@@ -1,12 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login/Login";
-import ManageStaff from "./pages/ManageStaff/AddStaff";
+import ManageStaff from "./pages/ManageStaff/RegisterStaff";
 import Footer from "./assets/components/Footer/Footer";
 import Header from "./assets/components/Header/Header";
 import CreateIncidents from "./pages/ManageIncidents/CreateIncidents/CreateIncidents";
 import RolActivities from "./pages/MiddlePage/RolActivities";
-import ManageStudents from "./pages/ManageStudents/ManageStudents";
+import RegisterStudents from "./pages/ManageStudents/RegisterStudents";
+import QueryStudents from "./pages/ManageStudents/QueryStudents";
+import UpdateStudents from "./pages/ManageStudents/UpdateStudents";
 import ProtectedRoute from "./assets/components/ProtectedRoute/ProtectedRoute";
 import ReadIncidents from "./pages/ManageIncidents/ReadIncidents/ReadIncidents";
 
@@ -33,10 +35,26 @@ function App() {
           }
         />
         <Route
-          path="/ManageStudents"
+          path="/RegisterStudents"
           element={
             <ProtectedRoute>
-              <ManageStudents />
+              <RegisterStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/QueryStudents"
+          element={
+            <ProtectedRoute>
+              <QueryStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UpdateStudents"
+          element={
+            <ProtectedRoute>
+              <UpdateStudents />
             </ProtectedRoute>
           }
         />

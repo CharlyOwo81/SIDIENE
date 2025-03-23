@@ -11,19 +11,22 @@ const Login: React.FC = () => {
     contrasenia,
     setContrasenia,
     alert,
-    setAlert, // Ahora está disponible
+    setAlert,
     isSubmitting,
     handleSubmit,
   } = useLogin();
 
   return (
-    <div className={styles["mainContainer"]}>
-      <div className={styles["containerRight"]}>
+    <div className={styles.mainContainer}>
+      <div className={styles.containerRight}>
+        <h1 className={styles.title}>Iniciar Sesión</h1>
+        <p className={styles.subtitle}>Accede al sistema con tus credenciales</p>
+
         {alert && (
           <Alert
             message={alert.message}
             type={alert.type}
-            onClose={() => setAlert(null)} // Esto ahora funciona
+            onClose={() => setAlert(null)}
           />
         )}
 
@@ -35,7 +38,14 @@ const Login: React.FC = () => {
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
         />
-      </div>  
+
+        <div className={styles.footer}>
+            {/* <a href="/forgot-password" className={styles.forgotLink}>
+            ¿Olvidaste tu contraseña?
+            </a> */}
+          <p>Proyecto SIDIENE - 2025 ©</p>
+        </div>
+      </div>
     </div>
   );
 };
