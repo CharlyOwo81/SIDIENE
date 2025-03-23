@@ -2,7 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './src/routes/authRoutes.js';
-import studentRoutes from './src/routes/studentRoutes.js'; // Correct path from root
+import studentRoutes from './src/routes/studentRoutes.js';
+import staffRoutes from './src/routes/staffRoutes.js';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:5137', // Match your frontend URL
+  origin: 'http://localhost:5174', // Match your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -21,12 +22,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// Define the base URL for API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/staff', staffRoutes);
 
 // 404 Handler (after all routes)
 app.use('*', (req, res) => {
-  res.status(404).send('404! Page not found');
+  res.status(404).send('404: Página no encontrada');
 });
 
 const port = process.env.PORT || 3307;

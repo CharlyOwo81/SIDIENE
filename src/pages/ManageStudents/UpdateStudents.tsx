@@ -8,6 +8,7 @@ import Navbar from "../../assets/components/Navbar/StudentsNavbar";
 import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
 import GoBackButton from "../../assets/components/Button/GoBackButton";
+import { updateStudent } from '../../services/studentsApi';
 
 interface Student {
   curp: string;
@@ -43,7 +44,7 @@ const UpdateStudents: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.get("http://localhost:5000/getStudent", {
+      const response = await axios.get("http://localhost:3307/api/students/updateStudents", {
         params: { curp: searchCurp },
       });
 

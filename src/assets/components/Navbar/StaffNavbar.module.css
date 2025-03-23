@@ -1,0 +1,77 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2.5rem;
+    background: linear-gradient(120deg, #891547 0%, #a51754 70%, #C26444 100%);
+    color: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .navTitle {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .navLinks {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .navLink {
+    color: #F3C44D; /* Yellow from your theme */
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .navLink:hover {
+    color: #E5823E; /* Orange on hover */
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+  
+  .navLink.active {
+    background: rgba(243, 196, 77, 0.2); /* Active link highlight */
+    color: #E5823E;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 1rem 1.5rem;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  
+    .navTitle {
+      font-size: 1.8rem;
+    }
+  
+    .navLinks {
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .navTitle {
+      font-size: 1.5rem;
+    }
+  
+    .navLink {
+      font-size: 1rem;
+      padding: 0.4rem 0.8rem;
+    }
+  }

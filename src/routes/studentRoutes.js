@@ -1,11 +1,24 @@
 import express from 'express';
-import { registerStudentController } from '../controllers/studentsController.js'; // Add .js extension
-import multer from 'multer';
+import {
+  createStudent,
+  getAllStudents,
+  getStudentById,
+  updateStudent,
+  deleteStudent,
+} from '../controllers/studentsController.js';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
 
-// Register student route
-router.post('/register', upload.single('file'), registerStudentController);
+router.post('/', createStudent);
+router.get('/', getAllStudents);
+router.get('/:id', getStudentById);
+router.put('/:id', updateStudent);
+router.delete('/:id', deleteStudent);
+
+// src/routes/studentRoutes.js
+router.post('/', (req, res, next) => {
+  console.log('POST /api/staff called with body:', req.body);
+  next();
+}, createStudent);
 
 export default router;

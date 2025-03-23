@@ -1,8 +1,10 @@
+// src/components/ManageStaff.tsx
 import React, { useState, ChangeEvent } from "react";
-import styles from "./AddStaff.module.css";
 import { motion } from "framer-motion";
-import axios from "axios";
 import Alert from "../../assets/components/Alert/Alert";
+import StaffNavbar from "../../assets/components/Navbar/StaffNavbar"; // New Navbar
+import styles from "./AddStaff.module.css";
+import { createStaff } from "../../services/staffApi";
 
 interface InputFieldProps {
   type: string;
@@ -73,32 +75,41 @@ const ManageStaff: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !formData.curp ||
+      !formData.nombre ||
+      !formData.apellidoPaterno ||
+      !formData.telefono ||
+      !formData.rol
+    ) {
+      setAlert({
+        message: "Por favor, completa todos los campos obligatorios.",
+        type: "error",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const datosFormulario = {
+      id: "",
       curp: formData.curp,
       nombre: formData.nombre,
+      apellido: `${formData.apellidoPaterno} ${formData.apellidoMaterno || ""}`.trim(),
       apellidoPaterno: formData.apellidoPaterno,
-      apellidoMaterno: formData.apellidoMaterno,
+      apellidoMaterno: formData.apellidoMaterno || null,
       telefono: formData.telefono,
       rol: formData.rol,
+      puesto: "",
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/staff/addStaff",
-        datosFormulario,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
+      const response = await createStaff(datosFormulario);
       setAlert({
-        message: `Personal registrado exitosamente.
-        Contraseña: ${response.data.contrasenia}`,
+        message: `Personal registrado exitosamente.`,
         type: "success",
       });
-
       setFormData({
         curp: "",
         nombre: "",
@@ -109,15 +120,8 @@ const ManageStaff: React.FC = () => {
       });
     } catch (error: any) {
       console.error("Error al enviar los datos:", error);
-      let errorMessage = "Ocurrió un error al registrar personal.";
-      if (error.response) {
-        errorMessage =
-          error.response.data.message || "Error desconocido del servidor.";
-      } else if (error.request) {
-        errorMessage = "No se recibió respuesta del servidor.";
-      }
       setAlert({
-        message: errorMessage,
+        message: error.message || "Ocurrió un error al registrar personal.",
         type: "error",
       });
     } finally {
@@ -129,23 +133,30 @@ const ManageStaff: React.FC = () => {
     <motion.section
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6, ease: "easeOut" }} // Adjusted timing
       className={styles.mainContainer}
     >
-      <h1>Gestionar Personal</h1>
+      <StaffNavbar /> {/* Replace h1 with StaffNavbar */}
 
       {alert && (
-        <Alert
-          message={alert.message}
-          type={alert.type}
-          onClose={() => setAlert(null)}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className={styles.alertContainer} // Add alert container class
+        >
+          <Alert
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert(null)}
+          />
+        </motion.div>
       )}
 
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
+        transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }} // Match RegisterStudents
         className={styles.containerRight}
       >
         <h2>Ingresar de manera manual</h2>
@@ -155,47 +166,37 @@ const ManageStaff: React.FC = () => {
             <InputField
               type="text"
               name="curp"
-              placeholder="CURP"
+              placeholder="CURP *"
               value={formData.curp}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, curp: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, curp: e.target.value })}
             />
             <InputField
               type="text"
               name="nombre"
-              placeholder="Nombre"
+              placeholder="Nombre *"
               value={formData.nombre}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, nombre: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             />
             <InputField
               type="text"
               name="apellidoPaterno"
-              placeholder="Apellido Paterno"
+              placeholder="Apellido Paterno *"
               value={formData.apellidoPaterno}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, apellidoPaterno: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, apellidoPaterno: e.target.value })}
             />
             <InputField
               type="text"
               name="apellidoMaterno"
               placeholder="Apellido Materno"
               value={formData.apellidoMaterno}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, apellidoMaterno: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, apellidoMaterno: e.target.value })}
             />
             <InputField
               type="text"
               name="telefono"
-              placeholder="Teléfono"
+              placeholder="Teléfono *"
               value={formData.telefono}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, telefono: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
             />
             <legend>Información Laboral</legend>
             <motion.select
@@ -207,7 +208,7 @@ const ManageStaff: React.FC = () => {
               whileFocus={{ scale: 1.05 }}
               className={styles.select}
             >
-              <option value="">Seleccione un rol</option>
+              <option value="">Seleccione un rol *</option>
               <option value="DIRECTIVO">DIRECTIVO</option>
               <option value="PREFECTO">PREFECTO</option>
               <option value="DOCENTE">DOCENTE</option>

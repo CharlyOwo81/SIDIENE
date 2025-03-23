@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import styles from "./ManageStudents.module.css";
@@ -7,80 +7,85 @@ import Button from "../../assets/components/Button/Button";
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
 import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
-import GoBackButton from "../../assets/components/Button/GoBackButton"; // Import the GoBackButton
+import GoBackButton from "../../assets/components/Button/GoBackButton";
+
+interface Staff {
+  curp: string;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  telefono: string;
+  rol: string;
+}
 
 const QueryStaff: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [searchQuery, setSearchQuery] = useState({
     curp: "",
-    nombres: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    grado: "",
-    grupo: "",
-    anio_ingreso: "",
+    telefono: "",
+    rol: "",
   });
-
-  const [file, setFile] = useState<File | null>(null);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
   const [alert, setAlert] = useState<{
     message: string;
     type: "success" | "error" | "warning" | "info";
   } | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Cargar todos los miembros del personal al montar el componente
+  useEffect(() => {
+    const fetchStaff = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get("http://localhost:5000/api/staff");
+        setStaff(response.data);
+        setFilteredStaff(response.data); // Inicialmente, mostrar todos los registros
+        setAlert({
+          message: "Datos del personal cargados correctamente.",
+          type: "success",
+        });
+      } catch (error: any) {
+        setAlert({
+          message: error.message || "Error al cargar los datos del personal.",
+          type: "error",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStaff();
+  }, []);
+
+  // Manejar cambios en los filtros
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setSearchQuery((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
+  // Aplicar filtros
+  const applyFilters = () => {
+    const filtered = staff.filter((member) => {
+      const matchesCurp = searchQuery.curp
+        ? member.curp.toLowerCase().includes(searchQuery.curp.toLowerCase())
+        : true;
+      const matchesTelefono = searchQuery.telefono
+        ? member.telefono.includes(searchQuery.telefono)
+        : true;
+      const matchesRol = searchQuery.rol
+        ? member.rol.toLowerCase().includes(searchQuery.rol.toLowerCase())
+        : true;
+
+      return matchesCurp && matchesTelefono && matchesRol;
+    });
+
+    setFilteredStaff(filtered);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    const formDataToSend = new FormData();
-    if (file) {
-      formDataToSend.append("file", file);
-    } else {
-      Object.entries(formData).forEach(([key, value]) =>
-        formDataToSend.append(key, value)
-      );
-    }
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/uploadStudents",
-        formDataToSend,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      setAlert({ message: response.data.message, type: "success" });
-      setFormData({
-        curp: "",
-        nombres: "",
-        apellidoPaterno: "",
-        apellidoMaterno: "",
-        grado: "",
-        grupo: "",
-        anio_ingreso: "",
-      });
-      setFile(null);
-    } catch (error: any) {
-      setAlert({
-        message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al procesar la petición."),
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // Ejecutar la búsqueda cuando cambien los filtros
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery]);
 
   return (
     <motion.section
@@ -112,93 +117,70 @@ const QueryStaff: React.FC = () => {
         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         className={styles.container}
       >
-        <h2 className={styles.formTitle}>Registrar Estudiantes</h2>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <h2 className={styles.formTitle}>Consultar Personal</h2>
+        <form className={styles.form}>
           <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Información del Estudiante</legend>
+            <legend className={styles.legend}>Filtros de Búsqueda</legend>
 
-            <FormSection title="Información Personal">
+            <FormSection title="Filtrar por CURP, Teléfono o Rol">
               <InputField
                 type="text"
                 name="curp"
-                placeholder="CURP"
-                value={formData.curp}
-                onChange={handleInputChange}
+                placeholder="Buscar por CURP"
+                value={searchQuery.curp}
+                onChange={handleFilterChange}
               />
               <InputField
                 type="text"
-                name="nombres"
-                placeholder="Nombres"
-                value={formData.nombres}
-                onChange={handleInputChange}
+                name="telefono"
+                placeholder="Buscar por Teléfono"
+                value={searchQuery.telefono}
+                onChange={handleFilterChange}
               />
               <InputField
                 type="text"
-                name="apellidoPaterno"
-                placeholder="Apellido Paterno"
-                value={formData.apellidoPaterno}
-                onChange={handleInputChange}
-              />
-              <InputField
-                type="text"
-                name="apellidoMaterno"
-                placeholder="Apellido Materno"
-                value={formData.apellidoMaterno}
-                onChange={handleInputChange}
+                name="rol"
+                placeholder="Buscar por Rol"
+                value={searchQuery.rol}
+                onChange={handleFilterChange}
               />
             </FormSection>
-
-            <FormSection title="Información Escolar">
-              <InputField
-                type="text"
-                name="grado"
-                placeholder="Grado"
-                value={formData.grado}
-                onChange={handleInputChange}
-              />
-              <InputField
-                type="text"
-                name="grupo"
-                placeholder="Grupo"
-                value={formData.grupo}
-                onChange={handleInputChange}
-              />
-              <InputField
-                type="text"
-                name="anio_ingreso"
-                placeholder="Año de Ingreso"
-                value={formData.anio_ingreso}
-                onChange={handleInputChange}
-              />
-            </FormSection>
-
-            <div className={styles.fileUpload}>
-              <label htmlFor="file-upload" className={styles.fileLabel}>
-                Subir PDF con Datos
-              </label>
-              <InputField
-                type="file"
-                name="file"
-                placeholder="Selecciona un archivo PDF"
-                value={file ? file.name : ""}
-                onChange={handleFileChange}
-              />
-            </div>
-
-            <div className={styles.buttonContainer}>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <span className={styles.spinner}></span> Guardando...
-                  </>
-                ) : (
-                  "Guardar"
-                )}
-              </Button>
-              <GoBackButton /> {/* Add the GoBackButton here */}
-            </div>
           </fieldset>
         </form>
+
+        <div className={styles.tableContainer}>
+          {filteredStaff.length > 0 ? (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>CURP</th>
+                  <th>Nombre Completo</th>
+                  <th>Teléfono</th>
+                  <th>Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredStaff.map((member, index) => (
+                  <motion.tr
+                    key={member.curp}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                  >
+                    <td>{member.curp}</td>
+                    <td>{`${member.nombres} ${member.apellidoPaterno} ${member.apellidoMaterno}`}</td>
+                    <td>{member.telefono}</td>
+                    <td>{member.rol}</td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className={styles.noResults}>
+              No se encontraron resultados con los filtros especificados.
+            </p>
+          )}
+        </div>
       </motion.div>
     </motion.section>
   );

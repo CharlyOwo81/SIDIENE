@@ -1,13 +1,11 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import styles from "./ManageStudents.module.css";
-import InputField from "../../assets/components/InputField/InputField";
-import Button from "../../assets/components/Button/Button";
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
-import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
+import { getAllStudents } from "../../services/studentsApi";
+import SearchAndFilters from "../../assets/components/SearchAndFilters/SearchAndFilters";
+import StudentTable from "../../assets/components/Table/StudentTable";
 
 interface Student {
   curp: string;
@@ -33,6 +31,30 @@ const QueryStudents: React.FC = () => {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Cargar todos los estudiantes al montar el componente
+  useEffect(() => {
+    const fetchStudents = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getAllStudents();
+        setStudents(response.data);
+        setAlert({
+          message: "Estudiantes cargados correctamente.",
+          type: "success",
+        });
+      } catch (error: any) {
+        setAlert({
+          message: error.message || "Error al cargar los estudiantes.",
+          type: "error",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -42,43 +64,31 @@ const QueryStudents: React.FC = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleQuery = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  // Filtrar estudiantes en el frontend
+  const filteredStudents = students.filter((student) => {
+    // Verificar si al menos un filtro tiene un valor
+    const isAnyFilterApplied =
+      filters.grado.trim() !== "" ||
+      filters.grupo.trim() !== "" ||
+      filters.anio_ingreso.trim() !== "";
 
-    try {
-      const response = await axios.get("http://localhost:5000/queryStudents", {
-        params: {
-          search: searchQuery,
-          ...filters,
-        },
-      });
-
-      setStudents(response.data.students || []);
-      setAlert({
-        message: response.data.message || "Consulta realizada con éxito.",
-        type: "success",
-      });
-    } catch (error: any) {
-      setAlert({
-        message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al procesar la consulta."),
-        type: "error",
-      });
-      setStudents([]);
-    } finally {
-      setIsLoading(false);
+    // Si no hay filtros aplicados, no mostrar ningún estudiante
+    if (!isAnyFilterApplied) {
+      return false;
     }
-  };
 
-  const filteredStudents = students.filter((student) =>
-    `${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno} ${student.curp} ${student.grado} ${student.grupo} ${student.anio_ingreso}`
+    // Aplicar la búsqueda y los filtros
+    const matchesSearch = `${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno} ${student.curp} ${student.grado} ${student.grupo} ${student.anio_ingreso}`
       .toLowerCase()
-      .includes(searchQuery.toLowerCase())
-  );
+      .includes(searchQuery.toLowerCase());
+
+    const matchesFilters =
+      (!filters.grado || student.grado === filters.grado) &&
+      (!filters.grupo || student.grupo === filters.grupo) &&
+      (!filters.anio_ingreso || student.anio_ingreso === filters.anio_ingreso);
+
+    return matchesSearch && matchesFilters;
+  });
 
   return (
     <motion.section
@@ -111,84 +121,23 @@ const QueryStudents: React.FC = () => {
         className={styles.container}
       >
         <h2 className={styles.formTitle}>Consultar Estudiantes</h2>
-        <form onSubmit={handleQuery} className={styles.form}>
-          <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Búsqueda y Filtros</legend>
 
-            <FormSection title="Búsqueda General">
-              <InputField
-                type="text"
-                name="search"
-                placeholder="Buscar por nombre, CURP, grado, etc."
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </FormSection>
-
-            <FormSection title="Filtros Específicos">
-              <InputField
-                type="text"
-                name="grado"
-                placeholder="Grado"
-                value={filters.grado}
-                onChange={handleFilterChange}
-              />
-              <InputField
-                type="text"
-                name="grupo"
-                placeholder="Grupo"
-                value={filters.grupo}
-                onChange={handleFilterChange}
-              />
-              <InputField
-                type="text"
-                name="anio_ingreso"
-                placeholder="Año de Ingreso"
-                value={filters.anio_ingreso}
-                onChange={handleFilterChange}
-              />
-            </FormSection>
-
-            <div className={styles.buttonContainer}>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <span className={styles.spinner}></span> Buscando...
-                  </>
-                ) : (
-                  "Buscar"
-                )}
-              </Button>
-              <GoBackButton />
-            </div>
-          </fieldset>
-        </form>
+        <SearchAndFilters
+          searchQuery={searchQuery}
+          filters={filters}
+          onSearchChange={handleSearchChange}
+          onFilterChange={handleFilterChange}
+        />
 
         <div className={styles.tableContainer}>
-          {filteredStudents.length > 0 ? (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Nombre Completo</th>
-                  <th>Grado y Grupo</th>
-                  <th>CURP</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStudents.map((student, index) => (
-                  <motion.tr
-                    key={student.curp}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.3 }}
-                  >
-                    <td>{`${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno}`}</td>
-                    <td>{`${student.grado} - ${student.grupo}`}</td>
-                    <td>{student.curp}</td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+          {filters.grado.trim() === "" &&
+          filters.grupo.trim() === "" &&
+          filters.anio_ingreso.trim() === "" ? (
+            <p className={styles.noResults}>
+              Por favor, aplica al menos un filtro para ver los resultados.
+            </p>
+          ) : filteredStudents.length > 0 ? (
+            <StudentTable students={filteredStudents} />
           ) : (
             <p className={styles.noResults}>
               No se encontraron estudiantes con los criterios especificados.

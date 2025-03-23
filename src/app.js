@@ -19,7 +19,7 @@ app.all('*', (req, res) => {
 
 // Enable CORS
 app.use(cors({
-  origin: 'http://localhost:5137', // Replace with your frontend URL
+  origin: 'http://localhost:5174', // Replace with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
