@@ -1,38 +1,38 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './src/routes/authRoutes.js'; // Adjust the path as needed
+import authRoutes from './src/routes/authRoutes.js';
+import studentRoutes from './src/routes/studentRoutes.js'; // Correct path from root
 
-// Load environment variables
 dotenv.config();
 
-// Initialize the app
 const app = express();
 
-// Middleware to parse JSON bodies
 app.use(express.json());
 
-// Enable CORS
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5137', // Match your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
-// Middleware to log incoming requests
 app.use((req, res, next) => {
   console.log(`🔍 Request received: ${req.method} ${req.url}`);
   next();
 });
 
-
-// Define the base URL for API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
 
-// Start the server
+// 404 Handler (after all routes)
+app.use('*', (req, res) => {
+  res.status(404).send('404! Page not found');
+});
+
 const port = process.env.PORT || 3307;
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
-
-
-
 
 
 // Crear una instancia de la aplicación Express

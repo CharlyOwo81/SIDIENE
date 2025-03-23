@@ -1,9 +1,11 @@
 import express from 'express';
-import { addStaff } from '../controllers/staffController.js';
-import db from '../config/db.js';
+import { registerStudentController } from '../controllers/studentsController.js'; // Add .js extension
+import multer from 'multer';
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
 
-router.post('/addStaff', addStaff);
+// Register student route
+router.post('/register', upload.single('file'), registerStudentController);
 
 export default router;

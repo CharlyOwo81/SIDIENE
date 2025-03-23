@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './src/routes/authRoutes.js'; // Adjust the path as needed
+import authRoutes from '../src/routes/authRoutes.js';
+import studentRoutes from '../src/routes/studentRoutes.js'; // Adjust the path as needed
 
 // Load environment variables
 dotenv.config();
@@ -11,6 +12,10 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+app.all('*', (req, res) => {
+  res.status(404).send('404! Page not found');
+});
 
 // Enable CORS
 app.use(cors({
@@ -27,6 +32,7 @@ app.use((req, res, next) => {
 
 // Define the base URL for API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
 
 // Start the server
 const port = process.env.PORT || 3307;

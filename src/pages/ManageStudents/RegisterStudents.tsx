@@ -7,7 +7,7 @@ import Button from "../../assets/components/Button/Button";
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
 import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
-import GoBackButton from "../../assets/components/Button/GoBackButton"; // Import the GoBackButton
+import GoBackButton from "../../assets/components/Button/GoBackButton";
 
 const RegisterStudents: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -38,22 +38,21 @@ const RegisterStudents: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const formDataToSend = new FormData();
     if (file) {
       formDataToSend.append("file", file);
-    } else {
-      Object.entries(formData).forEach(([key, value]) =>
-        formDataToSend.append(key, value)
-      );
     }
+    Object.entries(formData).forEach(([key, value]) =>
+      formDataToSend.append(key, value)
+    );
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/uploadStudents",
+        "http://localhost:3307/api/students/register", // Updated endpoint
         formDataToSend,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -68,13 +67,14 @@ const RegisterStudents: React.FC = () => {
         anio_ingreso: "",
       });
       setFile(null);
-    } catch (error: any) {
+    } catch (error) {
       setAlert({
         message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al procesar la petición."),
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : axios.isAxiosError(error) && error.request
+            ? "No response from server."
+            : "Error processing the request.",
         type: "error",
       });
     } finally {
@@ -176,12 +176,12 @@ const RegisterStudents: React.FC = () => {
               <label htmlFor="file-upload" className={styles.fileLabel}>
                 Subir PDF con Datos
               </label>
-              <InputField
+              <input
                 type="file"
+                id="file-upload"
                 name="file"
-                placeholder="Selecciona un archivo PDF"
-                value={file ? file.name : ""}
                 onChange={handleFileChange}
+                className={styles.input} // Use CSS class directly
               />
             </div>
 
@@ -195,7 +195,7 @@ const RegisterStudents: React.FC = () => {
                   "Guardar"
                 )}
               </Button>
-              <GoBackButton /> {/* Add the GoBackButton here */}
+              <GoBackButton />
             </div>
           </fieldset>
         </form>
