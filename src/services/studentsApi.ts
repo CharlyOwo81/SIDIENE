@@ -32,9 +32,18 @@ export const createStudent = async (studentData: StudentData): Promise<ApiRespon
   }
 };
 
-export const getAllStudents = async (): Promise<ApiResponse> => {
+export const getAllStudents = async (
+  searchQuery: string,
+  filters: { grado: string[]; grupo: string[]; }
+): Promise<ApiResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/students`);
+    const response = await axios.get(`${API_URL}/students`, {
+      params: {
+        searchQuery,
+        grado: filters.grado.join(','),
+        grupo: filters.grupo.join(','),
+      },
+    });
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -43,7 +52,6 @@ export const getAllStudents = async (): Promise<ApiResponse> => {
     throw new Error('An unknown error occurred');
   }
 };
-
 export const getStudentById = async (id: string): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/students/${id}`);

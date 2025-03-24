@@ -67,4 +67,59 @@
   margin-right: 0.5rem;
 }
 
-/* Rest of the styles remain unchanged */
+/* src/pages/ManageStudents/ManageStudents.module.css */
+.tableContainer {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.table {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Customize MUI DataGrid */
+.table :global(.MuiDataGrid-root) {
+  border: none;
+  font-family: "Montserrat", sans-serif;
+}
+
+.table :global(.MuiDataGrid-columnHeaders) {
+  background: linear-gradient(120deg, #891547 0%, #C26444 100%);
+  color: #F3C44D;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.table :global(.MuiDataGrid-cell) {
+  color: #333;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(229, 130, 62, 0.2);
+}
+
+.table :global(.MuiDataGrid-row:hover) {
+  background-color: rgba(243, 196, 77, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.table :global(.MuiDataGrid-footerContainer) {
+  background: #f9f9f9;
+  border-top: 1px solid #E5823E;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tableContainer {
+    margin-top: 1.5rem;
+  }
+
+  .table :global(.MuiDataGrid-columnHeaderTitle) {
+    font-size: 1rem;
+  }
+
+  .table :global(.MuiDataGrid-cell) {
+    font-size: 0.9rem;
+  }
+} 

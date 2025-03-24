@@ -1,6 +1,7 @@
-// components/StudentTable/StudentTable.tsx
+// src/assets/components/Table/StudentTable.tsx
 import React from "react";
 import { motion } from "framer-motion";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import styles from "../../../pages/ManageStudents/ManageStudents.module.css";
 
 interface Student {
@@ -17,31 +18,41 @@ interface StudentTableProps {
   students: Student[];
 }
 
+const columns: GridColDef[] = [
+  { field: "curp", headerName: "CURP", width: 200 },
+  { field: "nombres", headerName: "Nombres", width: 150 },
+  { field: "apellidoPaterno", headerName: "Apellido Paterno", width: 150 },
+  { field: "apellidoMaterno", headerName: "Apellido Materno", width: 150 },
+  { field: "grado", headerName: "Grado", width: 100 },
+  { field: "grupo", headerName: "Grupo", width: 100 },
+];
+
 const StudentTable: React.FC<StudentTableProps> = ({ students }) => {
+  // Map students to include an 'id' field required by DataGrid (using curp as unique identifier)
+  const rows = students.map((student) => ({
+    id: student.curp, // DataGrid requires a unique 'id' field
+    ...student,
+  }));
+
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          <th>Nombre Completo</th>
-          <th>Grado y Grupo</th>
-          <th>CURP</th>
-        </tr>
-      </thead>
-      <tbody>
-        {students.map((student, index) => (
-          <motion.tr
-            key={student.curp}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
-          >
-            <td>{`${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno}`}</td>
-            <td>{`${student.grado} - ${student.grupo}`}</td>
-            <td>{student.curp}</td>
-          </motion.tr>
-        ))}
-      </tbody>
-    </table>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={styles.tableContainer}
+    >
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSizeOptions={[5, 10, 20]}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 5 } },
+        }}
+        className={styles.table}
+        autoHeight
+        disableRowSelectionOnClick
+      />
+    </motion.div>
   );
 };
 

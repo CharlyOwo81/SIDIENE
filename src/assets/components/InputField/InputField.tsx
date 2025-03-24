@@ -9,6 +9,7 @@ interface InputFieldProps {
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   error?: boolean;
+  disabled?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -17,7 +18,7 @@ const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   value,
   onChange,
-  error,
+  error = false, // Default to false if not provided
 }) => (
   <motion.input
     type={type}
@@ -29,6 +30,7 @@ const InputField: React.FC<InputFieldProps> = ({
     whileHover={{ scale: 1.01 }}
     className={`${styles.input} ${error ? styles.error : ""} ${type === "file" ? styles.fileInput : ""}`}
     transition={{ type: "spring", stiffness: 300 }}
+    disabled={false}
   />
 );
 

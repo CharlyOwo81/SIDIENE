@@ -1,52 +1,55 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
-import styles from "./ManageStudents.module.css";
-import InputField from "../../assets/components/InputField/InputField";
-import Button from "../../assets/components/Button/Button";
+import styles from "./AddStaff.module.css";
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
-import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
+import { getAllStudents } from "../../services/studentsApi";
+import SearchAndFilters from "../../assets/components/SearchAndFilters/SearchAndFilters";
+import StudentTable from "../../assets/components/Table/StudentTable";
 
-interface Staff {
+interface Student {
   curp: string;
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  telefono: string;
-  rol: string;
+  grado: string;
+  grupo: string;
+  anio_ingreso: string;
 }
 
 const QueryStaff: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState({
-    curp: "",
-    telefono: "",
-    rol: "",
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<{
+    grado: string[];
+    grupo: string[];
+    anio_ingreso: string[];
+  }>({
+    grado: [],
+    grupo: [],
+    anio_ingreso: [],
   });
-  const [staff, setStaff] = useState<Staff[]>([]);
-  const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [alert, setAlert] = useState<{
     message: string;
     type: "success" | "error" | "warning" | "info";
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Cargar todos los miembros del personal al montar el componente
+  // Cargar todos los estudiantes al montar el componente
   useEffect(() => {
-    const fetchStaff = async () => {
+    const fetchStudents = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get("http://localhost:5000/api/staff");
-        setStaff(response.data);
-        setFilteredStaff(response.data); // Inicialmente, mostrar todos los registros
+        const response = await getAllStudents();
+        setStudents(response.data);
         setAlert({
-          message: "Datos del personal cargados correctamente.",
+          message: "Estudiantes cargados correctamente.",
           type: "success",
         });
       } catch (error: any) {
         setAlert({
-          message: error.message || "Error al cargar los datos del personal.",
+          message: error.message || "Error al cargar los estudiantes.",
           type: "error",
         });
       } finally {
@@ -54,38 +57,44 @@ const QueryStaff: React.FC = () => {
       }
     };
 
-    fetchStaff();
+    fetchStudents();
   }, []);
 
-  // Manejar cambios en los filtros
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSearchQuery((prev) => ({ ...prev, [name]: value }));
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  // Aplicar filtros
-  const applyFilters = () => {
-    const filtered = staff.filter((member) => {
-      const matchesCurp = searchQuery.curp
-        ? member.curp.toLowerCase().includes(searchQuery.curp.toLowerCase())
-        : true;
-      const matchesTelefono = searchQuery.telefono
-        ? member.telefono.includes(searchQuery.telefono)
-        : true;
-      const matchesRol = searchQuery.rol
-        ? member.rol.toLowerCase().includes(searchQuery.rol.toLowerCase())
-        : true;
+  const handleFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { name, options } = e.target;
+    const selectedOptions = Array.from(options)
+      .filter((option) => option.selected)
+      .map((option) => option.value);
 
-      return matchesCurp && matchesTelefono && matchesRol;
+    setFilters((prev) => ({ ...prev, [name]: selectedOptions }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    filterStudents();
+  };
+
+  const filterStudents = () => {
+    const filtered = students.filter((student) => {
+      const matchesSearch = `${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno} ${student.curp} ${student.grado} ${student.grupo} ${student.anio_ingreso}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      const matchesFilters =
+        (filters.grado.length === 0 || filters.grado.includes(student.grado)) &&
+        (filters.grupo.length === 0 || filters.grupo.includes(student.grupo)) &&
+        (filters.anio_ingreso.length === 0 ||
+          filters.anio_ingreso.includes(student.anio_ingreso));
+
+      return matchesSearch && matchesFilters;
     });
 
-    setFilteredStaff(filtered);
+    setFilteredStudents(filtered);
   };
-
-  // Ejecutar la búsqueda cuando cambien los filtros
-  useEffect(() => {
-    applyFilters();
-  }, [searchQuery]);
 
   return (
     <motion.section
@@ -117,67 +126,76 @@ const QueryStaff: React.FC = () => {
         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         className={styles.container}
       >
-        <h2 className={styles.formTitle}>Consultar Personal</h2>
-        <form className={styles.form}>
-          <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Filtros de Búsqueda</legend>
+        <h2 className={styles.formTitle}>Consultar Estudiantes</h2>
 
-            <FormSection title="Filtrar por CURP, Teléfono o Rol">
-              <InputField
-                type="text"
-                name="curp"
-                placeholder="Buscar por CURP"
-                value={searchQuery.curp}
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.searchBar}>
+            <input
+              type="text"
+              placeholder="Buscar estudiantes..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <div className={styles.filters}>
+            <label>
+              Grado:
+              <select
+                name="grado"
+                multiple
                 onChange={handleFilterChange}
-              />
-              <InputField
-                type="text"
-                name="telefono"
-                placeholder="Buscar por Teléfono"
-                value={searchQuery.telefono}
+                value={filters.grado}
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                {/* Add more options as needed */}
+              </select>
+            </label>
+
+            <label>
+              Grupo:
+              <select
+                name="grupo"
+                multiple
                 onChange={handleFilterChange}
-              />
-              <InputField
-                type="text"
-                name="rol"
-                placeholder="Buscar por Rol"
-                value={searchQuery.rol}
+                value={filters.grupo}
+              >
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                {/* Add more options as needed */}
+              </select>
+            </label>
+
+            <label>
+              Año de Ingreso:
+              <select
+                name="anio_ingreso"
+                multiple
                 onChange={handleFilterChange}
-              />
-            </FormSection>
-          </fieldset>
+                value={filters.anio_ingreso}
+              >
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                {/* Add more options as needed */}
+              </select>
+            </label>
+          </div>
+
+          <button type="submit" className={styles.submitButton}>
+            Buscar
+          </button>
         </form>
 
         <div className={styles.tableContainer}>
-          {filteredStaff.length > 0 ? (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>CURP</th>
-                  <th>Nombre Completo</th>
-                  <th>Teléfono</th>
-                  <th>Rol</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStaff.map((member, index) => (
-                  <motion.tr
-                    key={member.curp}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.3 }}
-                  >
-                    <td>{member.curp}</td>
-                    <td>{`${member.nombres} ${member.apellidoPaterno} ${member.apellidoMaterno}`}</td>
-                    <td>{member.telefono}</td>
-                    <td>{member.rol}</td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+          {filteredStudents.length > 0 ? (
+            <StudentTable students={filteredStudents} />
           ) : (
             <p className={styles.noResults}>
-              No se encontraron resultados con los filtros especificados.
+              No se encontraron estudiantes con los criterios especificados.
             </p>
           )}
         </div>

@@ -2,13 +2,10 @@ import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import styles from "./ManageStudents.module.css";
-import InputField from "../../assets/components/InputField/InputField";
-import Button from "../../assets/components/Button/Button";
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
-import FormSection from "../../assets/components/FormSection/FormSection";
 import Alert from "../../assets/components/Alert/Alert";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
-import { updateStudent } from '../../services/studentsApi';
+import SearchStudentForm from "./SearchStudentForm";
+import UpdateStudentForm from "./UpdateStudentForm";
 
 interface Student {
   curp: string;
@@ -17,7 +14,7 @@ interface Student {
   apellidoMaterno: string;
   grado: string;
   grupo: string;
-  anio_ingreso: string;
+  estatus: string;
 }
 
 const UpdateStudents: React.FC = () => {
@@ -34,7 +31,7 @@ const UpdateStudents: React.FC = () => {
     setSearchCurp(e.target.value);
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
   };
@@ -42,14 +39,12 @@ const UpdateStudents: React.FC = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
-      const response = await axios.get("http://localhost:3307/api/students/updateStudents", {
-        params: { curp: searchCurp },
-      });
-
-      if (response.data.student) {
-        setFormData(response.data.student);
+      const response = await axios.get(`http://localhost:3307/api/students/${searchCurp}`);
+  
+      if (response.data) {
+        setFormData(response.data); // Ensure the response matches the Student interface
         setAlert({
           message: "Estudiante encontrado.",
           type: "success",
@@ -75,20 +70,20 @@ const UpdateStudents: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
-
+  
     setIsSubmitting(true);
-
+  
     try {
       const response = await axios.put(
-        "http://localhost:5000/updateStudent",
+        `http://localhost:3307/api/students/${formData.curp}`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
-
+  
       setAlert({
         message: response.data.message || "Estudiante actualizado con éxito.",
         type: "success",
@@ -138,106 +133,22 @@ const UpdateStudents: React.FC = () => {
         className={styles.container}
       >
         <h2 className={styles.formTitle}>Actualizar Estudiantes</h2>
-        <form onSubmit={handleSearch} className={styles.form}>
-          <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Buscar Estudiante</legend>
-            <FormSection title="CURP del Estudiante">
-              <InputField
-                type="text"
-                name="curp"
-                placeholder="Ingrese el CURP"
-                value={searchCurp}
-                onChange={handleSearchChange}
-              />
-            </FormSection>
-            <div className={styles.buttonContainer}>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <span className={styles.spinner}></span> Buscando...
-                  </>
-                ) : (
-                  "Buscar"
-                )}
-              </Button>
-              <GoBackButton />
-            </div>
-          </fieldset>
-        </form>
+
+        <SearchStudentForm
+          searchCurp={searchCurp}
+          isLoading={isLoading}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearch}
+        />
 
         {formData && (
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <fieldset className={styles.fieldset}>
-              <legend className={styles.legend}>Actualizar Datos</legend>
-
-              <FormSection title="Información Personal">
-                <InputField
-                  type="text"
-                  name="nombres"
-                  placeholder="Nombres"
-                  value={formData.nombres}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  type="text"
-                  name="apellidoPaterno"
-                  placeholder="Apellido Paterno"
-                  value={formData.apellidoPaterno}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  type="text"
-                  name="apellidoMaterno"
-                  placeholder="Apellido Materno"
-                  value={formData.apellidoMaterno}
-                  onChange={handleInputChange}
-                />
-              </FormSection>
-
-              <FormSection title="Información Escolar">
-                <InputField
-                  type="text"
-                  name="grado"
-                  placeholder="Grado"
-                  value={formData.grado}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  type="text"
-                  name="grupo"
-                  placeholder="Grupo"
-                  value={formData.grupo}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  type="text"
-                  name="anio_ingreso"
-                  placeholder="Año de Ingreso"
-                  value={formData.anio_ingreso}
-                  onChange={handleInputChange}
-                />
-              </FormSection>
-
-              <div className={styles.buttonContainer}>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <span className={styles.spinner}></span> Actualizando...
-                    </>
-                  ) : (
-                    "Actualizar"
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => setFormData(null)}
-                  disabled={isSubmitting}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </fieldset>
-          </form>
+          <UpdateStudentForm
+            formData={formData}
+            isSubmitting={isSubmitting}
+            onInputChange={handleInputChange}
+            onSubmit={handleSubmit}
+            onCancel={() => setFormData(null)}
+          />
         )}
       </motion.div>
     </motion.section>
