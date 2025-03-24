@@ -28,16 +28,31 @@ export const createStaff = async (staffData: StaffData): Promise<ApiResponse> =>
     throw new Error('Un error desconocido ha ocurrido.');
   }
 };
+interface StaffFilters {
+  rol?: string[];
+  estatus?: string[];
+}
 
-export const getAllStaff = async (): Promise<ApiResponse> => {
+export const getAllStaff = async (params: {
+  searchQuery?: string;
+  filters?: StaffFilters;
+}): Promise<ApiResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/staff`);
-    return response;
+    const response = await axios.get(`${API_URL}/staff`, {
+      params: {
+        searchQuery: params.searchQuery,
+        filters: JSON.stringify(params.filters)
+      }
+    });
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Error fetching staff');
+      throw new Error(
+        error.response?.data?.message || 
+        'Error al obtener el personal. Por favor verifique los parámetros.'
+      );
     }
-    throw new Error('An unknown error occurred');
+    throw new Error('Error desconocido al obtener el personal');
   }
 };
 

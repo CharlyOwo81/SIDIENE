@@ -5,10 +5,12 @@ import {
   getStudentByCurp,
   updateStudent,
   deleteStudent,
+  uploadPdf,
 } from '../controllers/studentsController.js';
 
 const router = express.Router();
 
+router.post('/upload-pdf', uploadPdf);
 router.post('/', createStudent);
 router.get('/', getAllStudents);
 router.get('/:curp', getStudentByCurp); // Get a student by CURP

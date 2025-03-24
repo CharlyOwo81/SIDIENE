@@ -1,79 +1,173 @@
-.fieldset {
-    font-size: 1rem;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 50px;
-}
-
-.input {
-    font-size: 1rem;
-    width: 95%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 50px;
-}
-
-.select {
-    font-size: 1rem;
-    width: 94%;
-    padding: 10px;
-    margin: 10px 10px;
-    border: 1px solid #ccc;
-    border-radius: 50px;
-}
-
-.button {
-    font-size: 1rem;
-    position: relative;
-    align-self: center;
-    width: 30%;
-    padding: 10px;
-    background-color: #891547;
-    border: none;
-    color: white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 16px;
-    display: block;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.inputFile{
-    font-size: 1rem;
-    width: 94%;
-    padding: 10px;
-    margin: 10px 10px;
-    border: 1px solid #ccc;
-    border-radius: 50px;
-}
-
-/* Contenedor principal */
+/* Estructura principal */
 .mainContainer {
     display: flex;
-    /* Usa flexbox para alinear los contenedores */
-    justify-content: space-between;
-    /* Espacio entre los contenedores */
-    align-items: center;
-    /* Centra verticalmente */
-    height: 100vh;
-    /* Altura completa de la ventana */
-}
-
-.containerLeft,
-.containerRight {
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f4f4f4;
+  }
+  
+  .contentContainer {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 2rem;
+    margin-top: 30px; /* Ajusta según la altura de tu navbar */
+  }
+  
+  /* Estilos del formulario */
+  .formContainer {
+    width: 130%;
+    margin: 0 auto;
+    padding: 3rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(229, 130, 62, 0.3);
+  }
+  .fieldset {
+    width: 91%;
+    padding: 1.5rem;
+    border: 2px solid #E5823E;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .legend {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #C26444;
+    padding: 0 1rem;
+    background: #fff;
+    border-radius: 8px;
+    font-family: "Montserrat", sans-serif;
+  }
+  
+  .inputWrapper {
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+  
+  .input {
+    width: 91%;
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    border: 2px solid #E5823E;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+  }
+  
+  .input:focus {
+    border-color: #F3C44D;
+    box-shadow: 0 0 10px rgba(243, 196, 77, 0.4), inset 0 2px 6px rgba(0, 0, 0, 0.05);
+    outline: none;
+  }
+  
+  .select {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    border: 2px solid #E5823E;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+    cursor: pointer;
+  }
+  
+  .select:focus {
+    border-color: #F3C44D;
+    box-shadow: 0 0 10px rgba(243, 196, 77, 0.4);
+    outline: none;
+  }
+  
+  .buttonContainer {
+    display: flex;
     justify-content: center;
-    height: 89vh;
-    /* Mitad de la altura de la ventana */
-    width: 48%;
-    /* Ancho casi igual para ambos contenedores */
-    background-color: #f4f4f4;
-    /* Borde para visualización */
-    padding: 20px;
-}
+    margin-top: 1.5rem;
+  }
+  
+  .button {
+    font-size: 1.1rem;
+    width: 50%;
+    max-width: 200px;
+    padding: 0.9rem;
+    background: linear-gradient(120deg, #891547, #C26444);
+    border: none;
+    color: #F3C44D;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .button:hover {
+    background: linear-gradient(120deg, #C26444, #891547);
+    box-shadow: 0 4px 12px rgba(137, 21, 71, 0.4);
+  }
+  
+  .button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #666;
+  }
+  
+  .mainContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background: #f4f4f4;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .containerRight {
+      width: 100%;
+      max-width: 100%;
+      padding: 1.5rem;
+    }
+  
+    .formTitle {
+      font-size: 1.8rem;
+    }
+  
+    .legend {
+      font-size: 1.2rem;
+    }
+  
+    .input,
+    .select,
+    .button {
+      font-size: 1rem;
+      padding: 0.8rem 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .containerRight {
+      padding: 1rem;
+    }
+  
+    .formTitle {
+      font-size: 1.5rem;
+    }
+  
+    .input,
+    .select,
+    .button {
+      font-size: 0.9rem;
+    }
+  
+    .button {
+      width: 100%;
+      max-width: 150px;
+    }
+  }

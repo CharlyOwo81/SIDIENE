@@ -1,118 +1,254 @@
 import Student from '../models/studentModel.js';
+import multer from 'multer';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 
-export const createStudent = async (req, res) => {
-  try {
-    const { curp, nombres, apellidoPaterno, apellidoMaterno, grado, grupo, anio_ingreso } = req.body;
+const upload = multer({ storage: multer.memoryStorage() });
 
-    // Validar que el grado sea uno de los permitidos
-    const validGrados = ['1', '2', '3'];
-    if (!validGrados.includes(grado)) {
-      return res.status(400).json({ error: `Invalid grado value: ${grado}. Allowed values are 1, 2, 3.` });
+export const uploadPdf = [
+  upload.single('file'),
+  async (req, res) => {
+    try {
+      console.log('Upload PDF endpoint hit');
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      console.log('File received:', {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      });
+
+      const pdfBuffer = req.file.buffer;
+      const pdfUint8Array = new Uint8Array(pdfBuffer);
+
+      const loadingTask = pdfjsLib.getDocument({ data: pdfUint8Array });
+      const pdf = await loadingTask.promise;
+
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map((item) => item.str).join(' ');
+        text += pageText + '\n';
+      }
+      console.log('Extracted text:', text.substring(0, 200) + '...');
+
+      const students = parseStudentsFromPdf(text);
+      console.log('Parsed students:', students);
+
+      if (students.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No valid students found in the PDF',
+          sampleText: text.substring(0, 500) || 'No text available',
+        });
+      }
+
+      const errors = [];
+      const validStudents = students.filter((student, index) => {
+        if (!student.curp || !/^[A-Za-z0-9]{18}$/.test(student.curp)) {
+          errors.push(`Line ${index + 1}: Invalid CURP (${student.curp})`);
+          return false;
+        }
+        if (!student.nombres) {
+          errors.push(`Line ${index + 1}: Name is required`);
+          return false;
+        }
+        return true;
+      });
+
+      const result = await Student.bulkCreate(validStudents);
+      console.log('Database result:', result);
+
+      return res.status(201).json({
+        success: true,
+        message: `${validStudents.length} estudiantes procesados (${result.created} nuevos, ${result.updated} actualizados)`,
+        data: {
+          valid: validStudents.length,
+          created: result.created,
+          updated: result.updated,
+          errors: errors.length > 0 ? errors : undefined,
+        },
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      if (error instanceof multer.MulterError) {
+        return res.status(400).json({ message: 'File upload error', error: error.message });
+      }
+      return res.status(500).json({ message: 'Server error', error: error.message });
     }
+  },
+];
 
-    // Insertar el estudiante en la base de datos
-    const studentId = await Student.create(req.body);
-    res.status(201).json({ id: studentId, message: 'Estudiante creado de manera exitosa.' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+function parseStudentsFromPdf(text) {
+  // Split by tabs or multiple spaces to get all columns
+  const columns = text.split(/\t|\s{2,}/).filter((col) => col.trim());
+  console.log('All columns:', columns);
+
+  if (columns.length < 7) {
+    console.log('Not enough columns to parse');
+    return [];
   }
-};
-export const getAllStudents = async (req, res) => {
-  try {
-    const { searchQuery, grado, grupo } = req.query;
 
-    let query = `
-      SELECT nombres, apellido_paterno, apellido_materno, grado, grupo, curp
-      FROM estudiante
-      WHERE 1=1
-    `;
-    const values = [];
+  const students = [];
+  const headerRegex = /CURP\s*Nombres/i;
+  const curpRegex = /^[A-Za-z0-9]{18}$/;
 
-    if (searchQuery) {
-      query += ` AND (nombres LIKE ? OR apellido_paterno LIKE ? OR apellido_materno LIKE ? OR curp LIKE ? OR grado LIKE ? OR grupo LIKE ? OR anio_ingreso LIKE ?)`;
-      values.push(`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`);
-    }
-
-    if (grado) {
-      query += ` AND grado IN (${grado.split(',').map(() => '?').join(',')})`;
-      values.push(...grado.split(','));
-    }
-
-    if (grupo) {
-      query += ` AND grupo IN (${grupo.split(',').map(() => '?').join(',')})`;
-      values.push(...grupo.split(','));
-    }
-
-    console.log('Query:', query);
-    console.log('Values:', values);
-
-    const rows = await Student.query(query, values);
-
-    // Formatear los datos para manejar valores null o undefined
-    const formattedRows = rows.map(student => ({
-      nombres: student.nombres || '', // Si es null o undefined, se asigna una cadena vacía
-      apellidoPaterno: student.apellido_paterno || '',
-      apellidoMaterno: student.apellido_materno || '',
-      grado: student.grado || '',
-      grupo: student.grupo || '',
-      curp: student.curp || '',
-    }));
-
-    res.status(200).json(formattedRows);
-  } catch (error) {
-    console.error('Error fetching students:', error);
-    res.status(500).json({ error: error.message });
+  // Check if the first column is part of the header
+  let startIndex = 0;
+  if (headerRegex.test(columns[0])) {
+    startIndex = 7; // Skip the 7 header columns
   }
-};
 
+  // Process columns in groups of 7
+  for (let i = startIndex; i < columns.length; i += 7) {
+    if (i + 6 < columns.length) { // Ensure we have all 7 columns
+      const student = {
+        curp: columns[i],
+        nombres: columns[i + 1],
+        apellidoPaterno: columns[i + 2],
+        apellidoMaterno: columns[i + 3],
+        grado: columns[i + 4],
+        grupo: columns[i + 5],
+        anio_ingreso: columns[i + 6],
+      };
 
-export const getStudentByCurp = async (req, res) => {
-  try {
-    const { curp } = req.params;
-
-    const query = `SELECT * FROM estudiante WHERE curp = ?`;
-    const rows = await Student.query(query, [curp]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "Estudiante no encontrado." });
+      if (curpRegex.test(student.curp) && student.nombres) {
+        students.push(student);
+      } else {
+        console.warn(`Invalid student data at index ${i}:`, student);
+      }
+    } else {
+      console.warn(`Incomplete student data at index ${i}:`, columns.slice(i));
     }
-
-    res.status(200).json(rows[0]);
-  } catch (error) {
-    console.error("Error fetching student:", error);
-    res.status(500).json({ error: error.message });
   }
-};
 
+  console.log('Parsed students:', students);
+  return students;
+}
+  export const createStudent = async (req, res) => {
+    try {
+      const { curp, nombres, apellidoPaterno, apellidoMaterno, grado, grupo, anio_ingreso } = req.body;
 
-export const updateStudent = async (req, res) => {
-  try {
-    const { curp } = req.params;
-    const updatedData = req.body;
+      if (!curp || !nombres || !apellidoPaterno || !apellidoMaterno || !grado || !grupo || !anio_ingreso) {
+        return res.status(400).json({ error: 'Todos los campos son requeridos.' });
+      }
 
-    // Update the student
-    const result = await Student.updateById(curp, updatedData);
+      // Validar que el grado sea uno de los permitidos
+      const validGrados = ['1', '2', '3'];
+      if (!validGrados.includes(grado)) {
+        return res.status(400).json({ error: `Invalid grado value: ${grado}. Allowed values are 1, 2, 3.` });
+      }
 
-    if (!result) {
-      return res.status(404).json({ message: 'Estudiante no encontrado' });
+      // Insertar el estudiante en la base de datos
+      const studentId = await Student.create(req.body);
+      res.status(201).json({ id: studentId, message: 'Estudiante creado de manera exitosa.' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
+  };
+  export const getAllStudents = async (req, res) => {
+    try {
+      const { searchQuery, grado, grupo } = req.query;
 
-    // Fetch the updated student data
-    const updatedStudent = await Student.getById(curp);
+      let query = `
+        SELECT nombres, apellido_paterno, apellido_materno, grado, grupo, curp
+        FROM estudiante
+        WHERE 1=1
+      `;
+      const values = [];
 
-    res.status(200).json({ message: 'Estudiante actualizado con éxito', student: updatedStudent });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+      if (searchQuery) {
+        query += ` AND (nombres LIKE ? OR apellido_paterno LIKE ? OR apellido_materno LIKE ? OR curp LIKE ? OR grado LIKE ? OR grupo LIKE ? OR anio_ingreso LIKE ?)`;
+        values.push(`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`);
+      }
+
+      if (grado) {
+        query += ` AND grado IN (${grado.split(',').map(() => '?').join(',')})`;
+        values.push(...grado.split(','));
+      }
+
+      if (grupo) {
+        query += ` AND grupo IN (${grupo.split(',').map(() => '?').join(',')})`;
+        values.push(...grupo.split(','));
+      }
+
+      console.log('Query:', query);
+      console.log('Values:', values);
+
+      const rows = await Student.query(query, values);
+
+      // Formatear los datos para manejar valores null o undefined
+      const formattedRows = rows.map(student => ({
+        nombres: student.nombres || '', // Si es null o undefined, se asigna una cadena vacía
+        apellidoPaterno: student.apellido_paterno || '',
+        apellidoMaterno: student.apellido_materno || '',
+        grado: student.grado || '',
+        grupo: student.grupo || '',
+        curp: student.curp || '',
+      }));
+
+      res.status(200).json(formattedRows);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+  export const getStudentByCurp = async (req, res) => {
+    try {
+      const { curp } = req.params;
+
+      if (!curp || curp.trim() === '') {
+        return res.status(400).json({ success: false, message: 'La CURP no puede ser vacía.' });
+      }
+
+      const query = `SELECT * FROM estudiante WHERE curp = ?`;
+      const rows = await Student.query(query, [curp]);
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "Estudiante no encontrado." });
+      }
+
+      res.status(200).json(rows[0]);
+    } catch (error) {
+      console.error("Error fetching student:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+  export const updateStudent = async (req, res) => {
+    try {
+      const { curp } = req.params;
+      const updatedData = req.body;
+
+      // Update the student
+      const result = await Student.updateById(curp, updatedData);
+
+      if (!result) {
+        return res.status(404).json({ message: 'Estudiante no encontrado' });
+      }
+
+      // Fetch the updated student data
+      const updatedStudent = await Student.getById(curp);
+
+      res.status(200).json({ message: 'Estudiante actualizado con éxito', student: updatedStudent });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 
 
-export const deleteStudent = async (req, res) => {
-  try {
-    await Student.delete(req.params.id);
-    res.status(200).json({ message: 'Student deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  export const deleteStudent = async (req, res) => {
+    try {
+      await Student.delete(req.params.id);
+      res.status(200).json({ message: 'Student deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };

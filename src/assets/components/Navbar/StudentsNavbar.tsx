@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
           transition={{ type: "spring", stiffness: 300 }}
           onClick={() => navigate("/RegisterStudents")} // Use navigate
         >
-          <span className={styles.navIcon}>➕</span> Agregar
+          <span className={styles.navIcon}>➕</span> Registrar
         </motion.button>
         <motion.button
           className={styles.navLink}

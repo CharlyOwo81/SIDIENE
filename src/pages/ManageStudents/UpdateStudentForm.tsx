@@ -3,6 +3,7 @@ import InputField from "../../assets/components/InputField/InputField";
 import Button from "../../assets/components/Button/Button";
 import FormSection from "../../assets/components/FormSection/FormSection";
 import styles from "./ManageStudents.module.css";
+import GoBackButton from "../../assets/components/Button/GoBackButton";
 
 interface Student {
   curp: string;
@@ -105,6 +106,7 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
           <Button type="button" onClick={onCancel} disabled={isSubmitting}>
             Cancelar
           </Button>
+          <GoBackButton />
         </div>
       </fieldset>
     </form>

@@ -1,6 +1,53 @@
 import db from '../config/db.js';
 
 class Student {
+  static async bulkCreate(studentsData) {
+    try {
+      if (!studentsData || studentsData.length === 0) {
+        console.error('No student data provided for bulk insert');
+        return { created: 0, updated: 0 }; // Return empty result instead of throwing
+      }
+  
+      const sql = `
+        INSERT INTO estudiante 
+          (curp, nombres, apellido_paterno, apellido_materno, grado, grupo, anio_ingreso)
+        VALUES ?
+        ON DUPLICATE KEY UPDATE
+          nombres = VALUES(nombres),
+          apellido_paterno = VALUES(apellido_paterno),
+          apellido_materno = VALUES(apellido_materno),
+          grado = VALUES(grado),
+          grupo = VALUES(grupo),
+          anio_ingreso = VALUES(anio_ingreso)
+      `;
+      
+      // Map to database column names (apellido_paterno instead of apellidoPaterno)
+      const values = studentsData.map(student => [
+        student.curp,
+        student.nombres,
+        student.apellidoPaterno,
+        student.apellidoMaterno,
+        student.grado,
+        student.grupo,
+        student.anio_ingreso
+      ]);
+  
+      console.log('Executing bulk insert with:', { 
+        studentCount: values.length,
+        sampleStudent: values[0] 
+      });
+  
+      const [result] = await db.query(sql, [values]);
+      return {
+        created: result.affectedRows - result.changedRows, // Actual new inserts
+        updated: result.changedRows
+      };
+    } catch (error) {
+      console.error('Error in bulk student creation:', error);
+      throw error;
+    }
+  }
+
   static async query(sql, values) {
     try {
       const [rows] = await db.query(sql, values);

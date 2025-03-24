@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import Button from "../../assets/components/Button/Button"; // Your reusable Button component
 import Label from "../../assets/components/Label/Label"; // Reusable Label component
 import styles from "./QueryStudents.module.css";
+import GoBackButton from "../../assets/components/Button/GoBackButton";
+
 
 interface StudentQueryFormProps {
   searchQuery: string;
@@ -96,6 +98,7 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <Button type="submit">Buscar</Button>
+          <GoBackButton />
         </motion.div>
       </form>
     </motion.div>

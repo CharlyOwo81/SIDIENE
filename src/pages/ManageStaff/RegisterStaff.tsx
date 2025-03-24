@@ -1,61 +1,13 @@
-// src/components/ManageStaff.tsx
 import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import Alert from "../../assets/components/Alert/Alert";
-import StaffNavbar from "../../assets/components/Navbar/StaffNavbar"; // New Navbar
+import StaffNavbar from "../../assets/components/Navbar/StaffNavbar";
 import styles from "./AddStaff.module.css";
 import { createStaff } from "../../services/staffApi";
-
-interface InputFieldProps {
-  type: string;
-  name: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const InputField: React.FC<InputFieldProps> = ({
-  type,
-  name,
-  placeholder,
-  value,
-  onChange,
-}) => (
-  <motion.input
-    type={type}
-    name={name}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    whileFocus={{ scale: 1.05 }}
-    className={styles.input}
-  />
-);
-
-interface ButtonProps {
-  type: "button" | "submit" | "reset";
-  onClick?: () => void;
-  children: React.ReactNode;
-  disabled?: boolean;
-}
-
-const Button: React.FC<ButtonProps> = ({
-  type,
-  onClick,
-  children,
-  disabled,
-}) => (
-  <motion.button
-    type={type}
-    whileHover={{ scale: 1.01 }}
-    whileTap={{ scale: 0.9 }}
-    className={styles.button}
-    onClick={onClick}
-    disabled={disabled}
-  >
-    {children}
-  </motion.button>
-);
+import StaffForm from "./RegisterStaffForm";
+import { Button } from "@mui/material";
+import InputField from "../../assets/components/InputField/InputField";
+import GoBackButton from "../../assets/components/Button/GoBackButton";
 
 const ManageStaff: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -72,6 +24,16 @@ const ManageStaff: React.FC = () => {
     type: "success" | "error" | "warning" | "info";
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +67,7 @@ const ManageStaff: React.FC = () => {
     };
 
     try {
-      const response = await createStaff(datosFormulario);
+      await createStaff(datosFormulario);
       setAlert({
         message: `Personal registrado exitosamente.`,
         type: "success",
@@ -215,8 +177,15 @@ const ManageStaff: React.FC = () => {
               <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
             </motion.select>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Guardando..." : "Guardar"}
+              {isSubmitting ? (
+                <>
+                  <span className={styles.spinner}></span> Guardando
+                </>
+              ) : (
+                "Guardar"
+              )}
             </Button>
+            <GoBackButton />
           </fieldset>
         </form>
       </motion.div>

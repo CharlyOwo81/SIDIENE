@@ -5,7 +5,7 @@ import StudentForm from './RegisterStudentsForm';
 import Navbar from '../../assets/components/Navbar/StudentsNavbar';
 import Alert from '../../assets/components/Alert/Alert';
 import styles from './ManageStudents.module.css';
-import { createStudent } from '../../services/studentsApi'; // Import the service
+import { createStudent, uploadStudentsFromPdf } from '../../services/studentsApi';
 
 const RegisterStudents: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +18,7 @@ const RegisterStudents: React.FC = () => {
     anio_ingreso: '',
   });
   const [file, setFile] = useState<File | null>(null);
-  const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | 'warning'; details?: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,12 +35,34 @@ const RegisterStudents: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setAlert(null);
 
     try {
-      // Call the API to create a student
-      await createStudent(formData);
-      setAlert({ message: 'Student created successfully!', type: 'success' });
-      // Reset the form after successful submission
+      let response;
+      if (file) {
+        response = await uploadStudentsFromPdf(file);
+
+        if (response.data?.errors) {
+          setAlert({
+            message: `Procesado con ${response.data.errors.length} errores`,
+            type: 'warning',
+            details: response.data.errors.join('\n'),
+          });
+        } else {
+          setAlert({
+            message: `${response.data.valid} estudiantes procesados (${response.data.created} nuevos, ${response.data.updated} actualizados)`,
+            type: 'success',
+          });
+        }
+      } else {
+        response = await createStudent(formData);
+        setAlert({
+          message: '¡El estudiante ha sido registrado!',
+          type: 'success',
+        });
+      }
+
+      // Reset form
       setFormData({
         curp: '',
         nombres: '',
@@ -52,7 +74,11 @@ const RegisterStudents: React.FC = () => {
       });
       setFile(null);
     } catch (error) {
-      setAlert({ message: error instanceof Error ? error.message : 'An unknown error occurred', type: 'error' });
+      console.error('Submission error:', error);
+      setAlert({
+        message: error instanceof Error ? error.message : 'Error procesando la solicitud',
+        type: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +114,9 @@ const RegisterStudents: React.FC = () => {
         isSubmitting={isSubmitting}
         handleInputChange={handleInputChange}
         handleFileChange={handleFileChange}
-        handleSubmit={handleSubmit}
+       
+
+ handleSubmit={handleSubmit}
       />
     </motion.section>
   );

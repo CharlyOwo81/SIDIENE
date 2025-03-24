@@ -38,6 +38,17 @@ const UpdateStudents: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+
+        // Validar que el CURP no esté vacío
+    if (!searchCurp || searchCurp.trim() === '') {
+      setAlert({
+        message: "Por favor, ingresa un CURP válido.",
+        type: "error"
+      });
+      setFormData(null);
+      return;
+    }
+
     setIsLoading(true);
   
     try {

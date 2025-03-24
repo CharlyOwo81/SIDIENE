@@ -24,7 +24,7 @@ const StaffNavbar: React.FC = () => {
           transition={{ type: "spring", stiffness: 300 }}
           onClick={() => navigate("/RegisterStaff")} // Staff-specific route
         >
-          <span className={styles.navIcon}>➕</span> Agregar
+          <span className={styles.navIcon}>➕</span> Registrar
         </motion.button>
         <motion.button
           className={styles.navLink}

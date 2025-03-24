@@ -21,22 +21,71 @@ export const createStaff = async (req, res) => {
 
 export const getAllStaff = async (req, res) => {
   try {
-    const staff = await Staff.getAll();
-    res.status(200).json(staff);
+    // Validar parámetros de búsqueda
+    const { searchQuery = '', filters = {} } = req.query;
+    
+    // Validar que searchQuery no sea solo espacios en blanco
+    if (typeof searchQuery === 'string' && searchQuery.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "El término de búsqueda no puede estar vacío o contener solo espacios."
+      });
+    }
+
+    // Validar estructura de filtros
+    if (filters && typeof filters !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: "Formato de filtros inválido."
+      });
+    }
+
+    const staff = await Staff.getAll(searchQuery, filters);
+    res.status(200).json({
+      success: true,
+      data: staff,
+      count: staff.length
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error al obtener el personal:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error interno del servidor'
+    });
   }
 };
 
 export const getStaffById = async (req, res) => {
   try {
-    const staff = await Staff.getById(req.params.id);
-    if (!staff) {
-      return res.status(404).json({ message: 'Miembro del staff no encontrado.' });
+    const { id } = req.params;
+    
+    // Validar que el ID no esté vacío
+    if (!id || id.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "El ID no puede estar vacío."
+      });
     }
-    res.status(200).json(staff);
+
+    const staff = await Staff.getById(id);
+    
+    if (!staff) {
+      return res.status(404).json({
+        success: false,
+        message: "Miembro del personal no encontrado."
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: staff
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error al obtener el miembro del personal:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error interno del servidor'
+    });
   }
 };
 
