@@ -1,11 +1,10 @@
-// src/components/StudentQueryForm/StudentQueryForm.tsx
-import React, { ChangeEvent } from "react";
-import { motion } from "framer-motion";
-import Button from "../../assets/components/Button/Button"; // Your reusable Button component
-import Label from "../../assets/components/Label/Label"; // Reusable Label component
-import styles from "./QueryStudents.module.css";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
-
+import React, { ChangeEvent } from 'react';
+import { motion } from 'framer-motion';
+import Button from '../../assets/components/Button/Button';
+import Label from '../../assets/components/Label/Label';
+import SelectField from '../../assets/components/SelectField/SelectField'; // Import SelectField
+import GoBackButton from '../../assets/components/Button/GoBackButton';
+import styles from './QueryStudents.module.css';
 
 interface StudentQueryFormProps {
   searchQuery: string;
@@ -26,11 +25,28 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
   handleFilterChange,
   handleSubmit,
 }) => {
+  const gradoOptions = [
+    { value: '', label: 'Todos' },
+    { value: '1', label: '1' },
+    { value: '2', label: '2' },
+    { value: '3', label: '3' },
+  ];
+
+  const grupoOptions = [
+    { value: '', label: 'Todos' },
+    { value: 'A', label: 'A' },
+    { value: 'B', label: 'B' },
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'E', label: 'E' },
+    { value: 'F', label: 'F' },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       className={styles.queryContainer}
     >
       <form onSubmit={handleSubmit} className={styles.queryForm}>
@@ -43,7 +59,7 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
             onChange={handleSearchChange}
             placeholder="Nombre, CURP, etc."
             className={styles.searchInput}
-            whileFocus={{ scale: 1.02, borderColor: "#F3C44D" }}
+            whileFocus={{ scale: 1.02, borderColor: '#F3C44D' }}
             transition={{ duration: 0.2 }}
           />
         </div>
@@ -51,43 +67,38 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
         <div className={styles.filterGrid}>
           <div className={styles.filterGroup}>
             <Label htmlFor="grado">Grado</Label>
-            <motion.select
-              id="grado"
-              name="grado"
-              multiple
-              value={filters.grado}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-              whileFocus={{ scale: 1.02, borderColor: "#F3C44D" }}
+            <motion.div
+              whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <option value="">Todos</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </motion.select>
+              <SelectField
+                id="grado"
+                name="grado"
+                multiple
+                value={filters.grado}
+                onChange={handleFilterChange}
+                options={gradoOptions}
+                className={styles.filterSelect}
+              />
+            </motion.div>
           </div>
 
           <div className={styles.filterGroup}>
             <Label htmlFor="grupo">Grupo</Label>
-            <motion.select
-              id="grupo"
-              name="grupo"
-              multiple
-              value={filters.grupo}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-              whileFocus={{ scale: 1.02, borderColor: "#F3C44D" }}
+            <motion.div
+              whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <option value="">Todos</option>
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-              <option value="E">E</option>
-              <option value="F">F</option>
-            </motion.select>
+              <SelectField
+                id="grupo"
+                name="grupo"
+                multiple
+                value={filters.grupo}
+                onChange={handleFilterChange}
+                options={grupoOptions}
+                className={styles.filterSelect}
+              />
+            </motion.div>
           </div>
         </div>
 

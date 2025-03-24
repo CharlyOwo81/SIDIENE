@@ -1,4 +1,3 @@
-// RegisterStudents.tsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import StudentForm from './RegisterStudentsForm';
@@ -21,7 +20,7 @@ const RegisterStudents: React.FC = () => {
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | 'warning'; details?: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -41,7 +40,6 @@ const RegisterStudents: React.FC = () => {
       let response;
       if (file) {
         response = await uploadStudentsFromPdf(file);
-
         if (response.data?.errors) {
           setAlert({
             message: `Procesado con ${response.data.errors.length} errores`,
@@ -62,7 +60,6 @@ const RegisterStudents: React.FC = () => {
         });
       }
 
-      // Reset form
       setFormData({
         curp: '',
         nombres: '',
@@ -92,7 +89,6 @@ const RegisterStudents: React.FC = () => {
       className={styles.mainContainer}
     >
       <Navbar />
-
       {alert && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -107,16 +103,13 @@ const RegisterStudents: React.FC = () => {
           />
         </motion.div>
       )}
-
       <StudentForm
         formData={formData}
         file={file}
         isSubmitting={isSubmitting}
-        handleInputChange={handleInputChange}
+        handleInputChange={handleInputChange} // Use this for all inputs and selects
         handleFileChange={handleFileChange}
-       
-
- handleSubmit={handleSubmit}
+        handleSubmit={handleSubmit}
       />
     </motion.section>
   );

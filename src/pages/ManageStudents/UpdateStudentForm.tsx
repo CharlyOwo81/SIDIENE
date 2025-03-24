@@ -1,9 +1,12 @@
-import React, { ChangeEvent, FormEvent } from "react";
-import InputField from "../../assets/components/InputField/InputField";
-import Button from "../../assets/components/Button/Button";
-import FormSection from "../../assets/components/FormSection/FormSection";
-import styles from "./ManageStudents.module.css";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
+import React, { ChangeEvent, FormEvent } from 'react';
+import { motion } from 'framer-motion';
+import InputField from '../../assets/components/InputField/InputField';
+import SelectField from '../../assets/components/SelectField/SelectField';
+import Button from '../../assets/components/Button/Button';
+import FormSection from '../../assets/components/FormSection/FormSection';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
+import Label from '../../assets/components/Label/Label';
+import styles from './ManageStudents.module.css';
 
 interface Student {
   curp: string;
@@ -12,7 +15,8 @@ interface Student {
   apellidoMaterno: string;
   grado: string;
   grupo: string;
-  estatus: string; 
+  anio_ingreso: string;
+  estatus: string;
 }
 
 interface UpdateStudentFormProps {
@@ -30,86 +34,139 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
+  const estatusOptions = [
+    { value: 'ACTIVO', label: 'ACTIVO' },
+    { value: 'BAJA ADMINISTRATIVA', label: 'BAJA ADMINISTRATIVA' },
+    { value: 'EGRESADO', label: 'EGRESADO' },
+  ];
+
+  const grupoOptions = [
+    { value: 'A', label: 'A' },
+    { value: 'B', label: 'B' },
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'E', label: 'E' },
+    { value: 'F', label: 'F' },
+  ];
+
+  const gradoOptions = [
+    { value: '1', label: '1' },
+    { value: '2', label: '2' },
+    { value: '3', label: '3' },
+  ];
+
   return (
-    <form onSubmit={onSubmit} className={styles.form}>
+    <motion.form
+      onSubmit={onSubmit}
+      className={styles.form}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Actualizar Datos</legend>
+        <legend className={styles.legend}>Actualizar Datos del Estudiante</legend>
 
-        <FormSection title="Información Personal">
-          <InputField
-            type="text"
-            name="nombres"
-            placeholder="Nombres"
-            value={formData.nombres}
-            onChange={onInputChange}
-            disabled
-          />
-          <InputField
-            type="text"
-            name="apellidoPaterno"
-            placeholder="Apellido Paterno"
-            value={formData.apellidoPaterno}
-            onChange={onInputChange}
-            disabled
-          />
-          <InputField
-            type="text"
-            name="apellidoMaterno"
-            placeholder="Apellido Materno"
-            value={formData.apellidoMaterno}
-            onChange={onInputChange}
-            disabled
-          />
-        </FormSection>
-
-        <FormSection title="Información Escolar">
-          <InputField
-            type="text"
-            name="grado"
-            placeholder="Grado"
-            value={formData.grado}
-            onChange={onInputChange}
-          />
-          <InputField
-            type="text"
-            name="grupo"
-            placeholder="Grupo"
-            value={formData.grupo}
-            onChange={onInputChange}
-          />
+        {/* Sección de información básica no editable */}
+        <FormSection title="Información Básica">
           <div className={styles.inputWrapper}>
-            <label htmlFor="estatus" className={styles.label}>Estatus</label>
-            <select
-                id="estatus"
-                name="estatus" // Change from "status" to "estatus"
-                value={formData.estatus}
-                onChange={onInputChange}
-                className={styles.selectField}
-                >
-                <option value="ACTIVO">ACTIVO</option>
-                <option value="INACTIVO">INACTIVO</option>
-                <option value="BAJA ADMINISTRATIVA">BAJA ADMINISTRATIVA</option>
-            </select>
+            <Label htmlFor="curp">CURP</Label>
+            <InputField
+              type="text"
+              name="curp"
+              value={formData.curp}
+              onChange={onInputChange}
+              disabled placeholder={''}            />
+          </div>
+          
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="nombres">Nombres</Label>
+            <InputField
+              type="text"
+              name="nombres"
+              value={formData.nombres}
+              onChange={onInputChange}
+              disabled placeholder={''}            />
+          </div>
+          
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="apellidoPaterno">Apellido Paterno</Label>
+            <InputField
+              type="text"
+              name="apellidoPaterno"
+              value={formData.apellidoPaterno}
+              onChange={onInputChange}
+              disabled placeholder={''}            />
+          </div>
+          
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="apellidoMaterno">Apellido Materno</Label>
+            <InputField
+              type="text"
+              name="apellidoMaterno"
+              value={formData.apellidoMaterno}
+              onChange={onInputChange}
+              disabled placeholder={''}            />
           </div>
         </FormSection>
 
+        {/* Sección de información escolar editable */}
+        <FormSection title="Información Escolar">
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="grado">Grado</Label>
+            <SelectField
+              id="grado"
+              name="grado"
+              value={formData.grado}
+              onChange={onInputChange}
+              options={gradoOptions}
+              disabled={isSubmitting}
+            />
+          </div>
+          
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="grupo">Grupo</Label>
+            <SelectField
+              id="grupo"
+              name="grupo"
+              value={formData.grupo}
+              onChange={onInputChange}
+              options={grupoOptions}
+              disabled={isSubmitting}
+            />
+          </div>
+          
+          <div className={styles.inputWrapper}>
+            <Label htmlFor="estatus">Estatus</Label>
+            <SelectField
+              id="estatus"
+              name="estatus"
+              value={formData.estatus}
+              onChange={onInputChange}
+              options={estatusOptions}
+              disabled={isSubmitting}
+            />
+          </div>
+        </FormSection>
+
+        {/* Botones de acción */}
         <div className={styles.buttonContainer}>
-          <Button type="submit" disabled={isSubmitting}>
+          <GoBackButton/>
+          
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <span className={styles.spinner}></span> Actualizando...
               </>
             ) : (
-              "Actualizar"
+              'Guardar Cambios'
             )}
           </Button>
-          <Button type="button" onClick={onCancel} disabled={isSubmitting}>
-            Cancelar
-          </Button>
-          <GoBackButton />
         </div>
       </fieldset>
-    </form>
+    </motion.form>
   );
 };
 

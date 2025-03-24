@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from "react";
-import { motion } from "framer-motion";
-import styles from "./InputField.module.css";
+import React, { ChangeEvent } from 'react';
+import { motion } from 'framer-motion';
+import styles from './InputField.module.css';
 
 interface InputFieldProps {
   type: string;
@@ -10,6 +10,8 @@ interface InputFieldProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   error?: boolean;
   disabled?: boolean;
+  maxLength?: number;
+  className?: string;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -18,19 +20,20 @@ const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   value,
   onChange,
-  error = false, // Default to false if not provided
+  error = false,
+  disabled = false,
 }) => (
   <motion.input
     type={type}
     name={name}
     placeholder={placeholder}
-    value={type === "file" ? undefined : value} // File inputs don't use value
+    value={type === 'file' ? undefined : value}
     onChange={onChange}
-    whileFocus={{ scale: 1.02, borderColor: "#F3C44D" }}
+    whileFocus={{ scale: 1.02, borderColor: '#F3C44D' }}
     whileHover={{ scale: 1.01 }}
-    className={`${styles.input} ${error ? styles.error : ""} ${type === "file" ? styles.fileInput : ""}`}
-    transition={{ type: "spring", stiffness: 300 }}
-    disabled={false}
+    className={`${styles.input} ${error ? styles.error : ''}`}
+    transition={{ type: 'spring', stiffness: 300 }}
+    disabled={disabled}
   />
 );
 

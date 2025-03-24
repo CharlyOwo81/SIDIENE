@@ -1,36 +1,59 @@
-import React, { useEffect } from "react";
-import styles from "./Alert.module.css";
+import React, { useEffect, useState } from 'react';
+import styles from './Alert.module.css';
 
 interface AlertProps {
   message: string;
-  type: "success" | "error" | "warning" | "info";
+  type: 'success' | 'error' | 'warning' | 'info';
   onClose: () => void;
-  headerHeight?: number; // Optional prop for custom positioning
+  autoDismiss?: boolean;
+  dismissTime?: number;
 }
 
-const Alert: React.FC<AlertProps> = ({ message, type, onClose, headerHeight = 0 }) => {
-  // Auto-Dismiss: Close the alert after 5 seconds
+const Alert: React.FC<AlertProps> = ({
+  message,
+  type,
+  onClose,
+  autoDismiss = true,
+  dismissTime = 5000,
+}) => {
+  const [isExiting, setIsExiting] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(onClose, 5000); // 5 seconds
-    return () => clearTimeout(timer); // Cleanup on unmount or onClose change
-  }, [onClose]);
+    if (autoDismiss) {
+      const timer = setTimeout(() => setIsExiting(true), dismissTime);
+      return () => clearTimeout(timer);
+    }
+  }, [autoDismiss, dismissTime]);
+
+  useEffect(() => {
+    if (isExiting) {
+      const exitTimer = setTimeout(onClose, 400); // Match exit animation duration
+      return () => clearTimeout(exitTimer);
+    }
+  }, [isExiting, onClose]);
 
   return (
     <div
-      className={`${styles.alert} ${styles[`alert-${type}`]} ${styles["custom-top"]}`}
-      data-header-height={headerHeight} // Pass headerHeight as a data attribute
+      className={`${styles.alert} ${styles[`alert-${type}`]} ${isExiting ? styles['alert-exit'] : ''}`}
+      style={{ '--dismiss-time': `${dismissTime}ms` } as React.CSSProperties}
     >
-      {/* Icon Addition: Display an icon based on alert type */}
-      <span className={styles["alert-icon"]}>
-        {type === "success" && "✅"}
-        {type === "error" && "❌"}
-        {type === "warning" && "⚠️"}
-        {type === "info" && "ℹ️"}
-      </span>
-      <span className={styles["alert-message"]}>{message}</span>
-      <button className={styles["alert-close"]} onClick={onClose}>
-        ×
-      </button>
+      <div className={styles['alert-content']}>
+        <span className={styles['alert-icon']}>
+          {type === 'success' && '✅'}
+          {type === 'error' && '❌'}
+          {type === 'warning' && '⚠️'}
+          {type === 'info' && 'ℹ️'}
+        </span>
+        <span className={styles['alert-message']}>{message}</span>
+        <button
+          className={styles['alert-close']}
+          onClick={() => setIsExiting(true)}
+          aria-label="Close alert"
+        >
+          ×
+        </button>
+      </div>
+      {autoDismiss && <div className={styles['alert-progress']} />}
     </div>
   );
 };

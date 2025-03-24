@@ -14,6 +14,7 @@ interface Student {
   apellidoMaterno: string;
   grado: string;
   grupo: string;
+  anio_ingreso: string;
   estatus: string;
 }
 
@@ -38,8 +39,7 @@ const UpdateStudents: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
-        // Validar que el CURP no esté vacío
+  
     if (!searchCurp || searchCurp.trim() === '') {
       setAlert({
         message: "Por favor, ingresa un CURP válido.",
@@ -48,14 +48,21 @@ const UpdateStudents: React.FC = () => {
       setFormData(null);
       return;
     }
-
+  
     setIsLoading(true);
   
     try {
       const response = await axios.get(`http://localhost:3307/api/students/${searchCurp}`);
   
       if (response.data) {
-        setFormData(response.data); // Ensure the response matches the Student interface
+        // Transform the backend data to match frontend interface
+        const transformedData = {
+          ...response.data,
+          apellidoPaterno: response.data.apellido_paterno || response.data.apellidoPaterno,
+          apellidoMaterno: response.data.apellido_materno || response.data.apellidoMaterno
+        };
+        
+        setFormData(transformedData);
         setAlert({
           message: "Estudiante encontrado.",
           type: "success",

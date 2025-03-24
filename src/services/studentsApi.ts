@@ -11,6 +11,7 @@ interface StudentData {
   grado: string;
   grupo: string;
   anio_ingreso: string;
+  estatus?: string; // Add the 'estatus' property as optional
 }
 
 // Define the response structure (optional, adjust based on your backend response)
@@ -77,15 +78,33 @@ export const getStudentById = async (id: string): Promise<ApiResponse> => {
 
 export const updateStudent = async (id: string, studentData: StudentData): Promise<ApiResponse> => {
   try {
-    const response = await axios.put(`${API_URL}/students/${id}`, studentData);
+    const formattedData = {
+      nombres: studentData.nombres,
+      apellido_paterno: studentData.apellidoPaterno,
+      apellido_materno: studentData.apellidoMaterno,
+      grado: studentData.grado,
+      grupo: studentData.grupo,
+      anio_ingreso: studentData.anio_ingreso,
+      estatus: studentData.estatus
+    };
+    
+    const response = await axios.put(`${API_URL}/students/${id}`, formattedData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Error updating student');
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         'Error updating student';
+      throw new Error(errorMessage);
     }
     throw new Error('An unknown error occurred');
   }
 };
+
 
 export const deleteStudent = async (id: string): Promise<ApiResponse> => {
   try {

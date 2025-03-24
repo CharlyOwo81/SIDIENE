@@ -201,22 +201,47 @@ function parseStudentsFromPdf(text) {
   export const getStudentByCurp = async (req, res) => {
     try {
       const { curp } = req.params;
-
+  
       if (!curp || curp.trim() === '') {
-        return res.status(400).json({ success: false, message: 'La CURP no puede ser vacía.' });
+        return res.status(400).json({ 
+          success: false, 
+          message: 'La CURP no puede ser vacía.' 
+        });
       }
-
-      const query = `SELECT * FROM estudiante WHERE curp = ?`;
-      const rows = await Student.query(query, [curp]);
-
-      if (rows.length === 0) {
-        return res.status(404).json({ message: "Estudiante no encontrado." });
+  
+      const student = await Student.getById(curp);
+  
+      if (!student) {
+        return res.status(404).json({ 
+          success: false,
+          message: "Estudiante no encontrado." 
+        });
       }
-
-      res.status(200).json(rows[0]);
+  
+      // Formatear la respuesta con nombres de campos consistentes
+      const formattedStudent = {
+        curp: student.curp,
+        nombres: student.nombres,
+        apellidoPaterno: student.apellido_paterno || student.apellidoPaterno,
+        apellidoMaterno: student.apellido_materno || student.apellidoMaterno,
+        grado: student.grado,
+        grupo: student.grupo,
+        anio_ingreso: student.anio_ingreso,
+        anio_egreso: student.anio_egreso,
+        estatus: student.estatus
+      };
+  
+      res.status(200).json({
+        success: true,
+        data: formattedStudent
+      });
     } catch (error) {
       console.error("Error fetching student:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ 
+        success: false,
+        message: "Error al obtener el estudiante",
+        error: error.message 
+      });
     }
   };
 
@@ -225,23 +250,38 @@ function parseStudentsFromPdf(text) {
     try {
       const { curp } = req.params;
       const updatedData = req.body;
-
-      // Update the student
-      const result = await Student.updateById(curp, updatedData);
-
-      if (!result) {
-        return res.status(404).json({ message: 'Estudiante no encontrado' });
+  
+      // Validate required fields
+      if (!updatedData.grado || !updatedData.grupo || !updatedData.estatus) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Grado, grupo y estatus son campos requeridos." 
+        });
       }
-
-      // Fetch the updated student data
-      const updatedStudent = await Student.getById(curp);
-
-      res.status(200).json({ message: 'Estudiante actualizado con éxito', student: updatedStudent });
+  
+      const result = await Student.updateById(curp, updatedData);
+  
+      if (!result) {
+        return res.status(404).json({ 
+          success: false,
+          message: "Estudiante no encontrado." 
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: "Estudiante actualizado con éxito.",
+        data: result
+      });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error("Error updating student:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error al actualizar el estudiante",
+        error: error.message 
+      });
     }
   };
-
 
 
   export const deleteStudent = async (req, res) => {

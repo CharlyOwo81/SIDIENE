@@ -1,54 +1,18 @@
 .label {
-    display: block;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #891547; /* Deep pink from your theme */
-    margin-bottom: 0.5rem;
-    padding: 0.3rem 0.8rem;
-    background: linear-gradient(135deg, rgba(229, 130, 62, 0.1) 0%, rgba(243, 196, 77, 0.1) 100%); /* Subtle gradient */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547; /* Deep pink */
+  margin-bottom: 0.5rem;
+}
+
+.inputWrapper:focus-within .label {
+  color: #F3C44D; /* Yellow on focus */
+}
+
+@media (max-width: 480px) {
+  .label {
+    font-size: 0.9rem;
   }
-  
-  /* Pseudo-element for a subtle underline effect */
-  .label::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, #E5823E, #F3C44D); /* Orange to yellow gradient */
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-  
-  /* Hover effect */
-  .label:hover {
-    color: #C26444; /* Slightly lighter pink */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Animate underline on hover */
-  .label:hover::after {
-    transform: scaleX(1);
-  }
-  
-  /* Focus-within effect (when input is focused) */
-  .inputWrapper:focus-within .label {
-    color: #F3C44D; /* Yellow for focus */
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 480px) {
-    .label {
-      font-size: 1rem;
-      padding: 0.25rem 0.6rem;
-    }
-  }
+}

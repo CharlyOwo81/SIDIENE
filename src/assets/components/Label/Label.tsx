@@ -1,6 +1,5 @@
-// src/assets/components/Label/Label.tsx
-import React from "react";
-import styles from "./Label.module.css";
+import React from 'react';
+import styles from './Label.module.css';
 
 interface LabelProps {
   htmlFor: string;
@@ -15,4 +14,4 @@ const Label: React.FC<LabelProps> = ({ htmlFor, children }) => {
   );
 };
 
-export default Label;
+export default Label; 
