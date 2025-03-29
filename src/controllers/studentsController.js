@@ -249,17 +249,25 @@ function parseStudentsFromPdf(text) {
   export const updateStudent = async (req, res) => {
     try {
       const { curp } = req.params;
-      const updatedData = req.body;
+      const { nombres, apellidoPaterno, apellidoMaterno, grado, grupo, anio_ingreso, estatus } = req.body;
   
-      // Validate required fields
-      if (!updatedData.grado || !updatedData.grupo || !updatedData.estatus) {
-        return res.status(400).json({ 
+      // Validar campos requeridos
+      if (!apellidoPaterno || !apellidoMaterno) {
+        return res.status(400).json({
           success: false,
-          message: "Grado, grupo y estatus son campos requeridos." 
+          message: "Los apellidos son campos obligatorios."
         });
       }
   
-      const result = await Student.updateById(curp, updatedData);
+      const result = await Student.updateById(curp, {
+        nombres,
+        apellido_paterno: apellidoPaterno,
+        apellido_materno: apellidoMaterno,
+        grado,
+        grupo,
+        anio_ingreso,
+        estatus
+      });
   
       if (!result) {
         return res.status(404).json({ 
@@ -274,7 +282,7 @@ function parseStudentsFromPdf(text) {
         data: result
       });
     } catch (error) {
-      console.error("Error updating student:", error);
+      console.error("Update error:", error);
       res.status(500).json({ 
         success: false,
         message: "Error al actualizar el estudiante",

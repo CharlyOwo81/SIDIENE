@@ -96,12 +96,6 @@ class Student {
   }
   
   static async updateById(curp, updatedData) {
-    // Validar que el estudiante exista primero
-    const [existing] = await db.query('SELECT curp FROM estudiante WHERE curp = ?', [curp]);
-    if (!existing || existing.length === 0) {
-      return null;
-    }
-  
     const sql = `
       UPDATE estudiante
       SET 
@@ -117,8 +111,8 @@ class Student {
     
     const values = [
       updatedData.nombres,
-      updatedData.apellidoPaterno,
-      updatedData.apellidoMaterno,
+      updatedData.apellido_paterno, // Asegúrate que estos nombres coincidan
+      updatedData.apellido_materno,
       updatedData.grado,
       updatedData.grupo,
       updatedData.anio_ingreso,
@@ -128,22 +122,9 @@ class Student {
   
     await db.query(sql, values);
   
-    // Obtener el estudiante actualizado con todos los campos
-    const [updatedStudent] = await db.query(`
-      SELECT 
-        curp,
-        nombres,
-        apellido_paterno as apellidoPaterno,
-        apellido_materno as apellidoMaterno,
-        grado,
-        grupo,
-        anio_ingreso,
-        estatus
-      FROM estudiante 
-      WHERE curp = ?
-    `, [curp]);
-    
-    return updatedStudent[0];
+    // Return the updated student
+    const [updated] = await db.query('SELECT * FROM estudiante WHERE curp = ?', [curp]);
+    return updated[0];
   }
 
   static async delete(id) {
