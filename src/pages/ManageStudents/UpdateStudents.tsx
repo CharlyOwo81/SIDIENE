@@ -55,16 +55,16 @@ const UpdateStudents: React.FC = () => {
       const response = await axios.get(`http://localhost:3307/api/students/${searchCurp}`);
       console.log("Backend response:", response.data); // Add this line
       
-      if (response.data) {
+      if (response.data.data) {
         const transformedData = {
-          curp: response.data.curp, // Make sure curp is included
-          nombres: response.data.nombres,
-          apellidoPaterno: response.data.apellido_paterno || response.data.apellidoPaterno,
-          apellidoMaterno: response.data.apellido_materno || response.data.apellidoMaterno,
-          grado: response.data.grado,
-          grupo: response.data.grupo,
-          anio_ingreso: response.data.anio_ingreso,
-          estatus: response.data.estatus
+          curp: response.data.data.curp, // Make sure curp is included
+          nombres: response.data.data.nombres,
+          apellidoPaterno: response.data.data.apellido_paterno || response.data.data.apellidoPaterno,
+          apellidoMaterno: response.data.data.apellido_materno || response.data.data.apellidoMaterno,
+          grado: response.data.data.grado,
+          grupo: response.data.data.grupo,
+          anio_ingreso: response.data.data.anio_ingreso,
+          estatus: response.data.data.estatus
         };
         
         setFormData(transformedData);

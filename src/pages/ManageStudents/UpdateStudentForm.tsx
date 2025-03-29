@@ -66,7 +66,6 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
         <legend className={styles.legend}>Actualizar Datos del Estudiante</legend>
 
         {/* Sección de información básica no editable */}
-        // In your UpdateStudentForm component, update the basic info section:
 <FormSection title="Información Básica">
   <div className={styles.inputWrapper}>
     <Label htmlFor="nombres">Nombres</Label>

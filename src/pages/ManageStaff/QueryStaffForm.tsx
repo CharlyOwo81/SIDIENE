@@ -1,15 +1,14 @@
-import React, { ChangeEvent } from "react";
-import InputField from "../../assets/components/InputField/InputField";
-import SelectField from "../../assets/components/SelectField/SelectField";
-import Button from "../../assets/components/Button/Button";
-import styles from "./ManageStaff.module.css";
+import React, { ChangeEvent } from 'react';
+import { motion } from 'framer-motion';
+import InputField from '../../assets/components/InputField/InputField';
+import SelectField from '../../assets/components/SelectField/SelectField';
+import Button from '../../assets/components/Button/Button';
+import styles from './AddStaff.module.css';
 
 interface QueryStaffFormProps {
   searchQuery: string;
   filters: {
-    puesto: string[];
-    departamento: string[];
-    estatus: string[];
+    rol: string[];
   };
   handleSearchChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleFilterChange: (e: ChangeEvent<HTMLSelectElement>) => void;
@@ -23,34 +22,59 @@ const QueryStaffForm: React.FC<QueryStaffFormProps> = ({
   handleFilterChange,
   handleSubmit,
 }) => {
-  const puestoOptions = [
-    { value: "DOCENTE", label: "Docente" },
-    { value: "PREFECTO", label: "Administrativo" },
-    { value: "DIRECTIVO", label: "Directivo" },
-    { value: "TRABAJADOR SOCIAL", label: "Trabajador Social" },
+  const rolOptions = [
+    { value: '', label: 'Todos' },
+    { value: 'DOCENTE', label: 'Docente' },
+    { value: 'PREFECTO', label: 'Prefecto' },
+    { value: 'DIRECTIVO', label: 'Directivo' },
+    { value: 'TRABAJADOR_SOCIAL', label: 'Trabajador Social' },
   ];
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <motion.form
+      onSubmit={handleSubmit}
+      className={styles.form}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <div className={styles.searchContainer}>
-        <InputField
-                  type="text"
-                  placeholder="Buscar personal..."
-                  value={searchQuery}
-                  onChange={handleSearchChange} name={""}        />
-        <Button type="submit">Buscar</Button>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          <InputField
+            type="text"
+            placeholder="Buscar personal..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            name="search"
+          />
+        </motion.div>
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 400 }}
+        >
+          <Button type="submit">Buscar</Button>
+        </motion.div>
       </div>
 
       <div className={styles.filterContainer}>
-        <SelectField
-          name="puesto"
-          options={puestoOptions}
-          multiple
-          value={filters.puesto}
-          onChange={handleFilterChange}
-        />
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          <SelectField
+            name="rol"
+            options={rolOptions}
+            multiple
+            value={filters.rol}
+            onChange={handleFilterChange}
+          />
+        </motion.div>
       </div>
-    </form>
+    </motion.form>
   );
 };
 

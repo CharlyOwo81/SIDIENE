@@ -34,6 +34,97 @@
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
   }
   
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .searchContainer {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .filterContainer {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .searchContainer input,
+  .filterContainer select {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  @media (max-width: 768px) {
+    .form {
+      padding: 1.5rem;
+      margin: 1rem;
+    }
+  
+    .searchContainer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .tableContainer {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .staffTable {
+    border: none !important;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .staffTable .MuiDataGrid-columnHeaders {
+    background: linear-gradient(135deg, #891547 0%, #C26444 100%) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    border-bottom: 2px solid #E5823E !important;
+  }
+  
+  .staffTable .MuiDataGrid-cell {
+    border-bottom: 1px solid rgba(229, 130, 62, 0.1) !important;
+    font-size: 1rem !important;
+    color: #333 !important;
+    padding: 1rem !important;
+  }
+  
+  .staffTable .MuiDataGrid-row:hover {
+    background-color: rgba(243, 196, 77, 0.1) !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  .staffTable .MuiDataGrid-footerContainer {
+    background: #f9f9f9 !important;
+    border-top: 1px solid rgba(229, 130, 62, 0.1) !important;
+    padding: 0.5rem !important;
+  }
+  
+  @media (max-width: 768px) {
+    .tableContainer {
+      margin: 1rem;
+      padding: 0.5rem;
+    }
+  }
+
   .legend {
     font-size: 1.4rem;
     font-weight: 600;

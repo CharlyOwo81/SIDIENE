@@ -33,15 +33,15 @@ interface StaffFilters {
   estatus?: string[];
 }
 
-export const getAllStaff = async (searchQuery: string, filters: { puesto: string[]; departamento: string[]; estatus: string[]; }, params: {
-    searchQuery?: string;
-    filters?: StaffFilters;
-}): Promise<ApiResponse> => {
+export const getAllStaff = async (
+  searchQuery: string,
+  filters: { rol: string[]}
+): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/staff`, {
       params: {
-        searchQuery: params.searchQuery,
-        filters: JSON.stringify(params.filters)
+        searchQuery,
+        rol: filters.rol.join(','),
       }
     });
     return response.data;
@@ -49,10 +49,10 @@ export const getAllStaff = async (searchQuery: string, filters: { puesto: string
     if (axios.isAxiosError(error)) {
       throw new Error(
         error.response?.data?.message || 
-        'Error al obtener el personal. Por favor verifique los parámetros.'
+        'Error al obtener el personal'
       );
     }
-    throw new Error('Error desconocido al obtener el personal');
+    throw new Error('Error desconocido');
   }
 };
 

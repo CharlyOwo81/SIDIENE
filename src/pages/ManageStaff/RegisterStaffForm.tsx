@@ -1,126 +1,134 @@
-// src/components/StaffForm.tsx
-import React, { ChangeEvent, FormEvent } from "react";
-import { motion } from "framer-motion";
-import InputField from "../../assets/components/InputField/InputField";
-import Button from "../../assets/components/Button/Button";
-import Label from "../../assets/components/Label/Label"; // Import reusable Label
-import GoBackButton from "../../assets/components/Button/GoBackButton";
-import styles from "./AddStaff.module.css";
+import React from 'react';
+import { motion } from 'framer-motion';
+import InputField from '../../assets/components/InputField/InputField';
+import Button from '../../assets/components/Button/Button';
+import FormSection from '../../assets/components/FormSection/FormSection';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
+import Label from '../../assets/components/Label/Label';
+import SelectField from '../../assets/components/SelectField/SelectField';
+import styles from './ManageStudents.module.css';
+
+// Definir las opciones para los select
+const gradoOptions = [
+  { value: '1', label: '1' },
+  { value: '2', label: '2' },
+  { value: '3', label: '3' },
+];
+
+const grupoOptions = [
+  { value: 'A', label: 'A' },
+  { value: 'B', label: 'B' },
+  { value: 'C', label: 'C' },
+  { value: 'D', label: 'D' },
+  { value: 'E', label: 'E' },
+  { value: 'F', label: 'F' },
+];
 
 interface StaffFormProps {
   formData: {
     curp: string;
-    nombre: string;
+    nombres: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
-    telefono: string;
     rol: string;
   };
   isSubmitting: boolean;
-  onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  onSelectChange: (e: ChangeEvent<HTMLSelectElement>) => void;
-  onSubmit: (e: FormEvent) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void; // Unified handler
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const StaffForm: React.FC<StaffFormProps> = ({
+const RegisterStaffForm: React.FC<StaffFormProps> = ({
   formData,
   isSubmitting,
-  onInputChange,
-  onSelectChange,
-  onSubmit,
+  handleInputChange,
+  handleFileChange,
+  handleSubmit,
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-      className={styles.formContainer}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+      className={styles.container}
     >
-      <h2 className={styles.formTitle}>Registrar personal</h2>
-      <form onSubmit={onSubmit} className={styles.form}>
+      <h2 className={styles.formTitle}>Registrar Estudiantes</h2>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Datos Personales</legend>
+          <div className={styles.formGrid}>
+            <FormSection title="Información Personal">
+              <div className={styles.inputWrapper}>
+                <Label htmlFor="curp">CURP</Label>
+                <InputField
+                  type="text"
+                  name="curp"
+                  placeholder="CURP"
+                  value={formData.curp}
+                  onChange={handleInputChange}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <Label htmlFor="nombres">Nombres</Label>
+                <InputField
+                  type="text"
+                  name="nombres"
+                  placeholder="Nombres"
+                  value={formData.nombres}
+                  onChange={handleInputChange}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <Label htmlFor="apellidoPaterno">Apellido Paterno</Label>
+                <InputField
+                  type="text"
+                  name="apellidoPaterno"
+                  placeholder="Apellido Paterno"
+                  value={formData.apellidoPaterno}
+                  onChange={handleInputChange}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <Label htmlFor="apellidoMaterno">Apellido Materno</Label>
+                <InputField
+                  type="text"
+                  name="apellidoMaterno"
+                  placeholder="Apellido Materno"
+                  value={formData.apellidoMaterno}
+                  onChange={handleInputChange}
+                  disabled={isSubmitting}
+                />
+              </div>
+            </FormSection>
 
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="curp">CURP *</Label>
-            <InputField
-              type="text"
-              name="curp"
-              placeholder="Ingresa el CURP"
-              value={formData.curp}
-              onChange={onInputChange}
-            />
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="nombre">Nombre *</Label>
-            <InputField
-              type="text"
-              name="nombre"
-              placeholder="Ingresa el nombre"
-              value={formData.nombre}
-              onChange={onInputChange}
-            />
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="apellidoPaterno">Apellido Paterno *</Label>
-            <InputField
-              type="text"
-              name="apellidoPaterno"
-              placeholder="Ingresa el apellido paterno"
-              value={formData.apellidoPaterno}
-              onChange={onInputChange}
-            />
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="apellidoMaterno">Apellido Materno</Label>
-            <InputField
-              type="text"
-              name="apellidoMaterno"
-              placeholder="Ingresa el apellido materno"
-              value={formData.apellidoMaterno}
-              onChange={onInputChange}
-            />
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="telefono">Teléfono *</Label>
-            <InputField
-              type="text"
-              name="telefono"
-              placeholder="Ingresa el teléfono"
-              value={formData.telefono}
-              onChange={onInputChange}
-            />
-          </div>
-
-          <legend className={styles.legend}>Información Laboral</legend>
-          <div className={styles.inputWrapper}>
-            <Label htmlFor="rol">Rol *</Label>
-            <motion.select
-              id="rol"
-              name="rol"
-              value={formData.rol}
-              onChange={onSelectChange}
-              whileFocus={{ scale: 1.02, borderColor: "#F3C44D" }}
-              transition={{ duration: 0.2 }}
-              className={styles.select}
-            >
-              <option value="">Seleccione un rol</option>
-              <option value="DIRECTIVO">Directivo</option>
-              <option value="PREFECTO">Prefecto</option>
-              <option value="DOCENTE">Docente</option>
-              <option value="TRABAJADOR SOCIAL">Trabajador Social</option>
-            </motion.select>
+            <FormSection title="Información Escolar">
+              <div className={styles.inputWrapper}>
+                <Label htmlFor="rol">Rol</Label>
+                <SelectField
+                  id="rol"
+                  name="rol"
+                  value={formData.rol}
+                  onChange={handleInputChange} // Use handleInputChange
+                  options={gradoOptions}
+                  disabled={isSubmitting}
+                />
+              </div>
+            </FormSection>
           </div>
 
           <div className={styles.buttonContainer}>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Guardando..." : "Guardar"}
+              {isSubmitting ? (
+                <>
+                  <span className={styles.spinner}></span> Guardando
+                </>
+              ) : (
+                'Guardar'
+              )}
             </Button>
-            <GoBackButton/>
+            <GoBackButton />
           </div>
         </fieldset>
       </form>
@@ -128,4 +136,4 @@ const StaffForm: React.FC<StaffFormProps> = ({
   );
 };
 
-export default StaffForm;
+export default RegisterStaffForm;

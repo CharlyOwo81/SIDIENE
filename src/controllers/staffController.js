@@ -21,24 +21,10 @@ export const createStaff = async (req, res) => {
 
 export const getAllStaff = async (req, res) => {
   try {
-    // Validar parámetros de búsqueda
-    const { searchQuery = '', filters = {} } = req.query;
-    
-    // Validar que searchQuery no sea solo espacios en blanco
-    if (typeof searchQuery === 'string' && searchQuery.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: "El término de búsqueda no puede estar vacío o contener solo espacios."
-      });
-    }
-
-    // Validar estructura de filtros
-    if (filters && typeof filters !== 'object') {
-      return res.status(400).json({
-        success: false,
-        message: "Formato de filtros inválido."
-      });
-    }
+    const searchQuery = req.query.searchQuery || '';
+    const filters = {
+      rol: req.query.rol ? req.query.rol.split(',') : [],
+    };
 
     const staff = await Staff.getAll(searchQuery, filters);
     res.status(200).json({
@@ -47,10 +33,10 @@ export const getAllStaff = async (req, res) => {
       count: staff.length
     });
   } catch (error) {
-    console.error('Error al obtener el personal:', error);
+    console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Error interno del servidor'
+      message: error.message || 'Server error'
     });
   }
 };

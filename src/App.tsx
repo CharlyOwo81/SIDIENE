@@ -14,7 +14,7 @@ import UpdateStudents from "./pages/ManageStudents/UpdateStudents";
 
 //STAFF PAGES
 import RegisterStaff from "./pages/ManageStaff/RegisterStaff";
-//import QueryStaff from "./pages/ManageStaff/QueryStaff";
+import QueryStaff from "./pages/ManageStaff/QueryStaff";
 //import UpdateStaff from "./pages/ManageStaff/UpdateStaff";
 
 
@@ -43,7 +43,7 @@ function App() {
             </ProtectedRoute>}
             />
 
-      {/*<Route path="/QueryStaff" element={<ProtectedRoute><QueryStaff /></ProtectedRoute>}/> */}
+      <Route path="/QueryStaff" element={<ProtectedRoute><QueryStaff /></ProtectedRoute>}/>
         {/* <Route path="/UpdateStaff"element={<ProtectedRoute><UpdateStaff /></ProtectedRoute>}/> */}      
           <Route
             path="/RegisterStudents"

@@ -57,38 +57,30 @@ static async getAll(searchQuery = '', filters = {}) {
     let sql = 'SELECT * FROM personal WHERE 1=1';
     const params = [];
 
-    // Aplicar búsqueda
-    if (searchQuery && searchQuery.trim() !== '') {
+    if (searchQuery) {
       sql += ` AND (
         nombres LIKE ? OR 
         apellido_paterno LIKE ? OR 
         apellido_materno LIKE ? OR 
-        curp LIKE ? OR 
-        rol LIKE ?
+        telefono LIKE ? OR
+        curp LIKE ?
       )`;
-      const searchTerm = `%${searchQuery.trim()}%`;
-      params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+      const searchTerm = `%${searchQuery}%`;
+      params.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
 
-    // Aplicar filtros
-    if (filters.rol && filters.rol.length > 0) {
+    if (filters.rol?.length > 0) {
       sql += ` AND rol IN (${filters.rol.map(() => '?').join(',')})`;
       params.push(...filters.rol);
-    }
-
-    if (filters.estatus && filters.estatus.length > 0) {
-      sql += ` AND estatus IN (${filters.estatus.map(() => '?').join(',')})`;
-      params.push(...filters.estatus);
     }
 
     const [rows] = await db.query(sql, params);
     return rows;
   } catch (error) {
-    console.error('Error al obtener el personal:', error);
+    console.error('Error:', error);
     throw error;
   }
 }
-
   static async getById(id) {
     try {
       const sql = 'SELECT * FROM personal WHERE curp = ?';
