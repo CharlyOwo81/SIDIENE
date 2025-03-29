@@ -95,37 +95,38 @@ class Student {
     return rows[0]; // Devolver el primer resultado (el estudiante)
   }
   
-  static async updateById(curp, updatedData) {
-    const sql = `
-      UPDATE estudiante
-      SET 
-        nombres = ?,
-        apellido_paterno = ?,
-        apellido_materno = ?,
-        grado = ?,
-        grupo = ?,
-        anio_ingreso = ?,
-        estatus = ?
-      WHERE curp = ?
-    `;
-    
-    const values = [
-      updatedData.nombres,
-      updatedData.apellido_paterno, // Asegúrate que estos nombres coincidan
-      updatedData.apellido_materno,
-      updatedData.grado,
-      updatedData.grupo,
-      updatedData.anio_ingreso,
-      updatedData.estatus,
-      curp
-    ];
+// In your Student model
+static async updateById(curp, updatedData) {
+  const sql = `
+    UPDATE estudiante
+    SET 
+      nombres = ?,
+      apellido_paterno = ?,
+      apellido_materno = ?,
+      grado = ?,
+      grupo = ?,
+      anio_ingreso = ?,
+      estatus = ?
+    WHERE curp = ?
+  `;
   
-    await db.query(sql, values);
-  
-    // Return the updated student
-    const [updated] = await db.query('SELECT * FROM estudiante WHERE curp = ?', [curp]);
-    return updated[0];
-  }
+  const values = [
+    updatedData.nombres,
+    updatedData.apellidoPaterno,
+    updatedData.apellidoMaterno,
+    updatedData.grado,
+    updatedData.grupo,
+    updatedData.anio_ingreso,
+    updatedData.estatus,
+    curp
+  ];
+
+  await db.query(sql, values);
+
+  // Return the updated student
+  const [updated] = await db.query('SELECT * FROM estudiante WHERE curp = ?', [curp]);
+  return updated[0];
+}
 
   static async delete(id) {
     const sql = 'DELETE FROM students WHERE id = ?';

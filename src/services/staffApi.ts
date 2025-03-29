@@ -33,9 +33,9 @@ interface StaffFilters {
   estatus?: string[];
 }
 
-export const getAllStaff = async (params: {
-  searchQuery?: string;
-  filters?: StaffFilters;
+export const getAllStaff = async (searchQuery: string, filters: { puesto: string[]; departamento: string[]; estatus: string[]; }, params: {
+    searchQuery?: string;
+    filters?: StaffFilters;
 }): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/staff`, {

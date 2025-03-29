@@ -246,51 +246,55 @@ function parseStudentsFromPdf(text) {
   };
 
 
-  export const updateStudent = async (req, res) => {
-    try {
-      const { curp } = req.params;
-      const { nombres, apellidoPaterno, apellidoMaterno, grado, grupo, anio_ingreso, estatus } = req.body;
-  
-      // Validar campos requeridos
-      if (!apellidoPaterno || !apellidoMaterno) {
-        return res.status(400).json({
-          success: false,
-          message: "Los apellidos son campos obligatorios."
-        });
-      }
-  
-      const result = await Student.updateById(curp, {
-        nombres,
-        apellido_paterno: apellidoPaterno,
-        apellido_materno: apellidoMaterno,
-        grado,
-        grupo,
-        anio_ingreso,
-        estatus
-      });
-  
-      if (!result) {
-        return res.status(404).json({ 
-          success: false,
-          message: "Estudiante no encontrado." 
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Estudiante actualizado con éxito.",
-        data: result
-      });
-    } catch (error) {
-      console.error("Update error:", error);
-      res.status(500).json({ 
+// In your studentsController.js
+export const updateStudent = async (req, res) => {
+  try {
+    const { curp } = req.params;
+    const { nombres, apellidoPaterno, apellidoMaterno, grado, grupo, anio_ingreso, estatus } = req.body;
+
+    console.log("Updating student with CURP:", curp);
+    console.log("Update data:", req.body);
+
+    const result = await Student.updateById(curp, {
+      nombres,
+      apellido_paterno: apellidoPaterno,
+      apellido_materno: apellidoMaterno,
+      grado,
+      grupo,
+      anio_ingreso,
+      estatus
+    });
+
+    if (!result) {
+      return res.status(404).json({ 
         success: false,
-        message: "Error al actualizar el estudiante",
-        error: error.message 
+        message: "Estudiante no encontrado." 
       });
     }
-  };
 
+    res.status(200).json({
+      success: true,
+      message: "Estudiante actualizado con éxito.",
+      data: {
+        curp: result.curp,
+        nombres: result.nombres,
+        apellidoPaterno: result.apellido_paterno,
+        apellidoMaterno: result.apellido_materno,
+        grado: result.grado,
+        grupo: result.grupo,
+        anio_ingreso: result.anio_ingreso,
+        estatus: result.estatus
+      }
+    });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error al actualizar el estudiante",
+      error: error.message 
+    });
+  }
+};
 
   export const deleteStudent = async (req, res) => {
     try {

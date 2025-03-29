@@ -39,7 +39,7 @@ const UpdateStudents: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+    
     if (!searchCurp || searchCurp.trim() === '') {
       setAlert({
         message: "Por favor, ingresa un CURP válido.",
@@ -53,13 +53,18 @@ const UpdateStudents: React.FC = () => {
   
     try {
       const response = await axios.get(`http://localhost:3307/api/students/${searchCurp}`);
-  
+      console.log("Backend response:", response.data); // Add this line
+      
       if (response.data) {
-        // Transform the backend data to match frontend interface
         const transformedData = {
-          ...response.data,
+          curp: response.data.curp, // Make sure curp is included
+          nombres: response.data.nombres,
           apellidoPaterno: response.data.apellido_paterno || response.data.apellidoPaterno,
-          apellidoMaterno: response.data.apellido_materno || response.data.apellidoMaterno
+          apellidoMaterno: response.data.apellido_materno || response.data.apellidoMaterno,
+          grado: response.data.grado,
+          grupo: response.data.grupo,
+          anio_ingreso: response.data.anio_ingreso,
+          estatus: response.data.estatus
         };
         
         setFormData(transformedData);
@@ -75,6 +80,7 @@ const UpdateStudents: React.FC = () => {
         });
       }
     } catch (error: any) {
+      console.error("Search error:", error); // Add error logging
       setAlert({
         message:
           error.response?.data?.message ||
@@ -88,7 +94,6 @@ const UpdateStudents: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;

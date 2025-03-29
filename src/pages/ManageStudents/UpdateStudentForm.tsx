@@ -32,7 +32,6 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
   isSubmitting,
   onInputChange,
   onSubmit,
-  onCancel,
 }) => {
   const estatusOptions = [
     { value: 'ACTIVO', label: 'ACTIVO' },
@@ -67,35 +66,42 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
         <legend className={styles.legend}>Actualizar Datos del Estudiante</legend>
 
         {/* Sección de información básica no editable */}
+        // In your UpdateStudentForm component, update the basic info section:
 <FormSection title="Información Básica">
   <div className={styles.inputWrapper}>
     <Label htmlFor="nombres">Nombres</Label>
     <InputField
-              type="text"
-              name="nombres"
-              value={formData.nombres}
-              onChange={onInputChange}
-              disabled placeholder={''}    />
+      type="text"
+      name="nombres"
+      value={formData.nombres || ''}
+      onChange={onInputChange}
+      disabled 
+      placeholder=""
+    />
   </div>
   
   <div className={styles.inputWrapper}>
     <Label htmlFor="apellidoPaterno">Apellido Paterno</Label>
     <InputField
-              type="text"
-              name="apellidoPaterno"
-              value={formData.apellidoPaterno}
-              onChange={onInputChange}
-              disabled placeholder={''}    />
+      type="text"
+      name="apellidoPaterno"
+      value={formData.apellidoPaterno || ''}
+      onChange={onInputChange}
+      disabled 
+      placeholder=""
+    />
   </div>
   
   <div className={styles.inputWrapper}>
     <Label htmlFor="apellidoMaterno">Apellido Materno</Label>
     <InputField
-              type="text"
-              name="apellidoMaterno"
-              value={formData.apellidoMaterno}
-              onChange={onInputChange}
-              disabled placeholder={''}    />
+      type="text"
+      name="apellidoMaterno"
+      value={formData.apellidoMaterno || ''}
+      onChange={onInputChange}
+      disabled 
+      placeholder=""
+    />
   </div>
 </FormSection>
 
