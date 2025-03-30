@@ -52,38 +52,32 @@ class Staff {
   }
 }
 
-// models/Staff.js - Fixed getAll method
 static async getAll(searchQuery = '', filters = {}) {
   try {
     let sql = 'SELECT * FROM personal WHERE 1=1';
     const params = [];
 
-    // Fixed search query handling
     if (searchQuery) {
       sql += ` AND (
         nombres LIKE ? OR 
         apellido_paterno LIKE ? OR 
         apellido_materno LIKE ? OR 
+        telefono LIKE ? OR
         curp LIKE ?
       )`;
       const searchTerm = `%${searchQuery}%`;
-      // Add 4 parameters for the 4 placeholders
       params.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
 
-    // Fixed filter handling
     if (filters.rol?.length > 0) {
       sql += ` AND rol IN (${filters.rol.map(() => '?').join(',')})`;
       params.push(...filters.rol);
     }
 
-    console.log('Final SQL:', sql);
-    console.log('Params:', params);
-
     const [rows] = await db.query(sql, params);
     return rows;
   } catch (error) {
-    console.error('Database Error:', error);
+    console.error('Error:', error);
     throw error;
   }
 }
