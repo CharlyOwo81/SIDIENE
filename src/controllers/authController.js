@@ -41,18 +41,21 @@ export const authController = async (req, res) => {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    // Successful login
-    return res.json({
+
+    // Al realizar el login exitoso
+    res.status(200).json({
+      success: true,
       message: 'Inicio de sesión exitoso',
       user: {
-        curp: user.curp,
-        nombre: user.nombres,
-        apellidoPaterno: user.apellido_paterno,
+        curp: user.curp, // Asegurar que se envía la CURP
+        nombres: user.nombres,
+        apellidoPaterno: user.apellido_paterno, // Asegurar coincidencia con nombres de campos en DB
         apellidoMaterno: user.apellido_materno,
-        telefono: user.telefono,
-        rol: user.rol,
-      },
+        rol: user.rol.toUpperCase(),
+        telefono: user.telefono
+      }
     });
+
   } catch (error) {
     console.error("Error en el servidor:", error);
     return res.status(500).json({ message: 'Error en el servidor' });

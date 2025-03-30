@@ -10,7 +10,17 @@ export const authService = async (telefono: string, contrasenia: string) => {
       headers: { "Content-Type": "application/json" },
     });
     console.log('API response:', response.data);
-    return response.data;
+    return {
+      message: "Inicio de sesión exitoso",
+      user: {
+        curp: response.data.user.curp, // <- Asegurar que existe
+        rol: response.data.user.rol,
+        nombres: response.data.user.nombres,
+        apellidoPaterno: response.data.user.apellidoPaterno, // Verificar nombres de campos
+        apellidoMaterno: response.data.user.apellidoMaterno,
+        telefono: response.data.user.telefono
+      }
+    };
   } catch (error) {
     console.error('API call failed:', error);
     if (axios.isAxiosError(error)) {

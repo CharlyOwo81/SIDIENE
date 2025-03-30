@@ -4,6 +4,8 @@ import cors from 'cors';
 import authRoutes from './src/routes/authRoutes.js';
 import studentRoutes from './src/routes/studentRoutes.js';
 import staffRoutes from './src/routes/staffRoutes.js';
+import incidentRoutes from './src/routes/incidentsRoutes.js';
+
 
 dotenv.config();
 
@@ -26,6 +28,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/incidences', incidentRoutes);
 
 // 404 Handler (after all routes)
 app.use('*', (req, res) => {

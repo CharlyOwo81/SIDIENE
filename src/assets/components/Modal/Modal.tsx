@@ -1,12 +1,12 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importar framer-motion
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Modal.module.css";
 
 interface ModalProps {
   students: any[];
   onClose: () => void;
   onSelectStudent: (student: any) => void;
-  isOpen: boolean; // Prop para controlar la visibilidad del modal
+  isOpen: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -15,42 +15,65 @@ const Modal: React.FC<ModalProps> = ({
   onSelectStudent,
   isOpen,
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredStudents, setFilteredStudents] = useState<any[]>([]);
+
+  useEffect(() => {
+    const filtered = students.filter((student) =>
+      `${student.nombres} ${student.apellidoPaterno || student.apellido_paterno} ${student.apellidoMaterno || student.apellido_materno} ${student.curp}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
+    setFilteredStudents(filtered);
+  }, [searchQuery, students]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           className={styles.modalOverlay}
-          initial={{ opacity: 0 }} // Estado inicial de la animación
-          animate={{ opacity: 1 }} // Estado animado
-          exit={{ opacity: 0 }} // Estado al salir
-          transition={{ duration: 0.3 }} // Duración de la animación
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
           <motion.div
             className={styles.modalContent}
-            initial={{ y: -50, opacity: 0 }} // Estado inicial de la animación
-            animate={{ y: 0, opacity: 1 }} // Estado animado
-            exit={{ y: 50, opacity: 0 }} // Estado al salir (cae hacia abajo)
-            transition={{ duration: 0.3 }} // Duración de la animación
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <h2>Selecciona un estudiante</h2>
-            <button onClick={onClose} className={styles.closeButton}>
-              X
-            </button>
+            <div className={styles.modalHeader}>
+              <h2>Seleccionar Estudiante</h2>
+              <button onClick={onClose} className={styles.closeButton}>
+                ×
+              </button>
+            </div>
+
+            <div className={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="Buscar estudiante..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+
             <div className={styles.studentList}>
-              {students.length > 0 ? (
+              {filteredStudents.length > 0 ? (
                 <table className={styles.studentTable}>
                   <thead>
                     <tr>
                       <th>Seleccionar</th>
-                      <th>Nombre</th>
-                      <th>Apellido Paterno</th>
-                      <th>Apellido Materno</th>
-                      <th>Grado</th>
-                      <th>Grupo</th>
+                      <th>Nombre Completo</th>
+                      <th>CURP</th>
+                      <th>Grado/Grupo</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map((student) => (
+                    {filteredStudents.map((student) => (
                       <tr
                         key={student.curp}
                         onClick={() => onSelectStudent(student)}
@@ -60,21 +83,22 @@ const Modal: React.FC<ModalProps> = ({
                           <input
                             type="radio"
                             name="selectedStudent"
-                            title="Seleccionar estudiante"
                             onChange={() => onSelectStudent(student)}
                           />
                         </td>
-                        <td>{student.nombre}</td>
-                        <td>{student.apellido_paterno}</td>
-                        <td>{student.apellido_materno}</td>
-                        <td>{student.grado}</td>
-                        <td>{student.grupo}</td>
+                        <td>
+                          {`${student.nombres} ${student.apellidoPaterno || student.apellido_paterno || ''} ${student.apellidoMaterno || student.apellido_materno || ''}`}
+                        </td>
+                        <td>{student.curp}</td>
+                        <td>{`${student.grado}° ${student.grupo}`}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p>No se encontraron estudiantes.</p>
+                <div className={styles.noResults}>
+                  <p>No se encontraron estudiantes</p>
+                </div>
               )}
             </div>
           </motion.div>

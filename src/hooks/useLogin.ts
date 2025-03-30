@@ -17,11 +17,12 @@ export const useLogin = () => {
     try {
       console.log("Teléfono:", telefono, "Contraseña:", contrasenia);
       const response = await authService(telefono, contrasenia);
-      if (response.message == "Inicio de sesión exitoso") {
-        localStorage.setItem("rol", response.user.rol);
+      if (response.message.toLowerCase().includes("exitoso")) {
+        localStorage.setItem("curp", response.user.curp);
+        localStorage.setItem("rol", response.user.rol.toUpperCase());
         localStorage.setItem(
           "nombreCompleto",
-          `${response.user.nombre} ${response.user.apellidoPaterno} ${response.user.apellidoMaterno}`
+          `${response.user.nombres} ${response.user.apellidoPaterno} ${response.user.apellidoMaterno}`
         );
         localStorage.setItem("telefono", response.user.telefono);
 

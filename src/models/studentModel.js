@@ -25,8 +25,8 @@ class Student {
       const values = studentsData.map(student => [
         student.curp,
         student.nombres,
-        student.apellidoPaterno,
-        student.apellidoMaterno,
+        student.apellido_paterno,
+        student.apellido_materno,
         student.grado,
         student.grupo,
         student.anio_ingreso
@@ -68,8 +68,8 @@ class Student {
       const values = [
         studentData.curp,
         studentData.nombres,
-        studentData.apellidoPaterno,
-        studentData.apellidoMaterno,
+        studentData.apellido_paterno,
+        studentData.apellido_materno,
         studentData.grado,
         studentData.grupo,
         studentData.anio_ingreso,
@@ -97,7 +97,7 @@ class Student {
   
 // In your Student model
 static async updateById(curp, updatedData) {
-  const sql = `
+  const sql = ` 
     UPDATE estudiante
     SET 
       nombres = ?,
@@ -112,8 +112,8 @@ static async updateById(curp, updatedData) {
   
   const values = [
     updatedData.nombres,
-    updatedData.apellidoPaterno,
-    updatedData.apellidoMaterno,
+    updatedData.apellido_paterno,
+    updatedData.apellido_materno,
     updatedData.grado,
     updatedData.grupo,
     updatedData.anio_ingreso,

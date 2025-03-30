@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./RolActivities.module.css";
 import navbarStyles from "./Navbar.module.css";
 import { useNavigate } from "react-router-dom";
@@ -31,12 +31,19 @@ const FunctionButton: React.FC<FunctionButtonProps> = ({
 
 function RolActivities() {
   const navigate = useNavigate();
-  const userRole = localStorage.getItem("rol") as
-    | "DIRECTIVO"
-    | "PREFECTO"
-    | "DOCENTE"
-    | "TRABAJADOR SOCIAL"
-    | null;
+  const userRole = localStorage.getItem("rol")?.toUpperCase() as 
+  | "DIRECTIVO" 
+  | "PREFECTO" 
+  | "DOCENTE" 
+  | "TRABAJADOR SOCIAL" 
+  | null;
+
+  // Agregar efecto de verificación inicial
+useEffect(() => {
+  if (!userRole) {
+    navigate("/login");
+  }
+}, [userRole, navigate]);
 
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
 

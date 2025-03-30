@@ -6,8 +6,8 @@ const API_URL = 'http://localhost:3307/api';
 interface StudentData {
   curp: string;
   nombres: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
+  apellido_paterno: string;
+  apellido_materno: string;
   grado: string;
   grupo: string;
   anio_ingreso: string;
@@ -80,8 +80,8 @@ export const updateStudent = async (id: string, studentData: StudentData): Promi
   try {
     const formattedData = {
       nombres: studentData.nombres,
-      apellido_paterno: studentData.apellidoPaterno,
-      apellido_materno: studentData.apellidoMaterno,
+      apellido_paterno: studentData.apellido_paterno,
+      apellido_materno: studentData.apellido_materno,
       grado: studentData.grado,
       grupo: studentData.grupo,
       anio_ingreso: studentData.anio_ingreso,
