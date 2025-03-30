@@ -1,8 +1,7 @@
-// src/assets/components/Table/StudentTable.tsx
 import React from "react";
 import { motion } from "framer-motion";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import styles from "../../../pages/ManageStudents/ManageStudents.module.css";
+import styles from "./Table.module.css"; // Import the new CSS module
 
 interface Student {
   curp: string;

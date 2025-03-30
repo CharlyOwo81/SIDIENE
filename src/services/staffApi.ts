@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3307/api';
 
 interface StaffData {
-  id: string;
+  curp: string;
   nombre: string;
   apellido: string;
   puesto: string;
@@ -30,7 +30,6 @@ export const createStaff = async (staffData: StaffData): Promise<ApiResponse> =>
 };
 interface StaffFilters {
   rol?: string[];
-  estatus?: string[];
 }
 
 export const getAllStaff = async (
@@ -56,9 +55,9 @@ export const getAllStaff = async (
   }
 };
 
-export const getStaffById = async (id: string): Promise<ApiResponse> => {
+export const getStaffById = async (curp: string): Promise<ApiResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/staff/${id}`);
+    const response = await axios.get(`${API_URL}/staff/${curp}`);
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {

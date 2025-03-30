@@ -53,34 +53,46 @@ class Staff {
 }
 
 static async getAll(searchQuery = '', filters = {}) {
-  try {
-    let sql = 'SELECT * FROM personal WHERE 1=1';
+  try{
+    let sql = 
+    `SELECT 
+    curp, 
+    nombres, 
+    apellido_paterno as apellidoPaterno, 
+    apellido_materno as apellidoMaterno, 
+    rol 
+    FROM personal 
+    WHERE 1=1`;
+  
     const params = [];
 
+    //Búsqueda con columnas exactas
     if (searchQuery) {
       sql += ` AND (
-        nombres LIKE ? OR 
-        apellido_paterno LIKE ? OR 
-        apellido_materno LIKE ? OR 
-        telefono LIKE ? OR
+        CONCAT(nombres, ' ', apellido_paterno, ' ', apellido_materno) LIKE ? OR
         curp LIKE ?
       )`;
       const searchTerm = `%${searchQuery}%`;
-      params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+      params.push(searchTerm, searchTerm);
     }
 
-    if (filters.rol?.length > 0) {
-      sql += ` AND rol IN (${filters.rol.map(() => '?').join(',')})`;
-      params.push(...filters.rol);
-    }
-
-    const [rows] = await db.query(sql, params);
-    return rows;
-  } catch (error) {
-    console.error('Error:', error);
-    throw error;
+        // Fixed array filter handling
+        if (filters.rol?.length > 0) {
+          sql += ` AND rol IN (?)`; // MySQL requires array wrapping
+          params.push([filters.rol]);
+        }
+    
+        console.log('Final SQL:', sql);
+        console.log('Params:', params);
+    
+        const [rows] = await db.query(sql, params);
+        return rows;
+      } catch (error) {
+        console.error('Database Error:', error);
+        throw error;
+      }
   }
-}
+  
   static async getById(id) {
     try {
       const sql = 'SELECT * FROM personal WHERE curp = ?';
@@ -92,29 +104,38 @@ static async getAll(searchQuery = '', filters = {}) {
     }
   }
 
-  static async update(id, staffData) {
-    try {
-      const sql = `
-        UPDATE staff
-        SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, telefono = ?, rol = ?
-        WHERE curp = ?
-      `;
-      const values = [
-        staffData.curp,
-        staffData.nombre,
-        staffData.apellidoPaterno,
-        staffData.apellidoMaterno,
-        staffData.telefono,
-        staffData.rol,
-        id,
-      ];
-      await db.query(sql, values);
-      console.log('Miembro del personal actualizado con éxito.');
-    } catch (error) {
-      console.error('Error al actualizar el miembro del personal:', error);
-      throw error;
-    }
+// models/Staff.js
+static async update(curp, staffData) {
+  try {
+    const sql = `
+      UPDATE personal
+      SET 
+        nombres = ?, 
+        apellido_paterno = ?, 
+        apellido_materno = ?, 
+        rol = ?
+      WHERE curp = ?
+    `;
+    const values = [
+      staffData.nombres,
+      staffData.apellidoPaterno,
+      staffData.apellidoMaterno,
+      staffData.rol,
+      curp // Original CURP from URL parameter
+    ];
+
+    console.log('Executing update with:', { sql, values });
+    
+    await db.query(sql, values);
+    console.log('Staff updated successfully');
+    
+    // Return updated staff data
+    return this.getById(curp);
+  } catch (error) {
+    console.error('Update error:', error);
+    throw error;
   }
+}
 
   static async delete(id) {
     try {

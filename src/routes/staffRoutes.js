@@ -11,9 +11,9 @@ const router = express.Router();
 
 router.post('/', createStaff);
 router.get('/', getAllStaff);
-router.get('/:id', getStaffById);
-router.put('/:id', updateStaff);
-router.delete('/:id', deleteStaff);
+router.get('/:curp', getStaffById);
+router.put('/:curp', updateStaff);
+router.delete('/:curp', deleteStaff);
 
 // src/routes/studentRoutes.js
 router.post('/', (req, res, next) => {

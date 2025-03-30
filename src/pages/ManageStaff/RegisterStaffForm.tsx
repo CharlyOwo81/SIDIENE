@@ -6,7 +6,7 @@ import FormSection from '../../assets/components/FormSection/FormSection';
 import GoBackButton from '../../assets/components/Button/GoBackButton';
 import Label from '../../assets/components/Label/Label';
 import SelectField from '../../assets/components/SelectField/SelectField';
-import styles from './ManageStudents.module.css';
+import styles from './AddStudents.module.css';
 
 // Definir las opciones para los select
 const gradoOptions = [

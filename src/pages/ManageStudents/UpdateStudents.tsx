@@ -94,6 +94,7 @@ const UpdateStudents: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;

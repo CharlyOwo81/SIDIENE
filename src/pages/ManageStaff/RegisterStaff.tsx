@@ -5,7 +5,8 @@ import StaffNavbar from "../../assets/components/Navbar/StaffNavbar";
 import styles from "./AddStaff.module.css";
 import { createStaff } from "../../services/staffApi";
 import StaffForm from "./RegisterStaffForm";
-import { Button } from "@mui/material";
+import Button from "../../assets/components/Button/Button";
+import Label from "../../assets/components/Label/Label";
 import InputField from "../../assets/components/InputField/InputField";
 import GoBackButton from "../../assets/components/Button/GoBackButton";
 
