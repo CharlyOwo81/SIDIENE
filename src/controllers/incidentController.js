@@ -42,18 +42,18 @@ export const createIncident = async (req, res) => {
 // controllers/incidentController.js
 export const getAllIncidents = async (req, res) => {
   try {
-    const incidents = await Incident.getAll(req.query);
-    
+    const incidents = await Incident.getAll();
     res.status(200).json({
       success: true,
-      data: incidents, // Asegurar que la respuesta use "data"
+      data: incidents,
       count: incidents.length
     });
-
   } catch (error) {
+    console.error('Error en getAllIncidents:', error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
+      error: error // Para debug en desarrollo
     });
   }
 };
@@ -75,12 +75,15 @@ export const getIncidentById = async (req, res) => {
 
 export const updateIncident = async (req, res) => {
   try {
+    const { id } = req.params;
     const updatedData = {
-      ...req.body,
-      fecha: new Date(req.body.fecha)
+      fecha: new Date(req.body.fecha),
+      nivel_severidad: req.body.nivel_severidad,
+      motivo: req.body.motivo,
+      descripcion: req.body.descripcion
     };
 
-    const updated = await Incident.update(req.params.id, updatedData);
+    const updated = await Incident.update(id, updatedData);
     
     if (!updated) {
       return res.status(404).json({
@@ -89,11 +92,17 @@ export const updateIncident = async (req, res) => {
       });
     }
 
-    const updatedIncident = await Incident.getById(req.params.id);
-    res.json({ success: true, data: updatedIncident });
+    const updatedIncident = await Incident.getById(id);
+    res.json({ 
+      success: true, 
+      data: updatedIncident 
+    });
 
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 

@@ -15,46 +15,29 @@ class Incident {
 
 // En models/incidentModel.js
 // models/incidentModel.js
-static async getAll(filters = {}) {
+static async getAll() {
   try {
-    let sql = `
+    const sql = `
       SELECT 
         i.id_incidencia,
-        i.fecha,
+        DATE_FORMAT(i.fecha, '%Y-%m-%d') as fecha,
         i.nivel_severidad,
         i.motivo,
         i.descripcion,
         e.curp AS curp_estudiante,
-        CONCAT(e.nombres, ' ', e.apellido_paterno) AS nombre_estudiante,
+        CONCAT(e.nombres, ' ', e.apellido_paterno, ' ', e.apellido_materno) AS nombre_estudiante,
         e.grado,
         e.grupo,
-        p.nombre AS nombre_personal
+        CONCAT(p.nombres, ' ', p.apellido_paterno, ' ', p.apellido_materno) AS nombre_personal
       FROM incidencia i
       JOIN estudiante e ON i.id_estudiante = e.curp
-      JOIN personal p ON i.id_personal = p.id
-      WHERE 1=1
+      JOIN personal p ON i.id_personal = p.curp
     `;
 
-    // ... (filtros)
-    
-    const [rows] = await db.query(sql, params);
-    return rows.map(row => ({
-      id_incidencia: row.id_incidencia.toString(),
-      fecha: new Date(row.fecha).toISOString(),
-      nivel_severidad: row.nivel_severidad,
-      motivo: row.motivo,
-      descripcion: row.descripcion,
-      estudiante: {
-        curp: row.curp_estudiante,
-        nombres: row.nombre_estudiante.split(' ')[0] || '',
-        apellidoPaterno: row.nombre_estudiante.split(' ')[1] || '',
-        grado: row.grado,
-        grupo: row.grupo
-      },
-      personal: row.nombre_personal
-    }));
-
+    const [rows] = await db.query(sql);
+    return rows;
   } catch (error) {
+    console.error('Error en getAll:', error);
     throw error;
   }
 }

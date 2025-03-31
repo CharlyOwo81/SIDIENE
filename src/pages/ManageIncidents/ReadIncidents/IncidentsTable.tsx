@@ -51,7 +51,7 @@ const IncidentsTable: React.FC<IncidentsTableProps> = ({ incidents, onViewPDF })
               variants={rowVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ backgroundColor: "#f5f5f5", transition: { duration: 0.2 } }}
+              whileHover={{ transition: { duration: 0.2 } }}
             >
               <td>{incident.nombre_estudiante}</td>
               <td>{new Date(incident.fecha).toLocaleDateString()}</td>
@@ -67,7 +67,7 @@ const IncidentsTable: React.FC<IncidentsTableProps> = ({ incidents, onViewPDF })
               <td>
                 <motion.button
                   className={styles.pdfButton}
-                  whileHover={{ scale: 1.1, boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)" }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onViewPDF(incident)}
                 >

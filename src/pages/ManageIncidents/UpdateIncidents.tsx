@@ -19,14 +19,11 @@
     nivel_severidad: NivelSeveridad;
     motivo: string;
     descripcion: string;
-    estudiante: {
-      curp: string;
-      nombres: string;
-      apellidoPaterno: string;
-      apellidoMaterno: string;
-      grado: string;
-      grupo: string;
-    };
+    curp_estudiante: string;
+    nombre_estudiante: string;
+    grado: string;
+    grupo: string;
+    nombre_personal: string;
   }
 
   const UpdateIncidents: React.FC = () => {
@@ -45,47 +42,46 @@
     const [showResultsModal, setShowResultsModal] = useState(false);
 
   // En el handleSearch, verificar la respuesta
-    const handleSearch = async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!searchFilters.fecha && !searchFilters.nombre && !searchFilters.severidad) {
+      alert('Por favor ingresa al menos un criterio de búsqueda');
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:3307/api/incidences', {
+        params: searchFilters
+      });
       
-      // Validar que al menos un filtro esté presente
-      if (!searchFilters.fecha && !searchFilters.nombre && !searchFilters.severidad) {
-        alert('Por favor ingresa al menos un criterio de búsqueda');
-        return;
+      // Validación corregida
+      if (response.data.success && Array.isArray(response.data.data)) {
+        setIncidents(response.data.data);
+        setFilteredIncidents(response.data.data);
+        setShowResultsModal(true);
+      } else {
+        throw new Error(response.data.message || 'Formato de respuesta inválido');
       }
-
-      setLoading(true);
-      try {
-        const response = await axios.get('/api/incidences', {
-          params: searchFilters
-        });
-        
-        // Actualizar la condición de validación
-        if (response.status === 200 && Array.isArray(response.data)) {
-          setIncidents(response.data);
-          setFilteredIncidents(response.data);
-          setShowResultsModal(true);
-        } else {
-          throw new Error('Formato de respuesta inválido');
-        }
-      } catch (error) {
-        console.error('Error searching incidents:', error);
-        if (axios.isAxiosError(error)) {
-          alert(error.response?.data?.message || 'Error al buscar incidencias');
-        } else {
-          alert('Error al buscar incidencias');
-        }
-      } finally {
-        setLoading(false);
+    } catch (error) {
+      console.error('Error searching incidents:', error);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || 'Error al buscar incidencias');
+      } else {
+        alert('Error al buscar incidencias');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const handleModalSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
       const term = e.target.value.toLowerCase();
       setSearchTerm(term);
       const filtered = incidents.filter(incident =>
-        incident.estudiante.nombres.toLowerCase().includes(term) ||
-        incident.estudiante.apellidoPaterno.toLowerCase().includes(term) ||
+        incident.nombre_estudiante.toLowerCase().includes(term) ||
+        incident.nivel_severidad.toLowerCase().includes(term) ||
         incident.motivo.toLowerCase().includes(term)
       );
       setFilteredIncidents(filtered);
@@ -97,12 +93,15 @@
 
       setIsSubmitting(true);
       try {
-        await axios.put(`/api/incidents/${selectedIncident.id_incidencia}`, {
-          fecha: selectedIncident.fecha,
-          nivel_severidad: selectedIncident.nivel_severidad,
-          motivo: selectedIncident.motivo,
-          descripcion: selectedIncident.descripcion
-        });
+        await axios.put(
+          `http://localhost:3307/api/incidences/${selectedIncident.id_incidencia}`, // URL corregida
+          {
+            fecha: selectedIncident.fecha,
+            nivel_severidad: selectedIncident.nivel_severidad,
+            motivo: selectedIncident.motivo,
+            descripcion: selectedIncident.descripcion
+          }
+        );
         
         // Actualizar lista de incidentes
         const updatedIncidents = incidents.map(inc => 
@@ -170,6 +169,7 @@
                 <Button type="submit" disabled={loading}>
                   {loading ? 'Buscando...' : 'Buscar Incidencias'}
                 </Button>
+                <GoBackButton />
               </div>
             </div>
           </form>
@@ -204,7 +204,7 @@
                     {new Date(incident.fecha).toLocaleDateString()}
                   </div>
                   <div className={styles.resultName}>
-                    {incident.estudiante.nombres} {incident.estudiante.apellidoPaterno}
+                    {incident.nombre_estudiante}
                   </div>
                   <div className={styles.resultSeverity}>
                     {incident.nivel_severidad}
@@ -293,6 +293,7 @@
                 >
                   Cancelar
                 </Button>
+
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
