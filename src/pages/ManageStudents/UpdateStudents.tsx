@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import styles from "./ManageStudents.module.css";
+import styles from "../ManageStaff/AddStaff.module.css"; // Use AddStaff.module.css for consistency
 import Navbar from "../../assets/components/Navbar/StudentsNavbar";
 import Alert from "../../assets/components/Alert/Alert";
 import SearchStudentForm from "./SearchStudentForm";
@@ -39,39 +39,28 @@ const UpdateStudents: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!searchCurp || searchCurp.trim() === '') {
-      setAlert({
-        message: "Por favor, ingresa un CURP válido.",
-        type: "error"
-      });
+    if (!searchCurp.trim()) {
+      setAlert({ message: "Por favor, ingresa un CURP válido.", type: "error" });
       setFormData(null);
       return;
     }
-  
+
     setIsLoading(true);
-  
     try {
       const response = await axios.get(`http://localhost:3307/api/students/${searchCurp}`);
-      console.log("Backend response:", response.data); // Add this line
-      
       if (response.data.data) {
         const transformedData = {
-          curp: response.data.data.curp, // Make sure curp is included
+          curp: response.data.data.curp,
           nombres: response.data.data.nombres,
           apellidoPaterno: response.data.data.apellido_paterno || response.data.data.apellidoPaterno,
           apellidoMaterno: response.data.data.apellido_materno || response.data.data.apellidoMaterno,
           grado: response.data.data.grado,
           grupo: response.data.data.grupo,
           anio_ingreso: response.data.data.anio_ingreso,
-          estatus: response.data.data.estatus
+          estatus: response.data.data.estatus,
         };
-        
         setFormData(transformedData);
-        setAlert({
-          message: "Estudiante encontrado.",
-          type: "success",
-        });
+        setAlert({ message: "Estudiante encontrado.", type: "success" });
       } else {
         setFormData(null);
         setAlert({
@@ -80,13 +69,8 @@ const UpdateStudents: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error("Search error:", error); // Add error logging
       setAlert({
-        message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al buscar el estudiante."),
+        message: error.response?.data?.message || "Error al buscar el estudiante.",
         type: "error",
       });
       setFormData(null);
@@ -98,27 +82,21 @@ const UpdateStudents: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
-  
+
     setIsSubmitting(true);
-  
     try {
       const response = await axios.put(
         `http://localhost:3307/api/students/${formData.curp}`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
-  
       setAlert({
         message: response.data.message || "Estudiante actualizado con éxito.",
         type: "success",
       });
     } catch (error: any) {
       setAlert({
-        message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al actualizar el estudiante."),
+        message: error.response?.data?.message || "Error al actualizar el estudiante.",
         type: "error",
       });
     } finally {
@@ -134,7 +112,6 @@ const UpdateStudents: React.FC = () => {
       className={styles.mainContainer}
     >
       <Navbar />
-
       {alert && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -154,18 +131,18 @@ const UpdateStudents: React.FC = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-        className={styles.container}
+        className={styles.formContainer}
       >
         <h2 className={styles.formTitle}>Actualizar Estudiantes</h2>
 
-        <SearchStudentForm
-          searchCurp={searchCurp}
-          isLoading={isLoading}
-          onSearchChange={handleSearchChange}
-          onSearchSubmit={handleSearch}
-        />
-
-        {formData && (
+        {!formData ? (
+          <SearchStudentForm
+            searchCurp={searchCurp}
+            isLoading={isLoading}
+            onSearchChange={handleSearchChange}
+            onSearchSubmit={handleSearch}
+          />
+        ) : (
           <UpdateStudentForm
             formData={formData}
             isSubmitting={isSubmitting}

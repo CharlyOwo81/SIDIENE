@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import styles from "./AddStaff.module.css";
-import Navbar from "../../assets/components/Navbar/StudentsNavbar";
+import Navbar from "../../assets/components/Navbar/StaffNavbar";
 import Alert from "../../assets/components/Alert/Alert";
 import SearchStaffForm from "./SearchStaffForm";
 import UpdateStaffForm from "./UpdateStaffForm";
@@ -12,7 +12,7 @@ interface Staff {
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  rol : string;
+  rol: string;
 }
 
 const UpdateStaff: React.FC = () => {
@@ -36,51 +36,35 @@ const UpdateStaff: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!searchCurp || searchCurp.trim() === '') {
-      setAlert({
-        message: "Por favor, ingresa un CURP válido.",
-        type: "error"
-      });
+    if (!searchCurp.trim()) {
+      setAlert({ message: "Por favor, ingresa un CURP válido.", type: "error" });
       setFormData(null);
       return;
     }
-  
+
     setIsLoading(true);
-  
     try {
       const response = await axios.get(`http://localhost:3307/api/staff/${searchCurp}`);
-      console.log("Backend response:", response.data); // Add this line
-      
       if (response.data.data) {
         const transformedData = {
-          curp: response.data.data.curp, // Make sure curp is included
+          curp: response.data.data.curp,
           nombres: response.data.data.nombres,
           apellidoPaterno: response.data.data.apellido_paterno || response.data.data.apellidoPaterno,
           apellidoMaterno: response.data.data.apellido_materno || response.data.data.apellidoMaterno,
           rol: response.data.data.rol,
         };
-        
         setFormData(transformedData);
-        setAlert({
-          message: "Personal encontrado.",
-          type: "success",
-        });
+        setAlert({ message: "Personal encontrado.", type: "success" });
       } else {
         setFormData(null);
         setAlert({
-          message: "No se encontró un integrante del personal con ese CURP.",
+          message: "No se encontró personal con ese CURP.",
           type: "warning",
         });
       }
     } catch (error: any) {
-      console.error("Search error:", error); // Add error logging
       setAlert({
-        message:
-          error.response?.data?.message ||
-          (error.request
-            ? "Sin respuesta del servidor."
-            : "Error al buscar el estudiante."),
+        message: error.response?.data?.message || "Error al buscar al personal.",
         type: "error",
       });
       setFormData(null);
@@ -89,43 +73,43 @@ const UpdateStaff: React.FC = () => {
     }
   };
 
-// UpdateStaff.tsx
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!formData) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData) return;
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:3307/api/staff/${formData.curp}`,
+        {
+          nombres: formData.nombres,
+          apellidoPaterno: formData.apellidoPaterno,
+          apellidoMaterno: formData.apellidoMaterno,
+          rol: formData.rol,
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-  try {
-    const response = await axios.put(
-      `http://localhost:3307/api/staff/${formData.curp}`, // Use original CURP from search
-      {
-        nombres: formData.nombres,
-        apellidoPaterno: formData.apellidoPaterno,
-        apellidoMaterno: formData.apellidoMaterno,
-        rol: formData.rol
-      },
-      { headers: { "Content-Type": "application/json" } }
-    );
+      setAlert({
+        message: response.data.message || "Personal actualizado con éxito.",
+        type: "success",
+      });
 
-    setAlert({
-      message: response.data.message || "Personal actualizado con éxito",
-      type: "success",
-    });
+      const refreshResponse = await axios.get(`http://localhost:3307/api/staff/${formData.curp}`);
+      setFormData({
+        ...refreshResponse.data.data,
+        curp: formData.curp, // Preserve the original CURP
+      });
+    } catch (error: any) {
+      setAlert({
+        message: error.response?.data?.message || "Error al actualizar el personal.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    // Refresh the data
-    const refreshResponse = await axios.get(`http://localhost:3307/api/staff/${formData.curp}`);
-    setFormData(refreshResponse.data.data);
-
-  } catch (error: any) {
-    setAlert({
-      message: error.response?.data?.message || "Error al actualizar el personal",
-      type: "error",
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -134,7 +118,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       className={styles.mainContainer}
     >
       <Navbar />
-
       {alert && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -154,18 +137,18 @@ const handleSubmit = async (e: React.FormEvent) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-        className={styles.container}
+        className={styles.formContainer}
       >
-        <h2 className={styles.formTitle}>Actualizar Estudiantes</h2>
+        <h2 className={styles.formTitle}>Actualizar Personal</h2>
 
-        <SearchStaffForm
-          searchCurp={searchCurp}
-          isLoading={isLoading}
-          onSearchChange={handleSearchChange}
-          onSearchSubmit={handleSearch}
-        />
-
-        {formData && (
+        {!formData ? (
+          <SearchStaffForm
+            searchCurp={searchCurp}
+            isLoading={isLoading}
+            onSearchChange={handleSearchChange}
+            onSearchSubmit={handleSearch}
+          />
+        ) : (
           <UpdateStaffForm
             formData={formData}
             isSubmitting={isSubmitting}

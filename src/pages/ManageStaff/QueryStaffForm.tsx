@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 import InputField from '../../assets/components/InputField/InputField';
 import SelectField from '../../assets/components/SelectField/SelectField';
 import Button from '../../assets/components/Button/Button';
-import styles from './AddStaff.module.css';
+import styles from './QueryStaff.module.css';
+import Label from '../../assets/components/Label/Label';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
 
 interface QueryStaffFormProps {
   searchQuery: string;
@@ -15,6 +17,14 @@ interface QueryStaffFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
+const rolOptions = [
+  { value: '', label: 'Todos' },
+  { value: 'DOCENTE', label: 'Docente' },
+  { value: 'PREFECTO', label: 'Prefecto' },
+  { value: 'DIRECTIVO', label: 'Directivo' },
+  { value: 'TRABAJADOR SOCIAL', label: 'Trabajador Social' },
+];
+
 const QueryStaffForm: React.FC<QueryStaffFormProps> = ({
   searchQuery,
   filters,
@@ -22,59 +32,57 @@ const QueryStaffForm: React.FC<QueryStaffFormProps> = ({
   handleFilterChange,
   handleSubmit,
 }) => {
-  const rolOptions = [
-    { value: '', label: 'Todos' },
-    { value: 'DOCENTE', label: 'Docente' },
-    { value: 'PREFECTO', label: 'Prefecto' },
-    { value: 'DIRECTIVO', label: 'Directivo' },
-    { value: 'TRABAJADOR_SOCIAL', label: 'Trabajador Social' },
-  ];
 
   return (
-    <motion.form
-      onSubmit={handleSubmit}
-      className={styles.form}
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
+      className={styles.queryContainer}
     >
-      <div className={styles.searchContainer}>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-        >
+      <form onSubmit={handleSubmit} className={styles.queryForm}>
+        <div className={styles.inputGroup}>
+        <h2 className={styles.formTitle}>Consultar personal</h2>
+          <Label htmlFor="search">Buscar por Nombre o CURP</Label>
           <InputField
             type="text"
-            placeholder="Buscar personal..."
+            name={'search'}
             value={searchQuery}
             onChange={handleSearchChange}
-            name="search"
-          />
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400 }}
-        >
-          <Button type="submit">Buscar</Button>
-        </motion.div>
-      </div>
+            placeholder="Nombre, CURP, etc."
+            className={styles.searchInput}/>
+        </div>
 
-      <div className={styles.filterContainer}>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: 'spring', stiffness: 300 }}
+        <div className={styles.filterGrid}>
+          <div className={styles.filterGroup}>
+            <Label htmlFor="rol">Rol</Label>
+            <motion.div whileFocus={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <SelectField
+                name="rol"
+                options={rolOptions}
+                id="rol"
+                value={filters.rol}
+                onChange={handleFilterChange}
+                className={styles.filterSelect}
+              />
+            </motion.div>
+          </div>
+        </div>
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}
         >
-          <SelectField
-            name="rol"
-            options={rolOptions}
-            multiple
-            value={filters.rol}
-            onChange={handleFilterChange}
-          />
-        </motion.div>
-      </div>
-    </motion.form>
+        <GoBackButton />
+        <Button type="submit">Buscar</Button>
+
+        </div>
+      </form>
+    </motion.div>
   );
 };
 

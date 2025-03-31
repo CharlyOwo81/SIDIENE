@@ -5,15 +5,11 @@ import StaffNavbar from "../../assets/components/Navbar/StaffNavbar";
 import styles from "./AddStaff.module.css";
 import { createStaff } from "../../services/staffApi";
 import StaffForm from "./RegisterStaffForm";
-import Button from "../../assets/components/Button/Button";
-import Label from "../../assets/components/Label/Label";
-import InputField from "../../assets/components/InputField/InputField";
-import GoBackButton from "../../assets/components/Button/GoBackButton";
 
 const ManageStaff: React.FC = () => {
   const [formData, setFormData] = useState({
     curp: "",
-    nombre: "",
+    nombres: "",
     apellidoPaterno: "",
     apellidoMaterno: "",
     telefono: "",
@@ -26,9 +22,9 @@ const ManageStaff: React.FC = () => {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -41,7 +37,7 @@ const ManageStaff: React.FC = () => {
 
     if (
       !formData.curp ||
-      !formData.nombre ||
+      !formData.nombres ||
       !formData.apellidoPaterno ||
       !formData.telefono ||
       !formData.rol
@@ -58,7 +54,7 @@ const ManageStaff: React.FC = () => {
     const datosFormulario = {
       id: "",
       curp: formData.curp,
-      nombre: formData.nombre,
+      nombre: formData.nombres,
       apellido: `${formData.apellidoPaterno} ${formData.apellidoMaterno || ""}`.trim(),
       apellidoPaterno: formData.apellidoPaterno,
       apellidoMaterno: formData.apellidoMaterno || null,
@@ -75,7 +71,7 @@ const ManageStaff: React.FC = () => {
       });
       setFormData({
         curp: "",
-        nombre: "",
+        nombres: "",
         apellidoPaterno: "",
         apellidoMaterno: "",
         telefono: "",
@@ -116,80 +112,15 @@ const ManageStaff: React.FC = () => {
         </motion.div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }} // Match RegisterStudents
-        className={styles.containerRight}
-      >
-        <h2>Ingresar de manera manual</h2>
-        <form onSubmit={handleSubmit}>
-          <fieldset className={styles.fieldset}>
-            <legend>Datos Personales</legend>
-            <InputField
-              type="text"
-              name="curp"
-              placeholder="CURP *"
-              value={formData.curp}
-              onChange={(e) => setFormData({ ...formData, curp: e.target.value })}
-            />
-            <InputField
-              type="text"
-              name="nombre"
-              placeholder="Nombre *"
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            />
-            <InputField
-              type="text"
-              name="apellidoPaterno"
-              placeholder="Apellido Paterno *"
-              value={formData.apellidoPaterno}
-              onChange={(e) => setFormData({ ...formData, apellidoPaterno: e.target.value })}
-            />
-            <InputField
-              type="text"
-              name="apellidoMaterno"
-              placeholder="Apellido Materno"
-              value={formData.apellidoMaterno}
-              onChange={(e) => setFormData({ ...formData, apellidoMaterno: e.target.value })}
-            />
-            <InputField
-              type="text"
-              name="telefono"
-              placeholder="Teléfono *"
-              value={formData.telefono}
-              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-            />
-            <legend>Información Laboral</legend>
-            <motion.select
-              name="rol"
-              value={formData.rol}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setFormData({ ...formData, rol: e.target.value })
-              }
-              whileFocus={{ scale: 1.05 }}
-              className={styles.select}
-            >
-              <option value="">Seleccione un rol *</option>
-              <option value="DIRECTIVO">DIRECTIVO</option>
-              <option value="PREFECTO">PREFECTO</option>
-              <option value="DOCENTE">DOCENTE</option>
-              <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
-            </motion.select>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <span className={styles.spinner}></span> Guardando
-                </>
-              ) : (
-                "Guardar"
-              )}
-            </Button>
-            <GoBackButton />
-          </fieldset>
-        </form>
-      </motion.div>
+      <StaffForm
+        formData={formData}
+        isSubmitting={isSubmitting}
+        handleInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
+        handleSubmit={handleSubmit} 
+        handleFileChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
+          throw new Error("Function not implemented.");
+        } }/>
     </motion.section>
   );
 };

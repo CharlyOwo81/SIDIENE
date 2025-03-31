@@ -4,7 +4,6 @@ import Login from "./pages/Login/Login";
 
 import Footer from "./assets/components/Footer/Footer";
 import Header from "./assets/components/Header/Header";
-import CreateIncidents from "./pages/ManageIncidents/CreateIncidents/CreateIncidents";
 import RolActivities from "./pages/MiddlePage/RolActivities";
 
 //STUDENTS PAGES
@@ -19,12 +18,15 @@ import UpdateStaff from "./pages/ManageStaff/UpdateStaff";
 
 
 import ProtectedRoute from "./assets/components/ProtectedRoute/ProtectedRoute";
+import CreateIncidents from "./pages/ManageIncidents/CreateIncidents/CreateIncidents";
 import ReadIncidents from "./pages/ManageIncidents/ReadIncidents/ReadIncidents";
+import UpdateIncidents from "./pages/ManageIncidents/UpdateIncidents";
 
 function App() {
   return (
     <Router>
       <Header />
+      
       <Routes>
         <Route path="/" element={<Login />} />
         <Route
@@ -82,6 +84,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ReadIncidents />
+            </ProtectedRoute>
+          }
+        />
+                <Route
+          path="/UpdateIncidents"
+          element={
+            <ProtectedRoute>
+              <UpdateIncidents />
             </ProtectedRoute>
           }
         />

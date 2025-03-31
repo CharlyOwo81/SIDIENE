@@ -8,6 +8,7 @@ interface ModalProps {
   onSelectStudent: (student: any) => void;
   isOpen: boolean;
   children?: React.ReactNode;
+  title?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({

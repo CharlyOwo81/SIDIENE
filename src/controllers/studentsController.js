@@ -1,6 +1,5 @@
 import Student from '../models/studentModel.js';
 import multer from 'multer';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 
 const upload = multer({ storage: multer.memoryStorage() });
 

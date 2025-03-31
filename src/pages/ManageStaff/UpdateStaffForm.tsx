@@ -44,10 +44,7 @@ const UpdateStaffForm: React.FC<UpdateStaffFormProps> = ({
       className={styles.form}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Actualizar Datos del Estudiante</legend>
+      transition={{ duration: 0.5, ease: 'easeOut' }}>
 
         {/* Sección de información básica no editable */}
 <FormSection title="Información Básica">
@@ -106,10 +103,17 @@ const UpdateStaffForm: React.FC<UpdateStaffFormProps> = ({
         </FormSection>
 
         {/* Botones de acción */}
-        <div className={styles.buttonContainer}>
-          <GoBackButton/>
-          
-          <Button 
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}
+        >
+        <GoBackButton />
+        <Button 
             type="submit" 
             disabled={isSubmitting}
           >
@@ -121,8 +125,8 @@ const UpdateStaffForm: React.FC<UpdateStaffFormProps> = ({
               'Guardar Cambios'
             )}
           </Button>
+
         </div>
-      </fieldset>
     </motion.form>
   );
 };

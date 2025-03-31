@@ -20,8 +20,6 @@ const SearchStaffForm: React.FC<SearchStaffFormProps> = ({
 }) => {
   return (
     <form onSubmit={onSearchSubmit} className={styles.form}>
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Buscar integrante del personal</legend>
         <FormSection title="CURP del integrante del personal">
           <InputField
             type="text"
@@ -31,19 +29,19 @@ const SearchStaffForm: React.FC<SearchStaffFormProps> = ({
             onChange={onSearchChange}
           />
         </FormSection>
-        <div className={styles.buttonContainer}>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <span className={styles.spinner}></span> Buscando...
-              </>
-            ) : (
-              "Buscar"
-            )}
-          </Button>
-          <GoBackButton />
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}
+        >
+        <GoBackButton />
+        <Button type="submit">Buscar</Button>
+
         </div>
-      </fieldset>
     </form>
   );
 };

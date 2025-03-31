@@ -1,27 +1,53 @@
 import Incident from '../models/incidentModel.js';
 
+const handleError = (res, error) => {
+  console.error(error);
+  res.status(500).json({
+    success: false,
+    message: error.message
+  });
+};
+
 export const createIncident = async (req, res) => {
   try {
-    const requiredFields = ['id_estudiante', 'id_personal', 'nivel_severidad', 'motivo', 'descripcion'];
-    for (const field of requiredFields) {
-      if (!req.body[field]) {
-        return res.status(400).json({
-          success: false,
-          message: `${field} es requerido`
-        });
-      }
+    const requiredFields = ['id_estudiante', 'id_personal', 'nivel_severidad', 'motivo'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Campos requeridos faltantes: ${missingFields.join(', ')}`
+      });
     }
 
-    const incidentId = await Incident.create(req.body);
+    const incidentData = {
+      ...req.body,
+      fecha: new Date(req.body.fecha || Date.now())
+    };
+
+    const incidentId = await Incident.create(incidentData);
     
-    // Respuesta simplificada sin necesidad de obtener el registro
+    const newIncident = await Incident.getById(incidentId);
     res.status(201).json({
       success: true,
-      data: {
-        id: incidentId,
-        ...req.body // Incluimos los datos que ya tenemos
-      },
-      message: "Incidencia registrada exitosamente"
+      data: newIncident
+    });
+
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+// En controllers/incidentController.js
+// controllers/incidentController.js
+export const getAllIncidents = async (req, res) => {
+  try {
+    const incidents = await Incident.getAll(req.query);
+    
+    res.status(200).json({
+      success: true,
+      data: incidents, // Asegurar que la respuesta use "data"
+      count: incidents.length
     });
 
   } catch (error) {
@@ -32,18 +58,56 @@ export const createIncident = async (req, res) => {
   }
 };
 
-export const getAllIncidents = async (req, res) => {
+export const getIncidentById = async (req, res) => {
   try {
-    const incidents = await Incident.getAll();
-    res.status(200).json({
-      success: true,
-      data: incidents,
-      count: incidents.length
-    });
+    const incident = await Incident.getById(req.params.id);
+    if (!incident) {
+      return res.status(404).json({
+        success: false,
+        message: 'Incidencia no encontrada'
+      });
+    }
+    res.json({ success: true, data: incident });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    handleError(res, error);
+  }
+};
+
+export const updateIncident = async (req, res) => {
+  try {
+    const updatedData = {
+      ...req.body,
+      fecha: new Date(req.body.fecha)
+    };
+
+    const updated = await Incident.update(req.params.id, updatedData);
+    
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Incidencia no encontrada'
+      });
+    }
+
+    const updatedIncident = await Incident.getById(req.params.id);
+    res.json({ success: true, data: updatedIncident });
+
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const deleteIncident = async (req, res) => {
+  try {
+    const deleted = await Incident.delete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Incidencia no encontrada'
+      });
+    }
+    res.json({ success: true, message: 'Incidencia eliminada' });
+  } catch (error) {
+    handleError(res, error);
   }
 };

@@ -62,9 +62,6 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Actualizar Datos del Estudiante</legend>
-
         {/* Sección de información básica no editable */}
 <FormSection title="Información Básica">
   <div className={styles.inputWrapper}>
@@ -144,10 +141,17 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
         </FormSection>
 
         {/* Botones de acción */}
-        <div className={styles.buttonContainer}>
-          <GoBackButton/>
-          
-          <Button 
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}
+        >
+        <GoBackButton />
+        <Button 
             type="submit" 
             disabled={isSubmitting}
           >
@@ -159,8 +163,8 @@ const UpdateStudentForm: React.FC<UpdateStudentFormProps> = ({
               'Guardar Cambios'
             )}
           </Button>
+
         </div>
-      </fieldset>
     </motion.form>
   );
 };

@@ -1,44 +1,34 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import InputField from '../../assets/components/InputField/InputField';
-import Button from '../../assets/components/Button/Button';
-import FormSection from '../../assets/components/FormSection/FormSection';
-import GoBackButton from '../../assets/components/Button/GoBackButton';
-import Label from '../../assets/components/Label/Label';
-import SelectField from '../../assets/components/SelectField/SelectField';
-import styles from './ManageStudents.module.css';
+// src/components/RegisterStudentsForm.tsx
+import React from "react";
+import InputField from "../../assets/components/InputField/InputField";
+import SelectField from "../../assets/components/SelectField/SelectField";
+import Button from "../../assets/components/Button/Button";
+import styles from "./ManageStudents.module.css";
+import estilo from "./DatePicker.module.css";
+import DatePicker from "react-datepicker";
+import "cally";
+import "react-datepicker/dist/react-datepicker.css";
+import GoBackButton from "../../assets/components/Button/GoBackButton";
+import { CalendarDate } from "cally";
 
-// Definir las opciones para los select
-const gradoOptions = [
-  { value: '1', label: '1' },
-  { value: '2', label: '2' },
-  { value: '3', label: '3' },
-];
-
-const grupoOptions = [
-  { value: 'A', label: 'A' },
-  { value: 'B', label: 'B' },
-  { value: 'C', label: 'C' },
-  { value: 'D', label: 'D' },
-  { value: 'E', label: 'E' },
-  { value: 'F', label: 'F' },
-];
+interface FormData {
+  curp: string;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  grado: string;
+  grupo: string;
+  anio_ingreso: string;
+}
 
 interface StudentFormProps {
-  formData: {
-    curp: string;
-    nombres: string;
-    apellidoPaterno: string;
-    apellidoMaterno: string;
-    grado: string;
-    grupo: string;
-    anio_ingreso: string;
-  };
+  formData: FormData;
   file: File | null;
   isSubmitting: boolean;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void; // Unified handler
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }
 
 const StudentForm: React.FC<StudentFormProps> = ({
@@ -48,132 +38,147 @@ const StudentForm: React.FC<StudentFormProps> = ({
   handleInputChange,
   handleFileChange,
   handleSubmit,
+  setFormData,
 }) => {
+  const gradeOptions = [
+    { value: "1", label: "1°" },
+    { value: "2", label: "2°" },
+    { value: "3", label: "3°" },
+  ];
+
+  const groupOptions = [
+    { value: "A", label: "A" },
+    { value: "B", label: "B" },
+    { value: "C", label: "C" },
+  ];
+
+  const handleYearChange = (date: Date | null) => {
+    setFormData({
+      ...formData,
+      anio_ingreso: date?.getFullYear().toString() || ""
+    });
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
-      className={styles.container}
-    >
+    <div className={styles.formContainer}>
       <h2 className={styles.formTitle}>Registrar Estudiantes</h2>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <fieldset className={styles.fieldset}>
-          <div className={styles.formGrid}>
-            <FormSection title="Información Personal">
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="curp">CURP</Label>
-                <InputField
-                  type="text"
-                  name="curp"
-                  placeholder="CURP"
-                  value={formData.curp}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="nombres">Nombres</Label>
-                <InputField
-                  type="text"
-                  name="nombres"
-                  placeholder="Nombres"
-                  value={formData.nombres}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="apellidoPaterno">Apellido Paterno</Label>
-                <InputField
-                  type="text"
-                  name="apellidoPaterno"
-                  placeholder="Apellido Paterno"
-                  value={formData.apellidoPaterno}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="apellidoMaterno">Apellido Materno</Label>
-                <InputField
-                  type="text"
-                  name="apellidoMaterno"
-                  placeholder="Apellido Materno"
-                  value={formData.apellidoMaterno}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-            </FormSection>
-
-            <FormSection title="Información Escolar">
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="grado">Grado</Label>
-                <SelectField
-                  id="grado"
-                  name="grado"
-                  value={formData.grado}
-                  onChange={handleInputChange} // Use handleInputChange
-                  options={gradoOptions}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="grupo">Grupo</Label>
-                <SelectField
-                  id="grupo"
-                  name="grupo"
-                  value={formData.grupo}
-                  onChange={handleInputChange} // Use handleInputChange
-                  options={grupoOptions}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className={styles.inputWrapper}>
-                <Label htmlFor="anio_ingreso">Año de Ingreso</Label>
-                <InputField
-                  type="text"
-                  name="anio_ingreso"
-                  placeholder="Año de Ingreso"
-                  value={formData.anio_ingreso}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-            </FormSection>
+      <form onSubmit={handleSubmit} className={styles.formGrid}>
+        {/* Columna de Información Personal */}
+        <div className={styles.column}>
+          <h3 className={styles.columnTitle}>Información Personal</h3>
+          <div>
+            <label className={styles.label}>CURP</label>
+            <InputField
+              type="text"
+              name="curp"
+              placeholder="Ingrese CURP"
+              value={formData.curp}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+              maxLength={18}
+            />
           </div>
+          <div>
+            <label className={styles.label}>Nombres</label>
+            <InputField
+              type="text"
+              name="nombres"
+              placeholder="Ingrese nombres"
+              value={formData.nombres}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Apellido Paterno</label>
+            <InputField
+              type="text"
+              name="apellidoPaterno"
+              placeholder="Ingrese apellido paterno"
+              value={formData.apellidoPaterno}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Apellido Materno</label>
+            <InputField
+              type="text"
+              name="apellidoMaterno"
+              placeholder="Ingrese apellido materno"
+              value={formData.apellidoMaterno}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
 
-          <div className={styles.fileUpload}>
-            <div className={styles.inputWrapper}>
-              <Label htmlFor="file-upload">Subir PDF con Datos</Label>
-              <input
-                type="file"
-                id="file-upload"
-                name="file"
-                accept=".pdf"
-                onChange={handleFileChange}
-                className={styles.fileInput}
+        {/* Columna de Información Escolar */}
+        <div className={styles.column}>
+          <h3 className={styles.columnTitle}>Información Escolar</h3>
+          <div>
+            <label className={styles.label}>Grado</label>
+            <SelectField
+              name="grado"
+              options={gradeOptions}
+              value={formData.grado}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Grupo</label>
+            <SelectField
+              name="grupo"
+              options={groupOptions}
+              value={formData.grupo}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Año de Ingreso</label>
+            <div className={estilo.datePickerWrapper}>
+              <DatePicker
+                selected={formData.anio_ingreso ? new Date(formData.anio_ingreso) : null}
+                onChange={handleYearChange}
+                dateFormat="yyyy"
+                showYearPicker
+                className={estilo.datePickerInput}
                 disabled={isSubmitting}
               />
             </div>
           </div>
+        </div>
 
-          <div className={styles.buttonContainer}>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <span className={styles.spinner}></span> Guardando
-                </>
-              ) : (
-                'Guardar'
-              )}
-            </Button>
-            <GoBackButton />
-          </div>
-        </fieldset>
+        {/* Elementos de ancho completo */}
+        <div className={styles.fullWidth}>
+          <label className={styles.label}>Subir PDF (opcional)</label>
+          <InputField
+            type="file"
+            name="file"
+            placeholder="Seleccione un archivo PDF"
+            value={file ? file.name : ""}
+            onChange={handleFileChange}
+            disabled={isSubmitting}
+            className={styles.fileInput}
+          />
+        </div>
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}>
+          <GoBackButton/>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Registrando..." : "Registrar"}
+          </Button>
+        </div>
       </form>
-    </motion.div>
+    </div>
   );
 };
 

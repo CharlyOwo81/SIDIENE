@@ -54,12 +54,12 @@ const QueryStudents: React.FC = () => {
       setStudents(response.data);
       setFilteredStudents(response.data);
       setAlert({
-        message: "Estudiantes cargados correctamente.",
+        message: "Personal cargado correctamente.",
         type: "success",
       });
     } catch (error: any) {
       setAlert({
-        message: error.message || "Error al cargar los estudiantes.",
+        message: error.message || "Error al cargar al personal.",
         type: "error",
       });
     } finally {

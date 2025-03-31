@@ -53,7 +53,15 @@ const RegisterStudents: React.FC = () => {
           });
         }
       } else {
-        response = await createStudent(formData);
+        response = await createStudent({
+          curp: formData.curp,
+          nombres: formData.nombres,
+          apellido_paterno: formData.apellidoPaterno,
+          apellido_materno: formData.apellidoMaterno,
+          grado: formData.grado,
+          grupo: formData.grupo,
+          anio_ingreso: formData.anio_ingreso,
+        });
         setAlert({
           message: '¡El estudiante ha sido registrado!',
           type: 'success',
@@ -104,6 +112,7 @@ const RegisterStudents: React.FC = () => {
         </motion.div>
       )}
       <StudentForm
+        setFormData={setFormData}
         formData={formData}
         file={file}
         isSubmitting={isSubmitting}

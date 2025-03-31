@@ -5,6 +5,7 @@ import Label from '../../assets/components/Label/Label';
 import SelectField from '../../assets/components/SelectField/SelectField'; // Import SelectField
 import GoBackButton from '../../assets/components/Button/GoBackButton';
 import styles from './QueryStudents.module.css';
+import InputField from '../../assets/components/InputField/InputField';
 
 interface StudentQueryFormProps {
   searchQuery: string;
@@ -18,6 +19,24 @@ interface StudentQueryFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
+const gradeOptions = [
+  { value: '', label: 'Todos' },
+  { value: "1", label: "1°" },
+  { value: "2", label: "2°" },
+  { value: "3", label: "3°" },
+];
+
+const groupOptions = [
+  { value: '', label: 'Todos'},
+  { value: "A", label: "A" },
+  { value: "B", label: "B" },
+  { value: "C", label: "C" },
+  { value: "D", label: "D" },
+  { value: "E", label: "E"},
+  { value: "F", label: "F" }
+];
+
+
 const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
   searchQuery,
   filters,
@@ -25,22 +44,6 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
   handleFilterChange,
   handleSubmit,
 }) => {
-  const gradoOptions = [
-    { value: '', label: 'Todos' },
-    { value: '1', label: '1' },
-    { value: '2', label: '2' },
-    { value: '3', label: '3' },
-  ];
-
-  const grupoOptions = [
-    { value: '', label: 'Todos' },
-    { value: 'A', label: 'A' },
-    { value: 'B', label: 'B' },
-    { value: 'C', label: 'C' },
-    { value: 'D', label: 'D' },
-    { value: 'E', label: 'E' },
-    { value: 'F', label: 'F' },
-  ];
 
   return (
     <motion.div
@@ -51,33 +54,27 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
     >
       <form onSubmit={handleSubmit} className={styles.queryForm}>
         <div className={styles.inputGroup}>
+        <h2 className={styles.formTitle}>Consultar   Estudiantes</h2>
           <Label htmlFor="search">Buscar por Nombre o CURP</Label>
-          <motion.input
+          <InputField
             type="text"
-            id="search"
+            name={'search'}
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Nombre, CURP, etc."
-            className={styles.searchInput}
-            whileFocus={{ scale: 1.02, borderColor: '#F3C44D' }}
-            transition={{ duration: 0.2 }}
-          />
+            className={styles.searchInput}/>
         </div>
 
         <div className={styles.filterGrid}>
           <div className={styles.filterGroup}>
             <Label htmlFor="grado">Grado</Label>
-            <motion.div
-              whileFocus={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div whileFocus={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
               <SelectField
-                id="grado"
                 name="grado"
-                multiple
+                options={gradeOptions}
+                id="grado"
                 value={filters.grado}
                 onChange={handleFilterChange}
-                options={gradoOptions}
                 className={styles.filterSelect}
               />
             </motion.div>
@@ -85,32 +82,33 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
 
           <div className={styles.filterGroup}>
             <Label htmlFor="grupo">Grupo</Label>
-            <motion.div
-              whileFocus={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div whileFocus={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
               <SelectField
                 id="grupo"
                 name="grupo"
-                multiple
                 value={filters.grupo}
                 onChange={handleFilterChange}
-                options={grupoOptions}
+                options={groupOptions}
                 className={styles.filterSelect}
               />
             </motion.div>
           </div>
         </div>
 
-        <motion.div
-          className={styles.buttonWrapper}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+
+        <div 
+          className={styles.fullWidth} 
+          style={{ 
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem", // Espacio entre botones
+            alignItems: "center" // Alineación vertical
+          }}
         >
-          <Button type="submit">Buscar</Button>
-          <GoBackButton />
-        </motion.div>
+        <GoBackButton />
+        <Button type="submit">Buscar</Button>
+
+        </div>
       </form>
     </motion.div>
   );
