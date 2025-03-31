@@ -2,9 +2,9 @@ import express from 'express';
 import {
   createIncident,
   getAllIncidents,
-  getIncidentById,
-  updateIncident,
-  deleteIncident
+  //getIncidentById,
+  //updateIncident,
+  //deleteIncident
 } from '../controllers/incidentController.js';
 
 const router = express.Router();
@@ -16,12 +16,12 @@ router.post('/', createIncident);
 router.get('/', getAllIncidents);
 
 // Get single incident
-router.get('/:curp', getIncidentById);
+//router.get('/:curp', getIncidentById);
 
 // Update incident
-router.put('/:curp', updateIncident);
+//router.put('/:curp', updateIncident);
 
 // Delete incident
-router.delete('/:id', deleteIncident);
+//router.delete('/:id', deleteIncident);
 
 export default router;

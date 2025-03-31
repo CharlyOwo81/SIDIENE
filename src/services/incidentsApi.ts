@@ -28,3 +28,26 @@ export const createIncidence = async (incidenceData: IncidenceData): Promise<Api
     throw new Error('Un error desconocido ha ocurrido.');
   }
 };
+
+export const getAllStaff = async (
+  searchQuery: string,
+  filters: { rol: string[]}
+): Promise<ApiResponse> => {
+  try {
+    const response = await axios.get(`${API_URL}/incidences`, {
+      params: {
+        searchQuery,
+        rol: filters.rol.join(','),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message || 
+        'Error al obtener el personal'
+      );
+    }
+    throw new Error('Error desconocido');
+  }
+};

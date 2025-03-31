@@ -8,6 +8,9 @@ import CreateIncidenteForm from "./CreateIncidentsForm";
 import styles from './CreateIncidents.module.css';
 import { motivosPorSeveridad } from "../../../constants/incidenceOptions";
 
+const fechaSonora = new Date();
+fechaSonora.setHours(fechaSonora.getUTCHours() - 7);
+
 const CreateIncidents: React.FC = () => {
   const [formData, setFormData] = useState({
     curp: "",
@@ -16,7 +19,8 @@ const CreateIncidents: React.FC = () => {
     apellidoMaterno: "",
     grado: "",
     grupo: "",
-    fecha: new Date().toISOString().split("T")[0],
+    // Ajusta la fecha UTC a la hora de Sonora (UTC-7)
+    fecha: fechaSonora.toISOString().split('T')[0],
     nivelSeveridad: "",
     motivo: "",
     descripcion: "",
@@ -110,7 +114,7 @@ const CreateIncidents: React.FC = () => {
         apellidoMaterno: "",
         grado: "",
         grupo: "",
-        fecha: new Date().toISOString().split("T")[0],
+        fecha: fechaSonora.toISOString().split('T')[0],
         nivelSeveridad: "",
         motivo: "",
         descripcion: "",
