@@ -10,6 +10,7 @@
   import Button from "../../assets/components/Button/Button";
   import { motivosPorSeveridad } from "../../constants/incidenceOptions";
   import axios from 'axios';
+import Navbar from '../../assets/components/Navbar/IncidentsNavbar';
 
   type NivelSeveridad = keyof typeof motivosPorSeveridad;
 
@@ -124,6 +125,7 @@
         animate={{ opacity: 1, y: 0 }}
         className={styles.formContainer}
       >
+        <Navbar />
         {/* Formulario de Búsqueda */}
         <div className={styles.section}>
           <h2 className={styles.formTitle}>Buscar Incidencias</h2>

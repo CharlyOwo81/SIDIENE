@@ -1,14 +1,9 @@
-    import express from 'express';
-    import db from '../config/db.js';
-    import bcrypt from 'bcryptjs'; // Asegúrate de que esté instalado
-    import { authController } from '../controllers/authController.js';
+import express from 'express';
+import { authController } from '../controllers/authController.js';
 
-    // Inicializar el router
-    const router = express.Router();
+const router = express.Router();
 
-    console.log("🚀 authController.js ha sido cargado correctamente");
-    // Ruta para iniciar sesión
-    router.post('/authController', authController);
+// POST /api/auth/login
+router.post('/login', authController);
 
-    // Exportar el router
-    export default router;
+export default router;

@@ -335,7 +335,7 @@ const ReadIncidents: React.FC = () => {
       </div>
 
                               {/* Buttons */}
-                              <div className={styles.buttonContainer}>
+        <div className={styles.buttonContainer}>
           <GoBackButton />
         </div>
 

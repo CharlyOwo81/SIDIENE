@@ -26,9 +26,15 @@ app.use((req, res, next) => {
 
 // Define the base URL for API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/staff', staffRoutes);
-app.use('/api/incidences', incidentRoutes);
+// Import the authenticate middleware
+import { authenticate } from './src/middleware/auth.js';
+
+// Apply authentication middleware to protected routes
+app.use('/api/students', authenticate, studentRoutes);
+app.use('/api/staff', authenticate, staffRoutes);
+app.use('/api/incidences', authenticate, incidentRoutes);
+
+app.use(errorHandler);
 
 // 404 Handler (after all routes)
 app.use('*', (req, res) => {
