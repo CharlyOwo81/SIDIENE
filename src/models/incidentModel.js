@@ -66,6 +66,20 @@ static async getAll() {
     }
   }
 
+  static async getByStudent(curp) {
+    try {
+      const [rows] = await db.query(
+        `SELECT * FROM incidencia 
+         WHERE curp_estudiante = ? 
+         ORDER BY fecha DESC`,
+        [curp]
+      );
+      return rows;
+    } catch (error) {
+      throw new Error(`Error getting incidents: ${error.message}`);
+    }
+  }
+
   static async delete(id) {
     try {
       const [result] = await db.query(

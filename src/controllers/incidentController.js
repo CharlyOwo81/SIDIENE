@@ -73,6 +73,7 @@ export const getIncidentById = async (req, res) => {
   }
 };
 
+// Controlador principal
 export const updateIncident = async (req, res) => {
   try {
     const { id } = req.params;
@@ -104,6 +105,42 @@ export const updateIncident = async (req, res) => {
       message: error.message
     });
   }
+};
+
+// Funciones helper (pueden ir en el mismo archivo o en un utils/)
+const getNextBusinessDay = (date) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + 1);
+  
+  while (result.getDay() === 0 || result.getDay() === 6) {
+    result.setDate(result.getDate() + 1);
+  }
+  
+  return result;
+};
+
+async function sendParentNotification(student, incidents) {
+  const schoolName = "Escuela Primaria Revolución";
+  const nextBusinessDay = getNextBusinessDay(new Date());
+  
+  const message = `Estimados padres de ${student.nombre}, 
+    deben presentarse en ${schoolName} antes de 
+    ${nextBusinessDay.toLocaleDateString()} debido a 
+    incidencias acumuladas.`;
+
+  // Implementar lógica de envío real aquí
+  console.log('Enviando notificación a:', student.parentEmail);
+  console.log('Mensaje:', message);
+  
+  // Ejemplo de envío con nodemailer (requiere configuración)
+  /*
+  await transporter.sendMail({
+    from: 'escuela@example.com',
+    to: student.parentEmail,
+    subject: 'Notificación de incidencias',
+    text: message
+  });
+  */
 };
 
 export const deleteIncident = async (req, res) => {

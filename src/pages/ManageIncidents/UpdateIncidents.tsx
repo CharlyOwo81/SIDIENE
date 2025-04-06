@@ -24,6 +24,7 @@
     grado: string;
     grupo: string;
     nombre_personal: string;
+    estado: 'PENDIENTE' | 'ACTUALIZADO';
   }
 
   const UpdateIncidents: React.FC = () => {
@@ -99,7 +100,8 @@
             fecha: selectedIncident.fecha,
             nivel_severidad: selectedIncident.nivel_severidad,
             motivo: selectedIncident.motivo,
-            descripcion: selectedIncident.descripcion
+            descripcion: selectedIncident.descripcion,
+            estado: selectedIncident.estado
           }
         );
         
