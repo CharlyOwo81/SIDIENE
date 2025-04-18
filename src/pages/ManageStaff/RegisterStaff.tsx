@@ -14,6 +14,7 @@ const ManageStaff: React.FC = () => {
     apellidoMaterno: "",
     telefono: "",
     rol: "",
+    estatus: "",
   });
 
   const [alert, setAlert] = useState<{
@@ -22,14 +23,16 @@ const ManageStaff: React.FC = () => {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setFormData(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,12 +58,14 @@ const ManageStaff: React.FC = () => {
       id: "",
       curp: formData.curp,
       nombre: formData.nombres,
-      apellido: `${formData.apellidoPaterno} ${formData.apellidoMaterno || ""}`.trim(),
+      apellido:
+        `${formData.apellidoPaterno} ${formData.apellidoMaterno}`.trim(),
       apellidoPaterno: formData.apellidoPaterno,
-      apellidoMaterno: formData.apellidoMaterno || null,
+      apellidoMaterno: formData.apellidoMaterno,
       telefono: formData.telefono,
       rol: formData.rol,
-      puesto: "",
+      estatus: formData.estatus || "ACTIVO",
+      puesto: "Default Puesto", // Replace with appropriate value or form input
     };
 
     try {
@@ -76,6 +81,7 @@ const ManageStaff: React.FC = () => {
         apellidoMaterno: "",
         telefono: "",
         rol: "",
+        estatus: "",
       });
     } catch (error: any) {
       console.error("Error al enviar los datos:", error);
@@ -96,7 +102,6 @@ const ManageStaff: React.FC = () => {
       className={styles.mainContainer}
     >
       <StaffNavbar /> {/* Replace h1 with StaffNavbar */}
-
       {alert && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -111,16 +116,18 @@ const ManageStaff: React.FC = () => {
           />
         </motion.div>
       )}
-
       <StaffForm
         formData={formData}
         isSubmitting={isSubmitting}
         handleInputChange={handleInputChange}
         handleSelectChange={handleSelectChange}
-        handleSubmit={handleSubmit} 
-        handleFileChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
+        handleSubmit={handleSubmit}
+        handleFileChange={function (
+          e: React.ChangeEvent<HTMLInputElement>
+        ): void {
           throw new Error("Function not implemented.");
-        } }/>
+        }}
+      />
     </motion.section>
   );
 };

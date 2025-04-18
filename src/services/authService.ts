@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 export const authService = async (telefono: string, contrasenia: string) => {
-  console.log('Sending request:', { telefono, contrasenia });
   try {
     const response = await axios.post("http://localhost:3307/api/auth/authController", {
       telefono,
@@ -9,30 +8,26 @@ export const authService = async (telefono: string, contrasenia: string) => {
     }, {
       headers: { "Content-Type": "application/json" },
     });
-    console.log('API response:', response.data);
+
+    // Additional status check
+    if (response.data.user.estatus === 'INACTIVO' || response.data.user.estatus === 'JUBILADO') {
+      throw new Error(`account_${response.data.user.estatus.toLowerCase()}`);
+    }
+
     return {
-      message: "Inicio de sesión exitoso",
+      message: response.data.message,
       user: {
-        curp: response.data.user.curp, // <- Asegurar que existe
-        rol: response.data.user.rol,
-        nombres: response.data.user.nombres,
-        apellidoPaterno: response.data.user.apellidoPaterno, // Verificar nombres de campos
-        apellidoMaterno: response.data.user.apellidoMaterno,
-        telefono: response.data.user.telefono
+        ...response.data.user,
+        estatus: response.data.user.estatus // Forward status
       }
     };
   } catch (error) {
-    console.error('API call failed:', error);
     if (axios.isAxiosError(error)) {
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-      } else {
-        console.error('Error setting up request:', error.message);
+      // Handle backend's 403 response
+      if (error.response?.status === 403) {
+        throw new Error(error.response.data.message);
       }
-    } else {
-      console.error('Unexpected error:', error);
+      // Other error cases...
     }
     throw error;
   }

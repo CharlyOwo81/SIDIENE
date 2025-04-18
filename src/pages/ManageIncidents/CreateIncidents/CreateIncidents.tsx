@@ -46,6 +46,8 @@ const CreateIncidents: React.FC = () => {
   };
 
   const handleSelectStudent = (student: any) => {
+    if (!student) return;
+  
     setSelectedStudent(student);
     setFormData(prev => ({
       ...prev,
@@ -57,7 +59,7 @@ const CreateIncidents: React.FC = () => {
       grupo: student.grupo,
     }));
     setShowModal(false);
-  };
+  };  
 
   const handleOpenModal = async () => {
     if (formData.grado && formData.grupo) {
@@ -65,13 +67,21 @@ const CreateIncidents: React.FC = () => {
         const response = await axios.get(
           `http://localhost:3307/api/students?grado=${formData.grado}&grupo=${formData.grupo}`
         );
-        setStudents(response.data);
-        setShowModal(true);
+  
+        // Check for successful response structure
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setStudents(response.data.data);
+          setShowModal(true);
+        } else {
+          throw new Error('Formato de respuesta inválido');
+        }
+  
       } catch (error) {
         setAlert({
           message: "No se pudo obtener la lista de estudiantes.",
           type: "error",
         });
+        setStudents([]); // Reset students array
       }
     } else {
       setAlert({
@@ -100,6 +110,11 @@ const CreateIncidents: React.FC = () => {
         incidentData,
         { headers: { "Content-Type": "application/json" } }
       );
+
+      setAlert({
+        message: response.data.warning,
+        type: "warning",
+      })
       
       setAlert({ 
         message: response.data.message || "Incidencia registrada exitosamente", 

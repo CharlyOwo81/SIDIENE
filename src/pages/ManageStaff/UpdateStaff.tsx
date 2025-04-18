@@ -13,6 +13,7 @@ interface Staff {
   apellidoPaterno: string;
   apellidoMaterno: string;
   rol: string;
+  estatus: string;
 }
 
 const UpdateStaff: React.FC = () => {
@@ -29,7 +30,9 @@ const UpdateStaff: React.FC = () => {
     setSearchCurp(e.target.value);
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
   };
@@ -37,21 +40,31 @@ const UpdateStaff: React.FC = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchCurp.trim()) {
-      setAlert({ message: "Por favor, ingresa un CURP válido.", type: "error" });
+      setAlert({
+        message: "Por favor, ingresa un CURP válido.",
+        type: "error",
+      });
       setFormData(null);
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3307/api/staff/${searchCurp}`);
+      const response = await axios.get(
+        `http://localhost:3307/api/staff/${searchCurp}`
+      );
       if (response.data.data) {
         const transformedData = {
           curp: response.data.data.curp,
           nombres: response.data.data.nombres,
-          apellidoPaterno: response.data.data.apellido_paterno || response.data.data.apellidoPaterno,
-          apellidoMaterno: response.data.data.apellido_materno || response.data.data.apellidoMaterno,
+          apellidoPaterno:
+            response.data.data.apellido_paterno ||
+            response.data.data.apellidoPaterno,
+          apellidoMaterno:
+            response.data.data.apellido_materno ||
+            response.data.data.apellidoMaterno,
           rol: response.data.data.rol,
+          estatus: response.data.data.estatus,
         };
         setFormData(transformedData);
         setAlert({ message: "Personal encontrado.", type: "success" });
@@ -64,7 +77,8 @@ const UpdateStaff: React.FC = () => {
       }
     } catch (error: any) {
       setAlert({
-        message: error.response?.data?.message || "Error al buscar al personal.",
+        message:
+          error.response?.data?.message || "Error al buscar al personal.",
         type: "error",
       });
       setFormData(null);
@@ -86,6 +100,7 @@ const UpdateStaff: React.FC = () => {
           apellidoPaterno: formData.apellidoPaterno,
           apellidoMaterno: formData.apellidoMaterno,
           rol: formData.rol,
+          estatus: formData.estatus,
         },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -95,14 +110,16 @@ const UpdateStaff: React.FC = () => {
         type: "success",
       });
 
-      const refreshResponse = await axios.get(`http://localhost:3307/api/staff/${formData.curp}`);
+      const refreshResponse = await axios.get(
+        `http://localhost:3307/api/staff/${formData.curp}`
+      );
       setFormData({
         ...refreshResponse.data.data,
-        curp: formData.curp, // Preserve the original CURP
       });
     } catch (error: any) {
       setAlert({
-        message: error.response?.data?.message || "Error al actualizar el personal.",
+        message:
+          error.response?.data?.message || "Error al actualizar el personal.",
         type: "error",
       });
     } finally {

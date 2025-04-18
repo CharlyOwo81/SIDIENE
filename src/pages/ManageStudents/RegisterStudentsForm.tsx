@@ -25,7 +25,9 @@ interface StudentFormProps {
   formData: FormData;
   file: File | null;
   isSubmitting: boolean;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
@@ -50,12 +52,15 @@ const StudentForm: React.FC<StudentFormProps> = ({
     { value: "A", label: "A" },
     { value: "B", label: "B" },
     { value: "C", label: "C" },
+    { value: "D", label: "D" },
+    { value: "E", label: "E" },
+    { value: "F", label: "F" },
   ];
 
   const handleYearChange = (date: Date | null) => {
     setFormData({
       ...formData,
-      anio_ingreso: date?.getFullYear().toString() || ""
+      anio_ingreso: date?.getFullYear().toString() || "",
     });
   };
 
@@ -140,7 +145,9 @@ const StudentForm: React.FC<StudentFormProps> = ({
             <label className={styles.label}>Año de Ingreso</label>
             <div className={estilo.datePickerWrapper}>
               <DatePicker
-                selected={formData.anio_ingreso ? new Date(formData.anio_ingreso) : null}
+                selected={
+                  formData.anio_ingreso ? new Date(formData.anio_ingreso) : null
+                }
                 onChange={handleYearChange}
                 dateFormat="yyyy"
                 showYearPicker
@@ -164,15 +171,16 @@ const StudentForm: React.FC<StudentFormProps> = ({
             className={styles.fileInput}
           />
         </div>
-        <div 
-          className={styles.fullWidth} 
-          style={{ 
+        <div
+          className={styles.fullWidth}
+          style={{
             display: "flex",
             justifyContent: "center",
             gap: "1rem", // Espacio entre botones
-            alignItems: "center" // Alineación vertical
-          }}>
-          <GoBackButton/>
+            alignItems: "center", // Alineación vertical
+          }}
+        >
+          <GoBackButton />
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Registrando..." : "Registrar"}
           </Button>

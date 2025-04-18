@@ -1,26 +1,35 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import StudentForm from './RegisterStudentsForm';
-import Navbar from '../../assets/components/Navbar/StudentsNavbar';
-import Alert from '../../assets/components/Alert/Alert';
-import styles from './ManageStudents.module.css';
-import { createStudent, uploadStudentsFromPdf } from '../../services/studentsApi';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import StudentForm from "./RegisterStudentsForm";
+import Navbar from "../../assets/components/Navbar/StudentsNavbar";
+import Alert from "../../assets/components/Alert/Alert";
+import styles from "./ManageStudents.module.css";
+import {
+  createStudent,
+  uploadStudentsFromPdf,
+} from "../../services/studentsApi";
 
 const RegisterStudents: React.FC = () => {
   const [formData, setFormData] = useState({
-    curp: '',
-    nombres: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    grado: '',
-    grupo: '',
-    anio_ingreso: '',
+    curp: "",
+    nombres: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    grado: "",
+    grupo: "",
+    anio_ingreso: "",
   });
   const [file, setFile] = useState<File | null>(null);
-  const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | 'warning'; details?: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "success" | "error" | "warning";
+    details?: string;
+  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -43,13 +52,13 @@ const RegisterStudents: React.FC = () => {
         if (response.data?.errors) {
           setAlert({
             message: `Procesado con ${response.data.errors.length} errores`,
-            type: 'warning',
-            details: response.data.errors.join('\n'),
+            type: "warning",
+            details: response.data.errors.join("\n"),
           });
         } else {
           setAlert({
             message: `${response.data.valid} estudiantes procesados (${response.data.created} nuevos, ${response.data.updated} actualizados)`,
-            type: 'success',
+            type: "success",
           });
         }
       } else {
@@ -63,26 +72,29 @@ const RegisterStudents: React.FC = () => {
           anio_ingreso: formData.anio_ingreso,
         });
         setAlert({
-          message: '¡El estudiante ha sido registrado!',
-          type: 'success',
+          message: "¡El estudiante ha sido registrado!",
+          type: "success",
         });
       }
 
       setFormData({
-        curp: '',
-        nombres: '',
-        apellidoPaterno: '',
-        apellidoMaterno: '',
-        grado: '',
-        grupo: '',
-        anio_ingreso: '',
+        curp: "",
+        nombres: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+        grado: "",
+        grupo: "",
+        anio_ingreso: "",
       });
       setFile(null);
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       setAlert({
-        message: error instanceof Error ? error.message : 'Error procesando la solicitud',
-        type: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : "Error procesando la solicitud",
+        type: "error",
       });
     } finally {
       setIsSubmitting(false);
@@ -93,7 +105,7 @@ const RegisterStudents: React.FC = () => {
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       className={styles.mainContainer}
     >
       <Navbar />

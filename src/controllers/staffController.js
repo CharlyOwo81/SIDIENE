@@ -9,7 +9,39 @@ export const createStaff = async (req, res) => {
     // Validar que el rol sea uno de los permitidos
     const validRoles = ['DIRECTIVO', 'PREFECTO', 'DOCENTE', 'TRABAJADOR SOCIAL'];
     if (!validRoles.includes(rol)) {
-      return res.status(400).json({ error: `Invalid rol value: ${rol}. Allowed values are DIRECTIVO, PREFECTO, DOCENTE, TRABAJADOR SOCIAL.` });
+      return res.status(400).json({ 
+        error: `Invalid rol value: ${rol}. Allowed values are DIRECTIVO, PREFECTO, DOCENTE, TRABAJADOR SOCIAL.` 
+      });
+    }
+
+    if (!curp || !nombre || !apellidoPaterno || !apellidoMaterno || !telefono) {
+      return res.status(400).json({ 
+        error: 'Todos los campos son requeridos.' 
+      });
+    }
+
+    if (telefono.length < 10){
+      return res.status(400).json({ 
+        error: 'El número de teléfono debe tener al menos 10 dígitos.' 
+      });
+    }
+
+    if (curp.length !== 18) {
+      return res.status(400).json({ 
+        error: 'La CURP debe tener exactamente 18 caracteres.' 
+      });
+    }
+
+    if (!/^[A-Z]{4}\d{6}[HM][A-Z]{5}\d{2}$/.test(curp)) {
+      return res.status(400).json({ 
+      error: 'La CURP no es válida.' 
+      });
+    }
+
+    if (!/^\d+$/.test(telefono)) {
+      return res.status(400).json({ 
+      error: 'El número de teléfono solo debe contener dígitos.' 
+      });
     }
 
     // Insertar el miembro del staff en la base de datos
@@ -26,6 +58,16 @@ export const getAllStaff = async (req, res) => {
     const filters = {
       rol: req.query.rol ? req.query.rol.split(',') : []
     };
+
+    const hasFilters = filters.rol.length > 0 || searchQuery.length > 0;
+
+    if (!hasFilters) {
+      return res.status(200).json({
+        success: true,
+        warning: "Por favor aplique al menos un filtro para ver los resultados",
+        data: []
+      });
+    }
 
     // Validate and format response
     const rawStaff = await Staff.getAll(searchQuery, filters);
@@ -92,10 +134,10 @@ export const getStaffById = async (req, res) => {
 export const updateStaff = async (req, res) => {
   try {
     const { curp } = req.params; // Original CURP from URL
-    const { nombres, apellidoPaterno, apellidoMaterno, rol } = req.body;
+    const { nombres, apellidoPaterno, apellidoMaterno, rol, estatus } = req.body;
 
     // Validate required fields
-    if (!nombres || !apellidoPaterno || !apellidoMaterno || !rol) {
+    if (!nombres || !apellidoPaterno || !apellidoMaterno || !rol || !estatus) {
       return res.status(400).json({
         success: false,
         message: "Todos los campos son requeridos"
@@ -107,7 +149,8 @@ export const updateStaff = async (req, res) => {
       nombres,
       apellidoPaterno,
       apellidoMaterno,
-      rol
+      rol,
+      estatus
     });
 
     res.status(200).json({

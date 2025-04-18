@@ -24,6 +24,7 @@ static async getAll() {
         i.nivel_severidad,
         i.motivo,
         i.descripcion,
+        i.estado,
         e.curp AS curp_estudiante,
         CONCAT(e.nombres, ' ', e.apellido_paterno, ' ', e.apellido_materno) AS nombre_estudiante,
         e.grado,
@@ -45,7 +46,7 @@ static async getAll() {
   static async getById(id) {
     try {
       const [rows] = await db.query(
-        `SELECT * FROM incidencia WHERE id_incidencia = ?`,
+        `SELECT *, estado FROM incidencia WHERE id_incidencia = ?`,
         [id]
       );
       return rows[0] || null;

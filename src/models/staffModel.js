@@ -41,6 +41,7 @@ class Staff {
       staffData.apellidoMaterno,
       staffData.telefono,
       staffData.rol,
+      staffData.estatus,
       hashedPassword, // Contraseña hasheada
     ];
     const [result] = await db.query(sql, values);
@@ -113,7 +114,8 @@ static async update(curp, staffData) {
         nombres = ?, 
         apellido_paterno = ?, 
         apellido_materno = ?, 
-        rol = ?
+        rol = ?,
+        estatus = ?
       WHERE curp = ?
     `;
     const values = [
@@ -121,13 +123,14 @@ static async update(curp, staffData) {
       staffData.apellidoPaterno,
       staffData.apellidoMaterno,
       staffData.rol,
+      staffData.estatus,
       curp // Original CURP from URL parameter
     ];
 
     console.log('Executing update with:', { sql, values });
     
     await db.query(sql, values);
-    console.log('Staff updated successfully');
+    console.log('Miembro del personal actualizado con éxito.');
     
     // Return updated staff data
     return this.getById(curp);

@@ -56,14 +56,19 @@ export const getAllStudents = async (
         grupo: filters.grupo.join(','),
       },
     });
+
+    // Directly return the API response
     return response;
+
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Error fetching students');
+      const msg = error.response?.data?.message || 'Error buscando estudiantes';
+      throw new Error(msg);
     }
-    throw new Error('An unknown error occurred');
+    throw new Error('Error desconocido');
   }
 };
+
 export const getStudentById = async (id: string): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/students/${id}`);

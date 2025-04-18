@@ -20,28 +20,27 @@ const SearchStaffForm: React.FC<SearchStaffFormProps> = ({
 }) => {
   return (
     <form onSubmit={onSearchSubmit} className={styles.form}>
-        <FormSection title="CURP del integrante del personal">
-          <InputField
-            type="text"
-            name="curp"
-            placeholder="Ingrese el CURP"
-            value={searchCurp}
-            onChange={onSearchChange}
-          />
-        </FormSection>
-        <div 
-          className={styles.fullWidth} 
-          style={{ 
-            display: "flex",
-            justifyContent: "center",
-            gap: "1rem", // Espacio entre botones
-            alignItems: "center" // Alineación vertical
-          }}
-        >
+      <FormSection title="CURP del integrante del personal">
+        <InputField
+          type="text"
+          name="curp"
+          placeholder="Ingrese el CURP"
+          value={searchCurp}
+          onChange={onSearchChange}
+        />
+      </FormSection>
+      <div
+        className={styles.fullWidth}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "1rem", // Espacio entre botones
+          alignItems: "center", // Alineación vertical
+        }}
+      >
         <GoBackButton />
         <Button type="submit">Buscar</Button>
-
-        </div>
+      </div>
     </form>
   );
 };
