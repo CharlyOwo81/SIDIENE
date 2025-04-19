@@ -135,4 +135,33 @@ export const functionalities = [
     roles: ["DIRECTIVO", "TRABAJADOR SOCIAL"],
     path: "/ExportRecord",
   },
+  // Add these new entries to your functionalities array
+  {
+    id: "f18",
+    label: "Registrar Tutor",
+    icon: registerIcon,
+    roles: ["DIRECTIVO", "TRABAJADOR SOCIAL"],
+    path: "/RegisterTutor",
+  },
+  {
+    id: "f19",
+    label: "Consultar Tutores",
+    icon: queryIcon,
+    roles: ["DIRECTIVO", "TRABAJADOR SOCIAL", "PREFECTO"],
+    path: "/QueryTutors",
+  },
+  {
+    id: "f20",
+    label: "Actualizar Tutor",
+    icon: updateIcon,
+    roles: ["DIRECTIVO", "TRABAJADOR SOCIAL"],
+    path: "/UpdateTutor",
+  },
+  {
+    id: "f21",
+    label: "Exportar Tutores a PDF",
+    icon: funcion4Icon,
+    roles: ["DIRECTIVO", "TRABAJADOR SOCIAL"],
+    path: "/ExportTutors",
+  },
 ];

@@ -53,7 +53,7 @@ useEffect(() => {
     { name: "Canalizaciones", keywords: ["canalización", "Channel"] },
     { name: "Incidencias", keywords: ["incidencias", "Incidents"] },
     { name: "Expedientes", keywords: ["expediente", "Record"] },
-    { name: "Tutores", keywords: ["Tutors"] },
+    { name: "Tutores", keywords: ["Tutores", "tutores", "tutor"] },
   ];
 
   const allowedFunctionalities = functionalities.filter((func) =>

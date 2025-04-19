@@ -15,6 +15,7 @@ class Incident {
 
 // En models/incidentModel.js
 // models/incidentModel.js
+// models/incidentModel.js
 static async getAll() {
   try {
     const sql = `
@@ -29,10 +30,14 @@ static async getAll() {
         CONCAT(e.nombres, ' ', e.apellido_paterno, ' ', e.apellido_materno) AS nombre_estudiante,
         e.grado,
         e.grupo,
-        CONCAT(p.nombres, ' ', p.apellido_paterno, ' ', p.apellido_materno) AS nombre_personal
+        CONCAT(p.nombres, ' ', p.apellido_paterno, ' ', p.apellido_materno) AS nombre_personal,
+        GROUP_CONCAT(DISTINCT CONCAT(t.nombres, ' ', t.apellido_paterno) AS tutores
       FROM incidencia i
       JOIN estudiante e ON i.id_estudiante = e.curp
       JOIN personal p ON i.id_personal = p.curp
+      LEFT JOIN estudiantetutor et ON e.curp = et.curp_estudiante
+      LEFT JOIN tutor t ON et.curp_tutor = t.curp
+      GROUP BY i.id_incidencia
     `;
 
     const [rows] = await db.query(sql);

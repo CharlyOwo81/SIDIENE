@@ -260,6 +260,7 @@ const UpdateIncidents: React.FC = () => {
             <div className={styles.grid}>
               <div className={styles.inputWrapper}>
                 <Label htmlFor="fecha">Fecha</Label>
+                
                 <InputField
                   type="date"
                   name="fecha"
@@ -271,6 +272,7 @@ const UpdateIncidents: React.FC = () => {
                     })
                   }
                   placeholder={""}
+                  disabled
                 />
               </div>
 
@@ -295,21 +297,15 @@ const UpdateIncidents: React.FC = () => {
                 />
               </div>
 
+              {/* Replace SelectField with InputField for motivo */}
               <div className={styles.inputWrapper}>
                 <Label htmlFor="motivo">Motivo</Label>
-                <SelectField
+                <InputField
+                  type="text"
                   name="motivo"
+                  placeholder="motivo"
+                  disabled
                   value={selectedIncident.motivo}
-                  options={[
-                    { value: "", label: "Seleccionar motivo" },
-                    ...(
-                      motivosPorSeveridad[selectedIncident.nivel_severidad] ||
-                      []
-                    ).map((motivo) => ({
-                      value: motivo,
-                      label: motivo,
-                    })),
-                  ]}
                   onChange={(e) =>
                     setSelectedIncident({
                       ...selectedIncident,
