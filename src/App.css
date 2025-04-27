@@ -3,6 +3,8 @@
     font-family: 'Montserrat', 'sans-serif';
 }
 
+
+
 .show-enter {
     opacity: 0;
     transform: translateY(20%);

@@ -1,13 +1,18 @@
 import db from '../config/db.js';
-import bcrypt from 'bcrypt';
 
 class Tutor {
   static async create(tutorData) {
     try {
       await db.query('START TRANSACTION');
 
+      // Validate parentesco_id
+      const [parentesco] = await db.query('SELECT id FROM parentesco WHERE id = ?', [tutorData.parentesco_id]);
+      if (!parentesco.length) {
+        throw new Error('Parentesco inválido');
+      }
+
       // Insert tutor
-      const [result] = await db.query(
+      await db.query(
         `INSERT INTO tutor SET ?`,
         {
           curp: tutorData.curp,
@@ -34,11 +39,9 @@ class Tutor {
       }
 
       await db.query('COMMIT');
-      return result.insertId;
-
+      return true;
     } catch (error) {
       await db.query('ROLLBACK');
-      console.error('Error creating tutor:', error);
       throw error;
     }
   }
@@ -62,31 +65,29 @@ class Tutor {
         params.push(searchTerm, searchTerm);
       }
 
-      if (filters.grado) {
+      if (filters.grado && filters.grado.length > 0) {
         sql += ` AND EXISTS (
           SELECT 1 FROM estudiantetutor et
           JOIN estudiante e ON et.curp_estudiante = e.curp
           WHERE et.curp_tutor = t.curp
-          AND e.grado = ?
+          AND e.grado IN (?)
         )`;
         params.push(filters.grado);
       }
 
-      if (filters.grupo) {
+      if (filters.grupo && filters.grupo.length > 0) {
         sql += ` AND EXISTS (
           SELECT 1 FROM estudiantetutor et
           JOIN estudiante e ON et.curp_estudiante = e.curp
           WHERE et.curp_tutor = t.curp
-          AND e.grupo = ?
+          AND e.grupo IN (?)
         )`;
         params.push(filters.grupo);
       }
 
       const [rows] = await db.query(sql, params);
       return rows;
-
     } catch (error) {
-      console.error('Error getting tutors:', error);
       throw error;
     }
   }
@@ -102,7 +103,6 @@ class Tutor {
       
       return rows[0];
     } catch (error) {
-      console.error('Error getting tutor:', error);
       throw error;
     }
   }
@@ -112,7 +112,7 @@ class Tutor {
       await db.query('START TRANSACTION');
 
       // Update tutor
-      await db.query('UPDATE tutor SET ? WHERE curp = ?', [
+      const [result] = await db.query('UPDATE tutor SET ? WHERE curp = ?', [
         {
           nombres: tutorData.nombres,
           apellido_paterno: tutorData.apellido_paterno,
@@ -123,6 +123,10 @@ class Tutor {
         },
         curp
       ]);
+
+      if (result.affectedRows === 0) {
+        throw new Error('Tutor no encontrado');
+      }
 
       // Update student relationships
       await db.query('DELETE FROM estudiantetutor WHERE curp_tutor = ?', [curp]);
@@ -141,10 +145,8 @@ class Tutor {
 
       await db.query('COMMIT');
       return true;
-
     } catch (error) {
       await db.query('ROLLBACK');
-      console.error('Error updating tutor:', error);
       throw error;
     }
   }
@@ -153,12 +155,12 @@ class Tutor {
     try {
       await db.query('START TRANSACTION');
       await db.query('DELETE FROM estudiantetutor WHERE curp_tutor = ?', [curp]);
-      await db.query('DELETE FROM tutor WHERE curp = ?', [curp]);
+      const [result] = await db.query('DELETE FROM tutor WHERE curp = ?', [curp]);
       await db.query('COMMIT');
-      return true;
+
+      return result.affectedRows > 0;
     } catch (error) {
       await db.query('ROLLBACK');
-      console.error('Error deleting tutor:', error);
       throw error;
     }
   }

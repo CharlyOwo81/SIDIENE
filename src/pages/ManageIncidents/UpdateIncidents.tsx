@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Modal from "./Modal";
+import Alert from "../../assets/components/Alert/Alert";
 import GoBackButton from "../../assets/components/Button/GoBackButton";
 import styles from "../ManageIncidents/CreateIncidents/CreateIncidents.module.css";
 import Label from "../../assets/components/Label/Label";
@@ -34,6 +35,11 @@ const UpdateIncidents: React.FC = () => {
     severidad: "",
   });
 
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "success" | "error" | "warning" | "info";
+  } | null>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [filteredIncidents, setFilteredIncidents] = useState<Incident[]>([]);
@@ -44,47 +50,43 @@ const UpdateIncidents: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
 
-  // En el handleSearch, verificar la respuesta
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (
-      !searchFilters.fecha &&
-      !searchFilters.nombre &&
-      !searchFilters.severidad
-    ) {
-      alert("Por favor ingresa al menos un criterio de búsqueda");
-      return;
-    }
-
     setLoading(true);
+    
     try {
-      const response = await axios.get("http://localhost:3307/api/incidences", {
-        params: searchFilters,
+      const response = await axios.get('http://localhost:3307/api/incidences/filter', {
+        params: {
+          fecha: searchFilters.fecha || undefined,
+          nombre: searchFilters.nombre || undefined,
+          severidad: searchFilters.severidad.toUpperCase() || undefined
+        }
       });
-
-      // Validación corregida
-      if (response.data.success && Array.isArray(response.data.data)) {
-        setIncidents(response.data.data);
-        setFilteredIncidents(response.data.data);
-        setShowResultsModal(true);
-      } else {
-        throw new Error(
-          response.data.message || "Formato de respuesta inválido"
-        );
-      }
+  
+      setIncidents(response.data.data);
+      setFilteredIncidents(response.data.data);
+      setShowResultsModal(true);
+      setAlert({
+        message: response.data.message,
+        type: "success"
+      });
     } catch (error) {
-      console.error("Error searching incidents:", error);
+      console.error('Error searching incidents:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error al buscar incidencias");
+        setAlert({
+          message: 'Error al buscar incidencias: ' + (error.response?.data?.message || 'Error desconocido'),
+          type: 'error',
+        });
       } else {
-        alert("Error al buscar incidencias");
+        setAlert({
+          message: 'Error al buscar incidencias: ' + String(error),
+          type: 'error',
+        });
       }
     } finally {
       setLoading(false);
     }
   };
-
   const handleModalSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -122,11 +124,17 @@ const UpdateIncidents: React.FC = () => {
       setIncidents(updatedIncidents);
       setSelectedIncident(null);
 
-      alert(response.data.message);
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
     } catch (error) {
       console.error("Update error:", error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error actualizando");
+        setAlert({
+          message: error.response?.data?.message || "Error actualizando",
+          type: "error",
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -135,9 +143,31 @@ const UpdateIncidents: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={styles.formContainer}>
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className={styles.formContainer}
+  >
+    {/* Alert fuera del contenido principal */}
+    {alert && (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000
+        }}
+      >
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      </motion.div>
+    )}
+
       {/* Formulario de Búsqueda */}
       <div className={styles.section}>
         <h2 className={styles.formTitle}>Buscar Incidencias</h2>
@@ -255,6 +285,11 @@ const UpdateIncidents: React.FC = () => {
       {/* Formulario de Edición */}
       {selectedIncident && (
         <div className={styles.section}>
+          {selectedIncident.estado === "ACTUALIZADO" && (
+            <div className={styles.alert}>
+              ⚠️ Esta incidencia ya fue actualizada y no puede modificarse
+            </div>
+          )}
           <h2 className={styles.formTitle}>Editar Incidencia</h2>
           <form onSubmit={handleUpdate} className={styles.form}>
             <div className={styles.grid}>

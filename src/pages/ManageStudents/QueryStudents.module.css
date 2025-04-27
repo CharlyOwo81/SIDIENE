@@ -48,6 +48,18 @@
   gap: 0.3rem;
 }
 
+/* Add to both CSS files */
+.fullWidth {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+/* Adjust button spacing */
+.button {
+  margin: 0 0.5rem;
+  padding: 0.8rem 1.5rem;
+}
+
 .filterSelect {
   width: 88%;
   padding: 0.8rem 0.8rem;

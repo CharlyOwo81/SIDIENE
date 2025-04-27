@@ -1,8 +1,6 @@
 import React, { ChangeEvent } from "react";
-import { motion } from "framer-motion";
 import InputField from "../../assets/components/InputField/InputField";
 import Button from "../../assets/components/Button/Button";
-import FormSection from "../../assets/components/FormSection/FormSection";
 import GoBackButton from "../../assets/components/Button/GoBackButton";
 import Label from "../../assets/components/Label/Label";
 import SelectField from "../../assets/components/SelectField/SelectField";
@@ -39,7 +37,6 @@ const RegisterStaffForm: React.FC<StaffFormProps> = ({
   formData,
   isSubmitting,
   handleInputChange,
-  handleSelectChange,
   handleSubmit,
 }) => {
   return (

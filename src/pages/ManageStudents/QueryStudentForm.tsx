@@ -4,7 +4,7 @@ import Button from '../../assets/components/Button/Button';
 import Label from '../../assets/components/Label/Label';
 import SelectField from '../../assets/components/SelectField/SelectField'; // Import SelectField
 import GoBackButton from '../../assets/components/Button/GoBackButton';
-import styles from './QueryStudents.module.css';
+import styles from '../ManageStaff/QueryStaff.module.css'; // Use same styles as QueryStaff
 import InputField from '../../assets/components/InputField/InputField';
 
 interface StudentQueryFormProps {
@@ -54,7 +54,7 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
     >
       <form onSubmit={handleSubmit} className={styles.queryForm}>
         <div className={styles.inputGroup}>
-        <h2 className={styles.formTitle}>Consultar   Estudiantes</h2>
+        <h2 className={styles.formTitle}>Consultar Alumnado</h2>
           <Label htmlFor="search">Buscar por Nombre o CURP</Label>
           <InputField
             type="text"
@@ -68,7 +68,10 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
         <div className={styles.filterGrid}>
           <div className={styles.filterGroup}>
             <Label htmlFor="grado">Grado</Label>
-            <motion.div whileFocus={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+            <motion.div 
+              whileFocus={{ scale: 1.02 }} 
+              transition={{ duration: 0.2 }}
+            >
               <SelectField
                 name="grado"
                 options={gradeOptions}
@@ -105,9 +108,8 @@ const QueryStudentForm: React.FC<StudentQueryFormProps> = ({
             alignItems: "center" // Alineación vertical
           }}
         >
-        <GoBackButton />
-        <Button type="submit">Buscar</Button>
-
+          <GoBackButton />
+          <Button type="submit">Buscar</Button>
         </div>
       </form>
     </motion.div>

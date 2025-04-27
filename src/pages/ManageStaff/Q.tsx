@@ -1,35 +1,25 @@
 import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
-import styles from "./ManageStudents.module.css";
-import Navbar from "../../assets/components/Navbar/StudentsNavbar";
+import styles from "../ManageStudents/QueryStudents.module.css"; // Use same styles as QueryStudents
+import StaffNavbar from "../../assets/components/Navbar/StaffNavbar";
 import Alert from "../../assets/components/Alert/Alert";
-import { getAllStudents } from "../../services/studentsApi";
-import StudentQueryForm from "./QueryStudentForm"; // Import the new form
-import StudentTable from "../../assets/components/Table/StudentTable";
+import { getAllStaff } from "../../services/staffApi";
+import QueryStaffForm from "./QF";
+import StaffTable from "../../assets/components/Table/StaffTable";
 
-interface Student {
+interface Staff {
   curp: string;
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  grado: string;
-  grupo: string;
-  anio_ingreso: string;
+  rol: string;
 }
 
-const QueryStudents: React.FC = () => {
+const QueryStaff: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState<{
-    grado: string[];
-    grupo: string[];
-    anio_ingreso: string[];
-  }>({
-    grado: [],
-    grupo: [],
-    anio_ingreso: [],
-  });
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [filters, setFilters] = useState<{ rol: string[] }>({ rol: [] });
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
   const [alert, setAlert] = useState<null | {
     message: string;
     type: "success" | "error" | "warning" | "info";
@@ -52,61 +42,54 @@ const QueryStudents: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await getAllStudents(searchQuery, filters);
+      const response = await getAllStaff(searchQuery, filters);
 
-      // Check for warning in response data
-      if (response.data.warning) {
+      // Handle warning response
+      if (response.data.isWarning) {
         setAlert({
           message: response.data.warning,
           type: "warning",
         });
-        setStudents([]);
-        setFilteredStudents([]);
+        setStaff([]);
+        setFilteredStaff([]);
       } else {
-        // Access data directly from response.data.data
-        const studentsData = response.data.data || [];
-        setStudents(studentsData);
-        setFilteredStudents(studentsData);
+        // Handle success response
+        setStaff(response.data.data);
+        setFilteredStaff(response.data.data);
         setAlert({
-          message:
-            studentsData.length > 0
-              ? `Encontrados ${studentsData.length} estudiantes`
-              : "No se encontraron resultados",
+          message: "Personal cargado correctamente.",
           type: "success",
         });
       }
     } catch (error: any) {
       setAlert({
-        message: error.message || "Error al cargar estudiantes",
+        message: error.message || "Error al cargar al personal.",
         type: "error",
       });
-      setStudents([]);
-      setFilteredStudents([]);
+      setStaff([]);
+      setFilteredStaff([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filterStudents = () => {
-    const filtered = students.filter((student) => {
+  const filterStaff = () => {
+    const filtered = staff.filter((member) => {
       const matchesSearch =
-        `${student.nombres} ${student.apellidoPaterno} ${student.apellidoMaterno} ${student.curp} ${student.grado} ${student.grupo} ${student.anio_ingreso}`
+        `${member.nombres} ${member.apellidoPaterno} ${member.apellidoMaterno} ${member.curp} ${member.rol}`
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
-
       const matchesFilters =
-        (filters.grado.length === 0 || filters.grado.includes(student.grado)) &&
-        (filters.grupo.length === 0 || filters.grupo.includes(student.grupo));
-
+        filters.rol.length === 0 || filters.rol.includes(member.rol);
       return matchesSearch && matchesFilters;
     });
-
-    setFilteredStudents(filtered);
+    setFilteredStaff(filtered);
   };
 
-    React.useEffect(() => {
-      filterStudents();
-    }, [searchQuery, filters, students]);
+  // Call filterStaff whenever searchQuery or filters change (similar to QueryStudents behavior)
+  React.useEffect(() => {
+    filterStaff();
+  }, [searchQuery, filters, staff]);
 
   return (
     <motion.section
@@ -114,8 +97,8 @@ const QueryStudents: React.FC = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={styles.mainContainer}>
-        
-      <Navbar />
+
+      <StaffNavbar />
 
       {alert && (
         <motion.div
@@ -127,13 +110,11 @@ const QueryStudents: React.FC = () => {
             message={alert.message}
             type={alert.type}
             onClose={() => setAlert(null)}
-            autoDismiss={true}
-            dismissTime={5000}
           />
         </motion.div>
       )}
 
-      <StudentQueryForm
+      <QueryStaffForm
         searchQuery={searchQuery}
         filters={filters}
         handleSearchChange={handleSearchChange}
@@ -143,16 +124,14 @@ const QueryStudents: React.FC = () => {
 
       <div className={styles.tableContainer}>
         {isLoading ? (
-          <p>Cargando estudiantes.</p>
-        ) : filteredStudents.length > 0 ? (
-          <StudentTable students={filteredStudents} />
+          <p>Cargando personal.</p>
+        ) : filteredStaff.length > 0 ? (
+          <StaffTable staff={filteredStaff} />
         ) : (
           <p className={styles.noResults}>
-            {filters.grado.length === 0 &&
-            filters.grupo.length === 0 &&
-            !searchQuery
-              ? "Utilice los filtros para buscar estudiantes"
-              : "No se encontraron estudiantes con los criterios especificados"}
+            {staff.length === 0
+              ? "Utilice los filtros para buscar personal"
+              : "No se encontró personal con los criterios especificados"}
           </p>
         )}
       </div>
@@ -160,4 +139,4 @@ const QueryStudents: React.FC = () => {
   );
 };
 
-export default QueryStudents;
+export default QueryStaff;

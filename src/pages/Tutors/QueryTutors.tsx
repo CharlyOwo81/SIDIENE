@@ -13,7 +13,7 @@ const QueryTutors: React.FC = () => {
   useEffect(() => {
     const fetchTutors = async () => {
       try {
-        const response = await axios.get('http://localhost:3307/api/tutors');
+        const response = await axios.get('http://localhost:3307/api/tutor');
         setTutors(response.data.data);
       } catch (error) {
         setAlert({ message: 'Error cargando tutores', type: 'error' });

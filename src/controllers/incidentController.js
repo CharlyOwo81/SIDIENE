@@ -1,5 +1,15 @@
 import Incident from '../models/incidentModel.js';
 import db from '../config/db.js';
+import nodemailer from 'nodemailer';
+
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 const handleError = (res, error) => {
   console.error(error);
@@ -140,6 +150,37 @@ export const getIncidentById = async (req, res) => {
   }
 };
 
+export const getIncidentsByFilters = async (req, res) => {
+  try {
+    const filters = {
+      fecha: req.query.fecha,
+      nombre: req.query.nombre,
+      // Asegurar matching de mayúsculas/minúsculas
+      severidad: req.query.severidad?.toUpperCase() 
+    };
+
+    const incidents = await Incident.getByFilters(filters);
+    
+    res.status(200).json({
+      success: true,
+      data: incidents.map(incident => ({
+        ...incident,
+        contactos_tutores: incident.contactos_tutores 
+          ? incident.contactos_tutores.split(',').map(c => {
+              const [telefono, email] = c.split('|');
+              return { telefono, email };
+            })
+          : []
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 // Controlador principal
 // controllers/incidentController.js
 // controllers/incidentController.js
@@ -161,7 +202,7 @@ export const updateIncident = async (req, res) => {
     if (current[0].estado === 'ACTUALIZADO') {
       return res.status(400).json({ 
         success: false, 
-        message: 'Esta incidencia ya fue actualizada' 
+        message: 'Esta incidencia ya fue actualizada y no puede modificarse nuevamente' 
       });
     }
 
@@ -203,43 +244,38 @@ export const updateIncident = async (req, res) => {
 
     const { leves, severos, graves } = counts[0];
 
-    // 5. Notification logic with parentesco priority
-    const notifications = tutors.map(async (tutor) => {
-      const message = `Estimado ${tutor.parentesco},\nEl estudiante ha alcanzado:\n` +
-        `${leves} incidencias leves\n` +
-        `${severos} incidencias severas\n` +
-        `${graves} incidencias graves`;
-
-      // Priority: Parents first
-      const isParent = tutor.parentesco.toLowerCase().includes('padre') || 
-                      tutor.parentesco.toLowerCase().includes('madre');
-
-      if ((leves >= 3 || severos >= 2 || graves >= 1) && isParent) {
-        // Send immediate notification to parents
-        if (tutor.email) {
-          await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: tutor.email,
-            subject: 'URGENTE: Notificación de Incidencias',
-            text: message
-          });
-        }
-        if (tutor.telefono) {
-          await sendSMS(tutor.telefono, `URGENTE: ${message}`);
-        }
-      } else if (leves >= 3 || severos >= 2 || graves >= 1) {
-        // Regular notification for other tutors
-        if (tutor.email) {
-          await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: tutor.email,
-            subject: 'Notificación de Incidencias',
-            text: message
-          });
-        }
+    const sendRegularNotification = async (tutor, message) => {
+      if (tutor.email) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: tutor.email,
+          subject: 'Notificación de Incidencias',
+          text: message
+        });
       }
-    });
-
+    };
+    
+    // Dentro de la función updateIncident, modificar la sección de notificaciones:
+    const handleNotifications = async (tutors, counts) => {
+      const { leves, severos, graves } = counts;
+      
+      if (checkIncidentThresholds(leves, severos, graves)) {
+        const message = `Alerta: El estudiante ha alcanzado\n
+          - ${leves} incidencias leves\n
+          - ${severos} incidencias severas\n
+          - ${graves} incidencias graves`;
+    
+        await Promise.all(
+          tutors.map(async (tutor) => {
+            await sendPriorityNotification(tutor, message);
+            await sendRegularNotification(tutor, message);
+          })
+        );
+      }
+    };
+    
+    // Llamar esta función después de obtener los conteos
+    await handleNotifications(tutors, counts[0]);
     await Promise.all(notifications);
 
     res.json({
@@ -262,6 +298,7 @@ export const updateIncident = async (req, res) => {
       message: error.message
     });
   }
+    
 };
 // Funciones helper (pueden ir en el mismo archivo o en un utils/)
 const getNextBusinessDay = (date) => {

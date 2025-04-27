@@ -6,7 +6,7 @@ import studentRoutes from './src/routes/studentRoutes.js';
 import staffRoutes from './src/routes/staffRoutes.js';
 import incidentRoutes from './src/routes/incidentsRoutes.js';
 import tutorRoutes from './src/routes/tutorsRoutes.js';
-
+import parentescoRoutes from './src/routes/parentescoRoutes.js';
 
 
 dotenv.config();
@@ -32,6 +32,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/incidences', incidentRoutes);
 app.use('/api/tutor', tutorRoutes);
+app.use('/api/parentescos', parentescoRoutes);
 
 // 404 Handler (after all routes)
 app.use('*', (req, res) => {

@@ -46,7 +46,7 @@ export const createTutor = async (tutorData: TutorData): Promise<ApiResponse> =>
 
 export const getAllTutors = async (
   searchQuery: string,
-  filters: { grado: string[]; grupo: string[]; }
+  filters: { grado: string[]; grupo: string[] }
 ): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/tutors`, {
@@ -109,7 +109,6 @@ export const deleteTutor = async (curp: string): Promise<ApiResponse> => {
   }
 };
 
-// Additional specific tutor endpoints
 export const getTutorsByStudent = async (studentCurp: string): Promise<ApiResponse> => {
   try {
     const response = await axios.get(`${API_URL}/tutors/student/${studentCurp}`);

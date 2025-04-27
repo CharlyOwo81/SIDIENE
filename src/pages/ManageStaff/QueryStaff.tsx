@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent } from "react";
 import { motion } from "framer-motion";
-import styles from "../ManageStudents/QueryStudents.module.css"; // Use same styles as QueryStudents
-import Navbar from "../../assets/components/Navbar/StaffNavbar";
+import styles from "./AddStaff.module.css"; // Use same styles as QueryStudents
+import StaffNavbar from "../../assets/components/Navbar/StaffNavbar";
 import Alert from "../../assets/components/Alert/Alert";
 import { getAllStaff } from "../../services/staffApi";
-import QueryStaffForm from "./QueryStaffForm";
+import QueryStaffForm from "./QF";
 import StaffTable from "../../assets/components/Table/StaffTable";
 
 interface Staff {
@@ -53,6 +53,7 @@ const QueryStaff: React.FC = () => {
         setStaff([]);
         setFilteredStaff([]);
       } else {
+        // Handle success response
         setStaff(response.data.data);
         setFilteredStaff(response.data.data);
         setAlert({
@@ -96,7 +97,8 @@ const QueryStaff: React.FC = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={styles.mainContainer}>
-      <Navbar />
+
+      <StaffNavbar />
 
       {alert && (
         <motion.div
@@ -122,7 +124,7 @@ const QueryStaff: React.FC = () => {
 
       <div className={styles.tableContainer}>
         {isLoading ? (
-          <p>Cargando personal...</p>
+          <p>Cargando personal.</p>
         ) : filteredStaff.length > 0 ? (
           <StaffTable staff={filteredStaff} />
         ) : (
@@ -138,3 +140,4 @@ const QueryStaff: React.FC = () => {
 };
 
 export default QueryStaff;
+
