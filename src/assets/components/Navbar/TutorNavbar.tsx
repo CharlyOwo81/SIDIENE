@@ -44,6 +44,15 @@ const Navbar: React.FC = () => {
         >
           <span className={styles.navIcon}>✏️</span> Actualizar
         </motion.button>
+        <motion.button
+          className={styles.navLink}
+          whileHover={{ scale: 1.05, y: -3 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          onClick={() => navigate("/ExportTutors")}
+        >
+          <span className={styles.navIcon}>📒</span> Exportar
+        </motion.button>
       </div>
     </nav>
   );

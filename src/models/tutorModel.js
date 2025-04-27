@@ -46,51 +46,45 @@ class Tutor {
     }
   }
 
-  static async getAll(searchQuery = '', filters = {}) {
-    try {
-      let sql = `
-        SELECT t.*, p.tipo AS parentesco 
-        FROM tutor t
-        JOIN parentesco p ON t.parentesco_id = p.id
-        WHERE 1=1
-      `;
-      const params = [];
+// En models/tutorModel.js
+static async getAll(searchQuery = '', filters = {}) {
+  try {
+    let sql = `
+      SELECT t.*, p.tipo AS parentesco 
+      FROM tutor t
+      JOIN parentesco p ON t.parentesco_id = p.id
+      LEFT JOIN estudiantetutor et ON t.curp = et.curp_tutor
+      LEFT JOIN estudiante e ON et.curp_estudiante = e.curp
+      WHERE 1=1
+    `;
+    const params = [];
 
-      if (searchQuery) {
-        sql += ` AND (
-          CONCAT(t.nombres, ' ', t.apellido_paterno, ' ', t.apellido_materno) LIKE ? OR
-          t.curp LIKE ?
-        )`;
-        const searchTerm = `%${searchQuery}%`;
-        params.push(searchTerm, searchTerm);
-      }
-
-      if (filters.grado && filters.grado.length > 0) {
-        sql += ` AND EXISTS (
-          SELECT 1 FROM estudiantetutor et
-          JOIN estudiante e ON et.curp_estudiante = e.curp
-          WHERE et.curp_tutor = t.curp
-          AND e.grado IN (?)
-        )`;
-        params.push(filters.grado);
-      }
-
-      if (filters.grupo && filters.grupo.length > 0) {
-        sql += ` AND EXISTS (
-          SELECT 1 FROM estudiantetutor et
-          JOIN estudiante e ON et.curp_estudiante = e.curp
-          WHERE et.curp_tutor = t.curp
-          AND e.grupo IN (?)
-        )`;
-        params.push(filters.grupo);
-      }
-
-      const [rows] = await db.query(sql, params);
-      return rows;
-    } catch (error) {
-      throw error;
+    if (searchQuery) {
+      sql += ` AND (
+        CONCAT(t.nombres, ' ', t.apellido_paterno) LIKE ? OR
+        t.curp LIKE ?
+      )`;
+      params.push(`%${searchQuery}%`, `%${searchQuery}%`);
     }
+
+    if (filters.grado) {
+      sql += ' AND e.grado = ?';
+      params.push(filters.grado);
+    }
+
+    if (filters.grupo) {
+      sql += ' AND e.grupo = ?';
+      params.push(filters.grupo);
+    }
+
+    sql += ' GROUP BY t.curp'; // <- Agregar agrupación
+
+    const [rows] = await db.query(sql, params);
+    return rows;
+  } catch (error) {
+    throw error;
   }
+}
 
   static async getByCurp(curp) {
     try {

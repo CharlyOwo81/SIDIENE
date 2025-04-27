@@ -4,7 +4,7 @@ import Button from '../../assets/components/Button/Button';
 import Label from '../../assets/components/Label/Label';
 import SelectField from '../../assets/components/SelectField/SelectField'; // Import SelectField
 import GoBackButton from '../../assets/components/Button/GoBackButton';
-import styles from '../ManageStaff/QueryStaff.module.css'; // Use same styles as QueryStaff
+import styles from '../ManageStaff/AddStaff.module.css'; // Use same styles as QueryStaff
 import InputField from '../../assets/components/InputField/InputField';
 
 interface QueryStaffFormProps {
@@ -32,12 +32,8 @@ interface QueryStaffFormProps {
     handleSubmit,
   }) => {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={styles.queryContainer}
-      >
+      <div className={styles.formContainer}>
+      <h2 className={styles.formTitle}>Registrar Personal</h2>
         <form onSubmit={handleSubmit} className={styles.queryForm}>
           <div className={styles.inputGroup}>
             <h2 className={styles.formTitle}>Consultar Personal</h2>
@@ -84,7 +80,7 @@ interface QueryStaffFormProps {
             <Button type="submit">Buscar</Button>
           </div>
         </form>
-      </motion.div>
+      </div>
     );
   };
   

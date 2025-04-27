@@ -1,12 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
-/* Existing Styles (from previous updates) */
+/* Existing Styles */
 .mainContainer {
   min-height: 100vh;
   background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
   padding: 2rem;
   font-family: 'Montserrat', sans-serif;
   overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .formContainer {
@@ -284,7 +290,6 @@
   box-shadow: none;
 }
 
-/* New Styles for TutorList */
 .tutorTable {
   max-width: 1200px;
   margin: 0 auto;
@@ -373,8 +378,102 @@ tr:hover {
   background: linear-gradient(135deg, #d9363e 0%, #ff4d4f 100%);
 }
 
-/* Responsive Design (Updated for TutorList) */
+/* New Styles for QueryTutors */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.filterContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.selectStudentButton {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.selectStudentButton:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5);
+  background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+}
+
+.selectStudentButton:disabled {
+  background: #d0d0d0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.selectedStudent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(229, 130, 62, 0.2);
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.studentInfoWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.disabledInput {
+  background-color: #f5f5f5;
+  color: #666;
+  border: 2px solid #e0e0e0;
+  cursor: not-allowed;
+}
+
+.clearButton {
+  background: linear-gradient(135deg, #ff4d4f 0%, #d9363e 100%);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(217, 54, 62, 0.3);
+}
+
+.clearButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(217, 54, 62, 0.5);
+  background: linear-gradient(135deg, #d9363e 0%, #ff4d4f 100%);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+  }
+
   .formContainer {
     padding: 2rem;
   }
@@ -401,7 +500,6 @@ tr:hover {
     gap: 1.5rem;
   }
 
-  /* TutorList Responsive */
   .tutorTable {
     padding: 1rem;
   }
@@ -416,9 +514,35 @@ tr:hover {
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
   }
+
+  .filterContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .selectStudentButton {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .selectedStudent {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .clearButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+
   .formContainer {
     padding: 1.5rem;
   }
@@ -459,7 +583,6 @@ tr:hover {
     justify-content: center;
   }
 
-  /* TutorList Responsive */
   th, td {
     padding: 0.6rem 0.8rem;
     font-size: 0.85rem;
@@ -471,11 +594,15 @@ tr:hover {
     font-size: 0.8rem;
   }
 
-  /* Hide less critical columns on very small screens */
   th:nth-child(3),
   td:nth-child(3),
   th:nth-child(4),
   td:nth-child(4) {
     display: none;
+  }
+
+  .selectStudentButton {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
 }

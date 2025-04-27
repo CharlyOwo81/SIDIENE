@@ -9,11 +9,13 @@ import { getParentescos } from '../../services/parentescoApi';
 import { getAllStudents } from '../../services/studentsApi';
 import axios from 'axios';
 import Modal from '../../assets/components/Modal/ModalTutors';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
 
 interface TutorFormProps {
   tutor?: any;
   onSave: (data: any) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
 interface Student {
@@ -26,6 +28,7 @@ interface Student {
 }
 
 const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     curp: tutor?.curp || '',
     nombres: tutor?.nombres || '',
@@ -34,35 +37,17 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
     telefono: tutor?.telefono || '',
     email: tutor?.email || '',
     parentesco_id: tutor?.parentesco_id?.toString() || '1',
-    grado: tutor?.grado || '',
-    grupo: tutor?.grupo || '',
   });
 
   const [parentescos, setParentescos] = useState<{ id: number; tipo: string }[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>(tutor?.estudiantes || []);
   const [selectedStudentsData, setSelectedStudentsData] = useState<Student[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [studentError, setStudentError] = useState<string | null>(null);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const gradeOptions = [
-    { value: "1", label: "1°" },
-    { value: "2", label: "2°" },
-    { value: "3", label: "3°" },
-  ];
-
-  const groupOptions = [
-    { value: "A", label: "A" },
-    { value: "B", label: "B" },
-    { value: "C", label: "C" },
-    { value: "D", label: "D" },
-    { value: "E", label: "E" },
-    { value: "F", label: "F" },
-  ];
 
   useEffect(() => {
     const fetchParentescos = async () => {
@@ -80,12 +65,17 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
     const fetchAssociatedStudents = async () => {
       if (tutor?.curp) {
         try {
-          const response = await axios.get(`http://localhost:3307/api/students/by-tutor/${tutor.curp}`);
+          const response = await axios.get(`http://localhost:3307/api/tutor/${tutor.curp}/students`);
           const associatedStudents = response.data.data;
+          console.log('Fetched students:', associatedStudents); // Debug log
           setSelectedStudents(associatedStudents.map((student: Student) => student.curp));
           setSelectedStudentsData(associatedStudents);
-        } catch (err) {
-          setError('Error al cargar estudiantes asociados');
+        } catch (err: any) {
+          console.error('Error fetching associated students:', err.response || err);
+          const message = err.response?.status === 404 
+            ? 'Tutor no encontrado o sin estudiantes asociados'
+            : 'Error al cargar estudiantes asociados';
+          setError(message);
         }
       }
     };
@@ -97,8 +87,8 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
       setIsLoadingStudents(true);
       setStudentError(null);
       const response = await getAllStudents('', {
-        grado: formData.grado ? [formData.grado] : [],
-        grupo: formData.grupo ? [formData.grupo] : [],
+        grado: [],
+        grupo: []
       });
       setStudents(response.data.data);
       setIsModalOpen(true);
@@ -110,15 +100,13 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
   };
 
   const handleStudentSelect = (student: Student) => {
-    setSelectedStudentsData(prev => {
-      const exists = prev.some(s => s.curp === student.curp);
-      return exists 
-        ? prev.filter(s => s.curp !== student.curp)
-        : [...prev, student];
+    setSelectedStudentsData((prev) => {
+      const exists = prev.some((s) => s.curp === student.curp);
+      return exists ? prev.filter((s) => s.curp !== student.curp) : [...prev, student];
     });
-    setSelectedStudents(prev => 
+    setSelectedStudents((prev) =>
       prev.includes(student.curp)
-        ? prev.filter(curp => curp !== student.curp)
+        ? prev.filter((curp) => curp !== student.curp)
         : [...prev, student.curp]
     );
   };
@@ -127,20 +115,16 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
     const { name, value } = e.target;
     let processedValue = value;
 
-    switch(name) {
+    switch (name) {
       case 'curp':
         processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         break;
       case 'telefono':
         processedValue = value.replace(/\D/g, '').slice(0, 10);
         break;
-      case 'grado':
-      case 'grupo':
-        processedValue = value.toUpperCase();
-        break;
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: processedValue,
     }));
@@ -158,15 +142,10 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
       return setSubmitError('CURP inválido. Ejemplo válido: BABI041023MSRRYGH0');
     }
 
-    if (!formData.grado || !formData.grupo) {
-      return setSubmitError('Selecciona grado y grupo');
-    }
-
     if (!phoneRegex.test(formData.telefono)) {
       return setSubmitError('Teléfono debe tener 10 dígitos');
     }
 
-    // Validación modificada para email opcional
     if (formData.email && !emailRegex.test(formData.email)) {
       return setSubmitError('Formato de email inválido (opcional)');
     }
@@ -214,7 +193,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               disabled={!!tutor?.curp}
               placeholder="Ej: BABI041023MSRRYGH0"
               maxLength={18}
-               type='text'
+              type="text"
             />
           </div>
 
@@ -225,7 +204,8 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               value={formData.nombres}
               onChange={handleChange}
               placeholder="Nombres completos"
-               type='text'
+              type="text"
+              disabled={!!tutor?.curp} // Disable for updates
             />
           </div>
 
@@ -236,7 +216,8 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               value={formData.apellido_paterno}
               onChange={handleChange}
               placeholder="Apellido paterno"
-              type='text'
+              type="text"
+              disabled={!!tutor?.curp} // Disable for updates
             />
           </div>
 
@@ -247,7 +228,8 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               value={formData.apellido_materno}
               onChange={handleChange}
               placeholder="Apellido materno (opcional)"
-               type='text'
+              type="text"
+              disabled={!!tutor?.curp} // Disable for updates
             />
           </div>
         </div>
@@ -292,37 +274,6 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
             />
           </div>
         </div>
-
-        {/* Columna Escolar */}
-        <div className={styles.formColumn}>
-          <h3 className={styles.columnTitle}>Escolaridad</h3>
-          
-          <div className={styles.formGroup}>
-            <Label htmlFor="grado">Grado</Label>
-            <SelectField
-              name="grado"
-              value={formData.grado}
-              onChange={handleChange}
-              options={[
-                { value: '', label: 'Selecciona grado' },
-                ...gradeOptions,
-              ]}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <Label htmlFor="grupo">Grupo</Label>
-            <SelectField
-              name="grupo"
-              value={formData.grupo}
-              onChange={handleChange}
-              options={[
-                { value: '', label: 'Selecciona grupo' },
-                ...groupOptions,
-              ]}
-            />
-          </div>
-        </div>
       </div>
 
       {/* Sección Estudiantes */}
@@ -333,7 +284,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
           <Button
             type="button"
             onClick={handleSearchStudents}
-            disabled={isLoadingStudents || !formData.grado || !formData.grupo}
+            disabled={isLoadingStudents}
           >
             {isLoadingStudents ? 'Buscando...' : 'Buscar Estudiantes'}
           </Button>
@@ -352,11 +303,11 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
                 <li key={student.curp} className={styles.studentItem}>
                   <div className={styles.studentInfoContainer}>
                     <span className={styles.studentName}>
-                      {student.nombres} {student.apellidoPaterno}
+                      {student.nombres || 'Sin nombre'} {student.apellidoPaterno || 'Sin apellido paterno'}
                       {student.apellidoMaterno && ` ${student.apellidoMaterno}`}
                     </span>
                     <span className={styles.studentDetails}>
-                      {student.grado}°-{student.grupo} | CURP: {student.curp}
+                      {(student.grado && student.grupo) ? `${student.grado}°-${student.grupo}` : 'Sin grado/grupo'} | CURP: {student.curp}
                     </span>
                   </div>
                   <button
@@ -385,21 +336,17 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
       />
 
       <div className={styles.formActions}>
-        <Button 
-          type="button" 
-          onClick={onCancel} 
-          disabled={isSubmitting}
-        >
-          Cancelar
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={isSubmitting}
-          onClick={() => {
-            handleSubmit(new Event('submit') as unknown as React.FormEvent);
-          }}
-        >
-          {tutor?.curp ? 'Actualizar Tutor' : 'Registrar Tutor'}
+        <GoBackButton />
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <span className={styles.spinner}></span> Actualizando...
+            </>
+          ) : tutor?.curp ? (
+            'Actualizar Tutor'
+          ) : (
+            'Registrar Tutor'
+          )}
         </Button>
       </div>
     </motion.form>

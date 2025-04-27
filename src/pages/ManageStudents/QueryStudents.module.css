@@ -3,7 +3,7 @@
   max-width: 900px;
   margin: 2rem auto;
   padding: 2rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(229, 130, 62, 0.05));
+  background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(229, 130, 62, 0.2);
@@ -11,6 +11,7 @@
 
 .queryForm {
   display: flex;
+  background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
   flex-direction: column;
   gap: 2rem;
 }

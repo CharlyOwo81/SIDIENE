@@ -3,7 +3,6 @@
 /* Page Container */
 .pageContainer {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f2f5 0%, #e0e4e8 100%);
   font-family: 'Montserrat', sans-serif;
   padding: 2rem;
   position: relative;

@@ -5,6 +5,7 @@ import Alert from '../../assets/components/Alert/Alert';
 import styles from './ManageTutors.module.css';
 import TutorForm from './TutorForm';
 import Navbar from '../../assets/components/Navbar/TutorNavbar';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
 
 const RegisterTutor: React.FC = () => {
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -30,6 +31,7 @@ const RegisterTutor: React.FC = () => {
       {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
       
       <TutorForm onSave={handleSave} onCancel={() => window.history.back()} />
+      
     </motion.div>
   );
 };

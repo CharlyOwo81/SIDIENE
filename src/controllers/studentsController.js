@@ -258,6 +258,30 @@ export const getAllStudents = async (req, res) => {
   }
 };
 
+// Get students by grado and grupo
+export const getStudentsByGradeGroup = async (req, res) => {
+  try {
+    const { grado, grupo } = req.query;
+    if (!grado || !grupo) {
+      return res.status(400).json({ success: false, message: 'Faltan grado o grupo' });
+    }
+
+    const [results] = await db.query(`
+      SELECT curp, CONCAT(nombres, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, '')) AS nombre_completo
+      FROM estudiante
+      WHERE grado = ? AND grupo = ?
+    `, [grado, grupo]);
+
+    res.json({
+      success: true,
+      data: results,
+      count: results.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const getStudentByCurp = async (req, res) => {
   try {
     const { curp } = req.params;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import styles from './ManageTutors.module.css';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
 
 interface TutorListProps {
   tutors: any[];
@@ -8,7 +9,7 @@ interface TutorListProps {
   onDelete: (curp: string) => void;
 }
 
-const TutorList: React.FC<TutorListProps> = ({ tutors, onEdit, onDelete }) => {
+const TutorList: React.FC<TutorListProps> = ({ tutors}) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -22,7 +23,6 @@ const TutorList: React.FC<TutorListProps> = ({ tutors, onEdit, onDelete }) => {
             <th>Parentesco</th>
             <th>Teléfono</th>
             <th>Email</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -32,20 +32,6 @@ const TutorList: React.FC<TutorListProps> = ({ tutors, onEdit, onDelete }) => {
               <td>{tutor.parentesco}</td>
               <td>{tutor.telefono || 'N/A'}</td>
               <td>{tutor.email || 'N/A'}</td>
-              <td>
-                <button
-                  className={styles.editButton}
-                  onClick={() => onEdit(tutor)}
-                >
-                  Editar
-                </button>
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => onDelete(tutor.curp)}
-                >
-                  Eliminar
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
