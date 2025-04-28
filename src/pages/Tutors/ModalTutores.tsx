@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import styles from './ManageTutors.module.css';
+import styles from './ModalTutores.module.css';
 
 interface TutorModalProps {
   isOpen: boolean;
@@ -26,14 +26,14 @@ const TutorModal: React.FC<TutorModalProps> = ({ isOpen, onClose, tutors, onSele
             exit={{ y: 50 }}
           >
             <div className={styles.modalHeader}>
-              <h3>Tutores del {tutors[0]?.grado}° Grupo {tutors[0]?.grupo}</h3>
+              <h3>Tutores registrados</h3>
               <button onClick={onClose} className={styles.closeButton}>×</button>
             </div>
             
             <div className={styles.tutorList}>
               {tutors.map(tutor => (
                 <div key={tutor.curp} className={styles.tutorItem}>
-                  <span>{tutor.nombres} {tutor.apellido_paterno}</span>
+                  <span>{tutor.nombres} {tutor.apellido_paterno} {tutor.apellido_materno}</span>
                   <button 
                     className={styles.editButton}
                     onClick={() => onSelectTutor(tutor)}

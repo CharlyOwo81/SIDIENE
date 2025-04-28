@@ -6,6 +6,7 @@ import styles from './ManageTutors.module.css';
 import TutorForm from './TutorForm';
 import Navbar from '../../assets/components/Navbar/TutorNavbar';
 import GoBackButton from '../../assets/components/Button/GoBackButton';
+import navbarStyles from "../../assets/components/Navbar/Navbar.module.css";
 
 const RegisterTutor: React.FC = () => {
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -26,7 +27,7 @@ const RegisterTutor: React.FC = () => {
       className={styles.container}
     >
 
-      <Navbar/>
+<Navbar className={navbarStyles.navbar} />
 
       {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
       

@@ -1,0 +1,271 @@
+/* Enhanced ModalTutores.module.css */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: 
+        linear-gradient(135deg, 
+            rgba(137, 21, 71, 0.6) 0%, 
+            rgba(242, 101, 62, 0.4) 100%),
+        radial-gradient(circle at center, 
+            rgba(255, 255, 255, 0.1), 
+            rgba(255, 255, 255, 0));
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modalContent {
+    background: 
+        linear-gradient(145deg, 
+            rgba(255, 255, 255, 0.92) 0%, 
+            rgba(243, 196, 77, 0.15) 100%),
+        radial-gradient(circle at 20% 80%, 
+            rgba(255, 255, 255, 0.1), 
+            transparent 70%);
+    border: 1px solid rgba(243, 196, 77, 0.3);
+    border-radius: 24px;
+    padding: 36px;
+    width: clamp(320px, 90%, 560px);
+    box-shadow: 
+        0 8px 32px rgba(137, 21, 71, 0.25),
+        inset 0 0 12px rgba(255, 255, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+    animation: floatIn 0.6s ease-out;
+    will-change: transform, opacity;
+}
+
+@keyframes floatIn {
+    from {
+        transform: translateY(-20px) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    position: relative;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modalHeader::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 90%;
+    height: 2px;
+    background: 
+        linear-gradient(90deg, 
+            rgba(243, 196, 77, 0) 0%,
+            rgba(243, 196, 77, 0.8) 50%,
+            rgba(243, 196, 77, 0) 100%);
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+}
+
+.modalHeader h3 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: #891547;
+    margin: 0;
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.1),
+        -1px -1px 2px rgba(255, 255, 255, 0.2);
+    background: linear-gradient(180deg, #891547, #C26444);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: transform 0.3s ease;
+}
+
+.closeButton {
+    background: transparent;
+    border: 0;
+    font-size: 2rem;
+    color: #E5823E;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.closeButton:hover {
+    color: #F3C44D;
+    transform: rotate(180deg) scale(1.2);
+}
+
+.closeButton::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(243, 196, 77, 0.3) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.closeButton:hover::before {
+    opacity: 1;
+}
+
+.tutorList {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 16px;
+    margin: -8px;
+    scroll-behavior: smooth;
+}
+
+.tutorList::-webkit-scrollbar {
+    width: 12px;
+}
+
+.tutorList::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.tutorList::-webkit-scrollbar-thumb {
+    background: 
+        linear-gradient(45deg, 
+            #F3C44D 25%, 
+            #C26444 75%);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 0 8px rgba(243, 196, 77, 0.5),
+        inset 0 0 12px rgba(243, 196, 77, 0.3);
+}
+
+.tutorList::-webkit-scrollbar-thumb:hover {
+    background: 
+        linear-gradient(45deg, 
+            #E5823E 25%, 
+            #891547 75%);
+}
+
+.tutorItem {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 18px 24px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.85) 0%, 
+            rgba(243, 196, 77, 0.1) 100%);
+    border-radius: 16px;
+    margin: 8px 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px rgba(137, 21, 71, 0.1),
+        inset 0 0 8px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(243, 196, 77, 0.15);
+}
+
+.tutorItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 20px rgba(137, 21, 71, 0.15),
+        0 0 20px rgba(243, 196, 77, 0.3);
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.95) 0%, 
+            rgba(243, 196, 77, 0.15) 100%);
+}
+
+.tutorItem span {
+    font-size: clamp(1rem, 3vw, 1.15rem);
+    font-weight: 500;
+    color: #891547;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    transition: color 0.3s ease;
+}
+
+.editButton {
+    background: 
+        linear-gradient(45deg, 
+            #F3C44D 0%, 
+            #E5823E 100%);
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: 0;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 4px 8px rgba(229, 130, 62, 0.3),
+        inset 0 0 12px rgba(243, 196, 77, 0.4);
+}
+
+.editButton::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        linear-gradient(45deg, 
+            rgba(255, 255, 255, 0.3) 25%, 
+            transparent 75%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.editButton:hover::before {
+    transform: translateX(100%);
+}
+
+.editButton:active {
+    transform: scale(0.95);
+    box-shadow: 
+        0 2px 4px rgba(229, 130, 62, 0.3),
+        inset 0 0 8px rgba(243, 196, 77, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modalContent {
+        animation: none;
+    }
+    
+    .tutorItem,
+    .closeButton {
+        transition: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .modalContent {
+        padding: 24px;
+        border-radius: 18px;
+    }
+    
+    .modalHeader h3 {
+        font-size: 1.5rem;
+    }
+    
+    .tutorItem {
+        padding: 14px 18px;
+        border-radius: 12px;
+    }
+    
+    .editButton {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}

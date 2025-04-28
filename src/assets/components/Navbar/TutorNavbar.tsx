@@ -1,13 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import styles from "./StaffNavbar.module.css";
+import styles from "./Navbar.module.css";
 
-const Navbar: React.FC = () => {
+const TutorNavbar: React.FC<{ className?: string }> = ({ className }) => {
   const navigate = useNavigate();
 
   return (
-    <nav className={styles.navbar}>
+    <nav className={`${styles.navbar} ${className || ""}`} aria-label="Navegación de tutorías">
       <motion.h1
         className={styles.navTitle}
         initial={{ x: -20, opacity: 0 }}
@@ -58,4 +58,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default TutorNavbar;

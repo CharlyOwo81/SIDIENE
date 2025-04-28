@@ -6,6 +6,7 @@ import Alert from '../../assets/components/Alert/Alert';
 import TutorForm from './TutorForm';
 import TutorModal from './ModalTutores';
 import Navbar from '../../assets/components/Navbar/TutorNavbar';
+import navbarStyles from "../../assets/components/Navbar/Navbar.module.css";
 import SelectField from '../../assets/components/SelectField/SelectField';
 import Label from '../../assets/components/Label/Label';
 import styles from './ManageTutors.module.css';
@@ -116,7 +117,7 @@ const UpdateTutor: React.FC = () => {
       animate={{ opacity: 1 }}
       className={styles.container}
     >
-      <Navbar />
+<Navbar className={navbarStyles.navbar} />
       {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
       <h2 className={styles.title}>Actualización de Tutor</h2>
 

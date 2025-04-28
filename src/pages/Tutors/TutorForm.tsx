@@ -48,6 +48,10 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [studentError, setStudentError] = useState<string | null>(null);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
+  const [filters, setFilters] = useState({
+    grado: '',
+    grupo: '',
+  });
 
   useEffect(() => {
     const fetchParentescos = async () => {
@@ -67,7 +71,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
         try {
           const response = await axios.get(`http://localhost:3307/api/tutor/${tutor.curp}/students`);
           const associatedStudents = response.data.data;
-          console.log('Fetched students:', associatedStudents); // Debug log
+          console.log('Fetched students:', associatedStudents);
           setSelectedStudents(associatedStudents.map((student: Student) => student.curp));
           setSelectedStudentsData(associatedStudents);
         } catch (err: any) {
@@ -87,8 +91,8 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
       setIsLoadingStudents(true);
       setStudentError(null);
       const response = await getAllStudents('', {
-        grado: [],
-        grupo: []
+        grado: filters.grado ? [filters.grado] : [],
+        grupo: filters.grupo ? [filters.grupo] : [],
       });
       setStudents(response.data.data);
       setIsModalOpen(true);
@@ -127,6 +131,14 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: processedValue,
+    }));
+  };
+
+  const handleFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -205,7 +217,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               onChange={handleChange}
               placeholder="Nombres completos"
               type="text"
-              disabled={!!tutor?.curp} // Disable for updates
+              disabled={!!tutor?.curp}
             />
           </div>
 
@@ -217,7 +229,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               onChange={handleChange}
               placeholder="Apellido paterno"
               type="text"
-              disabled={!!tutor?.curp} // Disable for updates
+              disabled={!!tutor?.curp}
             />
           </div>
 
@@ -229,7 +241,7 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
               onChange={handleChange}
               placeholder="Apellido materno (opcional)"
               type="text"
-              disabled={!!tutor?.curp} // Disable for updates
+              disabled={!!tutor?.curp}
             />
           </div>
         </div>
@@ -276,28 +288,65 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
         </div>
       </div>
 
-      {/* Sección Estudiantes */}
+      {/* Sección Estudiantes Asociados */}
       <div className={styles.fullWidthSection}>
-        <h3 className={styles.columnTitle}>Estudiantes Asociados</h3>
-        
-        <div className={styles.studentControls}>
-          <Button
-            type="button"
-            onClick={handleSearchStudents}
-            disabled={isLoadingStudents}
-          >
-            {isLoadingStudents ? 'Buscando...' : 'Buscar Estudiantes'}
-          </Button>
-          
-          {selectedStudentsData.length > 0 && (
-            <span className={styles.studentCount}>
-              {selectedStudentsData.length} estudiantes seleccionados
-            </span>
-          )}
+        <div className={styles.studentHeader}>
+          <h3 className={styles.columnTitle}>Estudiantes a Cargo</h3>
+          <div className={styles.studentControls}>
+            <SelectField
+              name="grado"
+              value={filters.grado}
+              onChange={handleFilterChange}
+              options={[
+                { value: '', label: 'Selecciona grado' },
+                ...Array.from({ length: 3 }, (_, i) => ({
+                  value: `${i + 1}`,
+                  label: `${i + 1}°`,
+                })),
+              ]}
+            />
+            <SelectField
+              name="grupo"
+              value={filters.grupo}
+              onChange={handleFilterChange}
+              options={[
+                { value: '', label: 'Selecciona grupo' },
+                ..."ABCDEF".split("").map((letter) => ({
+                  value: letter,
+                  label: letter,
+                })),
+              ]}
+            />
+            <Button
+              type="button"
+              onClick={handleSearchStudents}
+              disabled={isLoadingStudents}
+            >
+              {isLoadingStudents ? (
+                <>
+                  <span className={styles.spinner}></span> Buscando...
+                </>
+              ) : (
+                'Buscar Estudiantes'
+              )}
+            </Button>
+            {selectedStudentsData.length > 0 && (
+              <span className={styles.studentCount}>
+                {selectedStudentsData.length} {selectedStudentsData.length === 1 ? 'estudiante' : 'estudiantes'} seleccionado{selectedStudentsData.length === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
         </div>
 
-        {selectedStudentsData.length > 0 && (
-          <div className={styles.selectedStudents}>
+        {studentError && <div className={styles.error}>❌ {studentError}</div>}
+
+        <div className={styles.selectedStudents}>
+          {selectedStudentsData.length === 0 ? (
+            <div className={styles.emptyState}>
+              <span>No hay estudiantes seleccionados</span>
+              <p>Selecciona un grado y grupo, luego presiona "Buscar Estudiantes" para asociar estudiantes al tutor.</p>
+            </div>
+          ) : (
             <ul className={styles.studentList}>
               {selectedStudentsData.map((student) => (
                 <li key={student.curp} className={styles.studentItem}>
@@ -306,23 +355,26 @@ const TutorForm: React.FC<TutorFormProps> = ({ tutor, onSave, onCancel }) => {
                       {student.nombres || 'Sin nombre'} {student.apellidoPaterno || 'Sin apellido paterno'}
                       {student.apellidoMaterno && ` ${student.apellidoMaterno}`}
                     </span>
-                    <span className={styles.studentDetails}>
-                      {(student.grado && student.grupo) ? `${student.grado}°-${student.grupo}` : 'Sin grado/grupo'} | CURP: {student.curp}
-                    </span>
+                    <div className={styles.studentDetails}>
+                      <span>
+                        {(student.grado && student.grupo) ? `${student.grado}°-${student.grupo}` : 'Sin grado/grupo'}
+                      </span>
+                      <span className={styles.studentCurp}>CURP: {student.curp}</span>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleStudentSelect(student)}
                     className={styles.removeButton}
-                    aria-label="Remover estudiante"
+                    aria-label={`Remover estudiante ${student.nombres}`}
                   >
                     ×
                   </button>
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {submitError && <div className={styles.error}>❌ {submitError}</div>}

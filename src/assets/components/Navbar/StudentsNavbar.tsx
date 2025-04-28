@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import styles from "./StudentsNavbar.module.css";
+import styles from "./Navbar.module.css";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
