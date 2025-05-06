@@ -260,6 +260,25 @@
   }
 }
 
+.fileSelector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fileTypeButton {
+  padding: 0.5rem 1rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fileTypeButton.active {
+  border-color: #2196F3;
+  background-color: #e3f2fd;
+}
+
 /* src/components/AddStaff.module.css */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 

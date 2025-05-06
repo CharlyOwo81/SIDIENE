@@ -62,16 +62,22 @@ static async getAll() {
 
   static async update(id, updateData) {
     try {
+      // Convertir fecha a formato MySQL
+      const formattedData = {
+        ...updateData,
+        fecha: new Date(updateData.fecha).toISOString().slice(0, 19).replace('T', ' ')
+      };
+  
       const [result] = await db.query(
         `UPDATE incidencia SET ? WHERE id_incidencia = ?`,
-        [updateData, id]
+        [formattedData, id]
       );
+      
       return result.affectedRows > 0;
     } catch (error) {
       throw new Error(`Error updating incident: ${error.message}`);
     }
   }
-
   static async getByStudent(curp) {
     try {
       const [rows] = await db.query(

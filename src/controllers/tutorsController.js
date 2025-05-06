@@ -185,10 +185,6 @@ export const getTutorsStudents = async (req, res) => {
   }
 };
 
-export const exportTutors = async (req, res) => {
-
-};
-
 // Get tutors by student CURP
 
 export const getTutorsByStudent = async (req, res) => {

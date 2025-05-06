@@ -11,6 +11,7 @@ import SelectField from "../../assets/components/SelectField/SelectField";
 import Button from "../../assets/components/Button/Button";
 import { motivosPorSeveridad } from "../../constants/incidenceOptions";
 import axios from "axios";
+import Navbar from "../../assets/components/Navbar/IncidentsNavbar";
 
 type NivelSeveridad = keyof typeof motivosPorSeveridad;
 
@@ -53,34 +54,39 @@ const UpdateIncidents: React.FC = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const response = await axios.get('http://localhost:3307/api/incidences/filter', {
-        params: {
-          fecha: searchFilters.fecha || undefined,
-          nombre: searchFilters.nombre || undefined,
-          severidad: searchFilters.severidad.toUpperCase() || undefined
+      const response = await axios.get(
+        "http://localhost:3307/api/incidences/filter",
+        {
+          params: {
+            fecha: searchFilters.fecha || undefined,
+            nombre: searchFilters.nombre || undefined,
+            severidad: searchFilters.severidad.toUpperCase() || undefined,
+          },
         }
-      });
-  
+      );
+
       setIncidents(response.data.data);
       setFilteredIncidents(response.data.data);
       setShowResultsModal(true);
       setAlert({
         message: response.data.message,
-        type: "success"
+        type: "success",
       });
     } catch (error) {
-      console.error('Error searching incidents:', error);
+      console.error("Error searching incidents:", error);
       if (axios.isAxiosError(error)) {
         setAlert({
-          message: 'Error al buscar incidencias: ' + (error.response?.data?.message || 'Error desconocido'),
-          type: 'error',
+          message:
+            "Error al buscar incidencias: " +
+            (error.response?.data?.message || "Error desconocido"),
+          type: "error",
         });
       } else {
         setAlert({
-          message: 'Error al buscar incidencias: ' + String(error),
-          type: 'error',
+          message: "Error al buscar incidencias: " + String(error),
+          type: "error",
         });
       }
     } finally {
@@ -102,71 +108,79 @@ const UpdateIncidents: React.FC = () => {
   // UpdateIncidents.tsx
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedIncident) return;
-
+    if (!selectedIncident || selectedIncident.estado === "ACTUALIZADO") return;
+  
     setIsSubmitting(true);
     try {
+      // Validación de datos antes de enviar
+      if (!selectedIncident.motivo || !selectedIncident.nivel_severidad) {
+        throw new Error("Todos los campos requeridos deben estar completos");
+      }
+  
       const response = await axios.put(
         `http://localhost:3307/api/incidences/${selectedIncident.id_incidencia}`,
         {
           ...selectedIncident,
           estado: "ACTUALIZADO",
+          fecha: new Date(selectedIncident.fecha).toISOString() // Formatear fecha
         }
       );
-
-      // Update local state with full response data
-      const updatedIncidents = incidents.map((inc) =>
-        inc.id_incidencia === selectedIncident.id_incidencia
-          ? response.data.data // Use the full response data
+  
+      // Actualizar estado local
+      const updatedIncidents = incidents.map(inc => 
+        inc.id_incidencia === selectedIncident.id_incidencia 
+          ? response.data.data 
           : inc
       );
-
+  
       setIncidents(updatedIncidents);
       setSelectedIncident(null);
-
+  
       setAlert({
-        message: response.data.message,
-        type: "success",
+        message: "Incidencia actualizada con éxito",
+        type: "success"
       });
+  
     } catch (error) {
       console.error("Update error:", error);
-      if (axios.isAxiosError(error)) {
-        setAlert({
-          message: error.response?.data?.message || "Error actualizando",
-          type: "error",
-        });
-      }
+      setAlert({
+        message: axios.isAxiosError(error) 
+          ? error.response?.data?.message || "Error de conexión"
+          : "Error al guardar cambios",
+        type: "error"
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
+    
     <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={styles.formContainer}
-  >
-    {/* Alert fuera del contenido principal */}
-    {alert && (
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          zIndex: 1000
-        }}
-      >
-        <Alert
-          message={alert.message}
-          type={alert.type}
-          onClose={() => setAlert(null)}
-        />
-      </motion.div>
-    )}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={styles.formContainer}>
+        <Navbar/>
+      {/* Alert fuera del contenido principal */}
+      {alert && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            zIndex: 1000,
+          }}>
+          <Alert
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert(null)}
+          />
+        </motion.div>
+      )}
+      
 
       {/* Formulario de Búsqueda */}
       <div className={styles.section}>
@@ -295,7 +309,7 @@ const UpdateIncidents: React.FC = () => {
             <div className={styles.grid}>
               <div className={styles.inputWrapper}>
                 <Label htmlFor="fecha">Fecha</Label>
-                
+
                 <InputField
                   type="date"
                   name="fecha"
@@ -331,24 +345,45 @@ const UpdateIncidents: React.FC = () => {
                   }
                 />
               </div>
-
+              </div>
               {/* Replace SelectField with InputField for motivo */}
+              {/* Campo Motivo Corregido */}
               <div className={styles.inputWrapper}>
                 <Label htmlFor="motivo">Motivo</Label>
-                <InputField
-                  type="text"
+                <SelectField
                   name="motivo"
-                  placeholder="motivo"
-                  disabled
                   value={selectedIncident.motivo}
-                  onChange={(e) =>
-                    setSelectedIncident({
-                      ...selectedIncident,
-                      motivo: e.target.value,
-                    })
-                  }
+                  options={[
+                    { value: "", label: "Selecciona un motivo" },
+                    // Opciones estándar
+                    ...(motivosPorSeveridad[selectedIncident.nivel_severidad] || []).map((motivo) => ({
+                      value: motivo,
+                      label: motivo,
+                    })),
+                    // Opción adicional para motivos antiguos no listados
+                    ...(!motivosPorSeveridad[selectedIncident.nivel_severidad]?.includes(
+                      selectedIncident.motivo
+                    )
+                      ? [
+                          {
+                            value: selectedIncident.motivo,
+                            label: `${selectedIncident.motivo} (motivo original)`,
+                          },
+                        ]
+                      : []),
+                  ]}
+                  onChange={(e) => {
+                    // Solo permite seleccionar nuevos motivos válidos
+                    if (e.target.value !== selectedIncident.motivo) {
+                      setSelectedIncident({
+                        ...selectedIncident,
+                        motivo: e.target.value,
+                      });
+                    }
+                  }}
+                  required={selectedIncident.estado === "PENDIENTE"}
                 />
-              </div>
+
 
               <div className={styles.inputWrapper}>
                 <Label htmlFor="descripcion">Descripción</Label>

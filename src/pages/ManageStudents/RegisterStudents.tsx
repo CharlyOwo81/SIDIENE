@@ -44,21 +44,23 @@ const RegisterStudents: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setAlert(null);
-
+  
     try {
       let response;
       if (file) {
+        console.log('Uploading file:', file.name, file.size, file.type);
         response = await uploadStudentsFromPdf(file);
-        if (response.data?.errors) {
+        if (response.data.errors?.length > 0) {
           setAlert({
             message: `Procesado con ${response.data.errors.length} errores`,
             type: "warning",
-            details: response.data.errors.join("\n"),
+            details: response.data.errors.join("\n") || "Errores detectados en el archivo.",
           });
         } else {
           setAlert({
             message: `${response.data.valid} estudiantes procesados (${response.data.created} nuevos, ${response.data.updated} actualizados)`,
             type: "success",
+            details: `Formato detectado: ${response.data.structure}, Separador: ${response.data.detectedDelimiter}`,
           });
         }
       } else {
@@ -76,7 +78,7 @@ const RegisterStudents: React.FC = () => {
           type: "success",
         });
       }
-
+  
       setFormData({
         curp: "",
         nombres: "",
@@ -89,6 +91,9 @@ const RegisterStudents: React.FC = () => {
       setFile(null);
     } catch (error) {
       console.error("Submission error:", error);
+      if (typeof error === "object" && error !== null && "response" in error) {
+        console.log("Server response:", (error as any).response.data); // Add this
+      }
       setAlert({
         message:
           error instanceof Error

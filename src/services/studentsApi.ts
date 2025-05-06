@@ -21,17 +21,14 @@ interface ApiResponse {
   statusText: string;
 }
 
-export const uploadStudentsFromPdf = async (file: File): Promise<ApiResponse> => {
+export const uploadStudentsFromPdf = async (file: File) => {
   const formData = new FormData();
-  formData.append('file', file); // Matches multer.single('file')
-  
-  const response = await axios.post(`${API_URL}/students/upload-pdf`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  formData.append('file', file);
+  return await axios.post(`${API_URL}/students/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
-  return response; // Return full response to match ApiResponse type
 };
+
 export const createStudent = async (studentData: StudentData): Promise<ApiResponse> => {
   try {
     const response = await axios.post(`${API_URL}/students`, studentData);

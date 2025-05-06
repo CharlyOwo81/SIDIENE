@@ -1,16 +1,11 @@
 import db from "../config/db.js";
 
 class Student {
-  static async bulkCreate(studentsData) {
+  static async bulkCreate(students) {
     try {
-      if (!studentsData || studentsData.length === 0) {
-        console.error("No student data provided for bulk insert");
-        return { created: 0, updated: 0 }; // Return empty result instead of throwing
-      }
-
       const sql = `
         INSERT INTO estudiante 
-          (curp, nombres, apellido_paterno, apellido_materno, grado, grupo, anio_ingreso)
+          (curp, nombres, apellido_paterno, apellido_materno, grado, grupo, anio_ingreso, anio_egreso, estatus)
         VALUES ?
         ON DUPLICATE KEY UPDATE
           nombres = VALUES(nombres),
@@ -18,11 +13,12 @@ class Student {
           apellido_materno = VALUES(apellido_materno),
           grado = VALUES(grado),
           grupo = VALUES(grupo),
-          anio_ingreso = VALUES(anio_ingreso)
+          anio_ingreso = VALUES(anio_ingreso),
+          anio_egreso = VALUES(anio_egreso),
+          estatus = VALUES(estatus)
       `;
 
-      // Map to database column names (apellido_paterno instead of apellidoPaterno)
-      const values = studentsData.map((student) => [
+      const values = students.map(student => [
         student.curp,
         student.nombres,
         student.apellido_paterno,
@@ -30,20 +26,19 @@ class Student {
         student.grado,
         student.grupo,
         student.anio_ingreso,
+        student.anio_egreso || null,
+        student.estatus || 'ACTIVO'
       ]);
 
-      console.log("Executing bulk insert with:", {
-        studentCount: values.length,
-        sampleStudent: values[0],
-      });
-
       const [result] = await db.query(sql, [values]);
+      
       return {
-        created: result.affectedRows - result.changedRows, // Actual new inserts
-        updated: result.changedRows,
+        created: result.affectedRows - result.changedRows,
+        updated: result.changedRows
       };
+
     } catch (error) {
-      console.error("Error in bulk student creation:", error);
+      console.error("Error en inserción masiva:", error);
       throw error;
     }
   }

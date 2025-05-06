@@ -17,7 +17,7 @@ interface QueryStaffFormProps {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   }
   const rolOptions = [
-    { value: "", label: "Todos" },
+    { value: '', label: "Todos" },
     { value: "DOCENTE", label: "Docente" },
     { value: "PREFECTO", label: "Prefecto" },
     { value: "DIRECTIVO", label: "Directivo" },

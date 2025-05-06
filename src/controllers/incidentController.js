@@ -185,40 +185,41 @@ export const getIncidentsByFilters = async (req, res) => {
 // controllers/incidentController.js
 // controllers/incidentController.js
 // controllers/incidentController.js
+// En controllers/incidentController.js
 export const updateIncident = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Get current incident state and student CURP
+    // Validar datos de entrada
+    if (!req.body.nivel_severidad || !req.body.motivo) {
+      return res.status(400).json({
+        success: false,
+        message: "Campos requeridos: nivel_severidad y motivo"
+      });
+    }
+
+    // Verificar si la incidencia existe
     const [current] = await db.query(
-      `SELECT estado, id_estudiante FROM incidencia WHERE id_incidencia = ?`,
+      `SELECT * FROM incidencia WHERE id_incidencia = ?`,
       [id]
     );
 
     if (!current.length) {
-      return res.status(404).json({ success: false, message: 'Incidencia no encontrada' });
-    }
-
-    if (current[0].estado === 'ACTUALIZADO') {
-      return res.status(400).json({ 
+      return res.status(404).json({ 
         success: false, 
-        message: 'Esta incidencia ya fue actualizada y no puede modificarse nuevamente' 
+        message: 'Incidencia no encontrada' 
       });
     }
 
-    // 2. Get tutors with their relationship type
-    const [tutors] = await db.query(`
-      SELECT 
-        t.email, 
-        t.telefono,
-        p.tipo AS parentesco
-      FROM estudiantetutor et
-      JOIN tutor t ON et.curp_tutor = t.curp
-      JOIN parentesco p ON t.parentesco_id = p.id
-      WHERE et.curp_estudiante = ?
-    `, [current[0].id_estudiante]);
+    // Validar estado
+    if (current[0].estado === 'ACTUALIZADO') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Incidencia ya actualizada' 
+      });
+    }
 
-    // 3. Update the incident
+    // Actualizar registro
     const updateData = {
       fecha: new Date(req.body.fecha),
       nivel_severidad: req.body.nivel_severidad,
@@ -232,73 +233,20 @@ export const updateIncident = async (req, res) => {
       [updateData, id]
     );
 
-    // 4. Get incident counts with severity breakdown
-    const [counts] = await db.query(`
-      SELECT 
-        COUNT(CASE WHEN nivel_severidad = 'LEVE' THEN 1 END) AS leves,
-        COUNT(CASE WHEN nivel_severidad = 'SEVERO' THEN 1 END) AS severos,
-        COUNT(CASE WHEN nivel_severidad = 'GRAVE' THEN 1 END) AS graves
-      FROM incidencia
-      WHERE id_estudiante = ?
-    `, [current[0].id_estudiante]);
-
-    const { leves, severos, graves } = counts[0];
-
-    const sendRegularNotification = async (tutor, message) => {
-      if (tutor.email) {
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: tutor.email,
-          subject: 'Notificación de Incidencias',
-          text: message
-        });
-      }
-    };
-    
-    // Dentro de la función updateIncident, modificar la sección de notificaciones:
-    const handleNotifications = async (tutors, counts) => {
-      const { leves, severos, graves } = counts;
-      
-      if (checkIncidentThresholds(leves, severos, graves)) {
-        const message = `Alerta: El estudiante ha alcanzado\n
-          - ${leves} incidencias leves\n
-          - ${severos} incidencias severas\n
-          - ${graves} incidencias graves`;
-    
-        await Promise.all(
-          tutors.map(async (tutor) => {
-            await sendPriorityNotification(tutor, message);
-            await sendRegularNotification(tutor, message);
-          })
-        );
-      }
-    };
-    
-    // Llamar esta función después de obtener los conteos
-    await handleNotifications(tutors, counts[0]);
-    await Promise.all(notifications);
-
+    // Respuesta exitosa
     res.json({
       success: true,
-      message: 'Incidencia actualizada y notificaciones enviadas',
-      data: {
-        ...updateData,
-        tutores_notificados: tutors.map(t => ({
-          email: t.email,
-          telefono: t.telefono,
-          parentesco: t.parentesco
-        })),
-        conteo_incidencias: counts[0]
-      }
+      message: 'Incidencia actualizada correctamente',
+      data: updateData
     });
 
   } catch (error) {
+    console.error('Error en updateIncident:', error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: 'Error interno del servidor'
     });
   }
-    
 };
 // Funciones helper (pueden ir en el mismo archivo o en un utils/)
 const getNextBusinessDay = (date) => {

@@ -40,6 +40,7 @@ const TutorModal: React.FC<TutorModalProps> = ({ isOpen, onClose, tutors, onSele
                   >
                     Editar
                   </button>
+                  <span>{tutor.parentesco}</span>
                 </div>
               ))}
             </div>

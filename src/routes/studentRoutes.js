@@ -5,13 +5,13 @@ import {
   getStudentByCurp,
   updateStudent,
   deleteStudent,
-  uploadPdf,
+  uploadStudents,
   getStudentsByGradeGroup,
 } from '../controllers/studentsController.js';
 
 const router = express.Router();
 
-router.post('/upload-pdf', uploadPdf);
+router.post('/upload', uploadStudents);
 router.post('/', createStudent);
 router.get('/', getAllStudents);
 router.get('/by-grade-group', getStudentsByGradeGroup);
