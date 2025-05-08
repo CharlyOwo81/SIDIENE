@@ -27,8 +27,8 @@ SIDIENE nace para eliminar los procesos manuales en instituciones educativas, of
 ## 🛠️ Tecnologías Usadas
 | Frontend               | Backend              | Base de Datos       | Otros                |
 |------------------------|----------------------|---------------------|----------------------|
-| React + TypeScript     | Node.js + Express    | MySQL               | Nodemailer           |
-| Vite                   | API REST             |                     | Framer Motion        |
+| React + TypeScript     | API REST             | MySQL               | Nodemailer           |
+| Vite                   |                      |                     | Framer Motion        |
 | CSS                    |                      |                     |                      |
 
 ---
