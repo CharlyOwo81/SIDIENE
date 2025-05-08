@@ -4,7 +4,15 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-%23339933?logo=nodedotjs)](https://nodejs.org/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/CharlyOwo81/SIDIENE)
 
-**Un sistema que serviría para modernizar la administración educativa.** Gestión de alumnos, personal, incidencias y más, ¡todo en un solo lugar! 🚀
+**Un sistema que servirá para modernizar la administración educativa.** Gestión de alumnos, personal, incidencias y más, ¡todo en un solo lugar! 🚀
+
+---
+# 🌍 Visión del Proyecto
+SIDIENE nace para eliminar los procesos manuales en instituciones educativas, ofreciendo:
+
+- **Digitalización completa** de expedientes estudiantiles y laborales.
+- **Automatización** de reportes e incidencias (ej: faltas disciplinarias, accidentes).
+- **Acceso seguro** con roles de usuario (admin, docente, prefectura).
 
 ---
 
@@ -13,8 +21,6 @@
 - **👨🏫 Administración de Personal**: Control de docentes y personal administrativo.
 - **🚨 Incidencias**: Creación, consulta y validación de las incidencias escolares (Reportes).
 - **📄 Generación de Reportes**: Exporta a PDF con un clic las incidencias, expedientes y demás formatos necesarios.
-
-![Dashboard Preview](/screenshots/dashboard.png) <!-- Agrega tus propias capturas -->
 
 ---
 
