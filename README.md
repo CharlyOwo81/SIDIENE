@@ -48,3 +48,6 @@ export default tseslint.config({
   },
 })
 ```
+
+En caso de necesitar acceso a la documentación.
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/CharlyOwo81/SIDIENE)
