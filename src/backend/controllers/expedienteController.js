@@ -1,4 +1,3 @@
-// src/controllers/expedienteController.js
 import Expediente from '../models/expedienteModel.js';
 import Incident from '../models/incidentModel.js';
 
@@ -73,6 +72,12 @@ export const getExpedientesByStudent = async (req, res) => {
           id_expediente: row.id_expediente,
           id_estudiante: row.id_estudiante,
           fecha_creacion: row.fecha_creacion,
+          curp: row.curp,
+          nombres: row.nombres,
+          apellido_paterno: row.apellido_paterno,
+          apellido_materno: row.apellido_materno,
+          grado: row.grado,
+          grupo: row.grupo,
           incidencias: [],
         });
       }
@@ -118,6 +123,41 @@ export const getExpedientesByStudent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener expedientes',
+      error: error.message,
+    });
+  }
+};
+
+export const getStudentsWithExpediente = async (req, res) => {
+  try {
+    const { grado, grupo } = req.params;
+
+    if (!grado || !grupo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Grado y grupo son requeridos',
+      });
+    }
+
+    const students = await Expediente.getStudentsWithExpediente(grado, grupo);
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron estudiantes para el grado y grupo especificados',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: students,
+      count: students.length,
+    });
+  } catch (error) {
+    console.error('Error fetching students with expediente:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener estudiantes',
       error: error.message,
     });
   }

@@ -59,13 +59,6 @@ const AgreementForm = ({ initialData, onSubmit }: Props) => {
         />
       </div>
       <div className={styles.formActions}>
-        <button
-          type="submit"
-          className={styles.submitButton}
-          disabled={!formData.descripcion}
-        >
-          {initialData?.id_acuerdo ? 'Actualizar Acuerdo' : 'Crear Acuerdo'}
-        </button>
       </div>
     </form>
   );

@@ -1,4 +1,3 @@
-// src/pages/CreateRecord.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,7 +6,8 @@ import SelectField from '../../assets/components/SelectField/SelectField';
 import Alert from '../../assets/components/Alert/Alert';
 import Navbar from '../../assets/components/Navbar/Navbar';
 import styles from './ManageExpedientes.module.css';
-import {gradoOptions, grupoOptions} from '../../../backend/constants/filtersOptions';
+import { gradoOptions, grupoOptions } from '../../../backend/constants/filtersOptions';
+import GoBackButton from '../../assets/components/Button/GoBackButton';
 
 const CreateRecord = () => {
   const [formData, setFormData] = useState({ id_estudiante: '' });
@@ -18,7 +18,6 @@ const CreateRecord = () => {
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   const navigate = useNavigate();
 
-  // Fetch students by grade and group
   useEffect(() => {
     if (grade && group) {
       const fetchStudents = async () => {
@@ -91,12 +90,13 @@ const CreateRecord = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={styles.mainContainer}
     >
-      <Navbar 
+      <Navbar
         title="Gestionar Expedientes"
         buttons={[
-          { label: "Registrar", icon: "➕", path: "/RegisterRecord" },
+          { label: "Registrar", icon: "➕", path: "/CreateRecord" },
           { label: "Consultar", icon: "🔍", path: "/ViewRecord" },
           { label: "Actualizar", icon: "✏️", path: "/UpdateRecord" },
+          { label: "Exportar", icon: "📥", path: "/ExportRecord" },
         ]}
         className="tutor-navbar"
       />
@@ -132,38 +132,44 @@ const CreateRecord = () => {
 
         <form onSubmit={handleSubmit}>
           <div className={styles.filterSection}>
-            <SelectField
-              value={grade}
-              onChange={(e) => {
-                setGrade(e.target.value);
-                setFormData({ id_estudiante: '' });
-              }}
-              options={gradoOptions}
-              required
-            />
-            <SelectField
-              value={group}
-              onChange={(e) => {
-                setGroup(e.target.value);
-                setFormData({ id_estudiante: '' });
-              }}
-              options={grupoOptions}
-              required
-            />
-            <SelectField
-              value={formData.id_estudiante}
-              onChange={(e) => setFormData({ id_estudiante: e.target.value })}
-              options={studentOptions}
-              disabled={!grade || !group || !students.length}
-              required
-            />
+            <div>
+              <label className={styles.filterLabel}>Grado</label>
+              <SelectField
+                value={grade}
+                onChange={(e) => {
+                  setGrade(e.target.value);
+                  setFormData({ id_estudiante: '' });
+                }}
+                options={gradoOptions}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Grupo</label>
+              <SelectField
+                value={group}
+                onChange={(e) => {
+                  setGroup(e.target.value);
+                  setFormData({ id_estudiante: '' });
+                }}
+                options={grupoOptions}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Estudiante</label>
+              <SelectField
+                value={formData.id_estudiante}
+                onChange={(e) => setFormData({ id_estudiante: e.target.value })}
+                options={studentOptions}
+                disabled={!grade || !group || !students.length}
+                required
+              />
+            </div>
           </div>
 
-          <motion.div
-            className={styles.formActions}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <div className={styles.formActions}>
+            <GoBackButton/>
             <button
               type="submit"
               className={styles.submitButton}
@@ -171,7 +177,7 @@ const CreateRecord = () => {
             >
               {loading ? 'Creando...' : 'Crear Expediente'}
             </button>
-          </motion.div>
+          </div>
         </form>
       </motion.div>
     </motion.section>

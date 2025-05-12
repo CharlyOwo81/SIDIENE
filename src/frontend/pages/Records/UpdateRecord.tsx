@@ -7,9 +7,9 @@ import AgreementForm from "./AgreementForm";
 import styles from "./ManageExpedientes.module.css";
 import Navbar from "../../assets/components/Navbar/Navbar";
 import Alert from "../../assets/components/Alert/Alert";
-
 import { ReactNode } from "react";
-
+import GoBackButton from "../../assets/components/Button/GoBackButton";
+import { gradoOptions, grupoOptions } from "../../../backend/constants/filtersOptions";
 class ErrorBoundary extends Component<{ children: ReactNode }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
@@ -64,36 +64,29 @@ const UpdateRecord = () => {
     type: "success" | "error" | "warning";
   } | null>(null);
 
-  // Cargar estudiantes por grado y grupo
   useEffect(() => {
     if (filters.grade && filters.group) {
       const fetchStudents = async () => {
         setLoading(true);
         setAlert(null);
         try {
-          const response = await axios.get(
-            `http://localhost:3307/api/students`,
-            {
-              params: { grado: filters.grade, grupo: filters.group },
-            }
-          );
-          console.log("Students response:", response.data);
+          const response = await axios.get(`http://localhost:3307/api/students`, {
+            params: { grado: filters.grade, grupo: filters.group },
+          });
           if (response.data.success) {
             setStudents(response.data.data || []);
             setFilters((prev) => ({ ...prev, student: "", incidencia: "" }));
             setIncidencias([]);
             setFormData({ descripcion: "", estatus: "ABIERTO" });
           } else {
-            setAlert(response.data.message || "Error al cargar estudiantes");
+            setAlert({
+              message: response.data.message || "Error al cargar estudiantes",
+              type: "error",
+            });
             setStudents([]);
           }
         } catch (err: any) {
-          console.error(
-            "Error fetching students:",
-            err.response?.data || err.message
-          );
           setAlert({
-            // <-- Aquí estaba setError
             message:
               err.response?.data?.message ||
               "Error de conexión al cargar estudiantes",
@@ -113,26 +106,23 @@ const UpdateRecord = () => {
     }
   }, [filters.grade, filters.group]);
 
-  // Cargar incidencias por estudiante
   useEffect(() => {
     if (filters.student) {
       const fetchIncidencias = async () => {
         setLoading(true);
         setAlert(null);
         try {
-          console.log("Fetching incidencias for CURP:", filters.student);
           const response = await axios.get(
             `http://localhost:3307/api/incidences/student/${filters.student}`
           );
-          console.log("Incidencias response:", response.data);
           if (response.data.success) {
             const data = Array.isArray(response.data.data)
-              ? response.data.data.map((item: { id_incidencia: any; motivo: any; descripcion: any; estado: any; fecha: string | number | Date; nivel_severidad: any; }) => ({
+              ? response.data.data.map((item: any) => ({
                   id_incidencia: item.id_incidencia,
                   motivo: item.motivo,
                   descripcion: item.descripcion || "",
-                  estatus: item.estado || "ABIERTO", // Mapear 'estado' a 'estatus'
-                  fecha: new Date(item.fecha).toISOString(), // Normalizar fecha
+                  estatus: item.estado || "ABIERTO",
+                  fecha: new Date(item.fecha).toISOString(),
                   nivel_severidad: item.nivel_severidad || "LEVE",
                 }))
               : [];
@@ -141,26 +131,22 @@ const UpdateRecord = () => {
             setFormData({ descripcion: "", estatus: "ABIERTO" });
             if (data.length === 0) {
               setAlert({
-                // <-- Cambiar aquí
                 message:
-                  "No se encontraron incidencias para este estudiante. Verifica la CURP o la base de datos.",
+                  "No se encontraron incidencias para este estudiante.",
                 type: "warning",
               });
             }
           } else {
-            setAlert(
-              response.data.message ||
-                "Estudiante no encontrado o sin incidencias"
-            );
+            setAlert({
+              message:
+                response.data.message ||
+                "Estudiante no encontrado o sin incidencias",
+              type: "error",
+            });
             setIncidencias([]);
           }
         } catch (err: any) {
-          console.error(
-            "Error fetching incidencias:",
-            err.response?.data || err.message
-          );
           setAlert({
-            // <-- Cambiar aquí
             message:
               err.response?.status === 404
                 ? "Estudiante no encontrado o sin incidencias"
@@ -181,7 +167,6 @@ const UpdateRecord = () => {
     }
   }, [filters.student]);
 
-  // Cargar datos de incidencia específica
   useEffect(() => {
     if (filters.incidencia) {
       const fetchIncidencia = async () => {
@@ -191,25 +176,25 @@ const UpdateRecord = () => {
           const response = await axios.get(
             `http://localhost:3307/api/incidences/${filters.incidencia}`
           );
-          console.log("Incidencia response:", response.data);
           if (response.data.success) {
             setFormData({
               descripcion: response.data.data.descripcion || "",
-              estatus: response.data.data.estado || "ABIERTO", // Mapear 'estado'
+              estatus: response.data.data.estado || "ABIERTO",
             });
           } else {
-            setAlert(response.data.message || "Error al cargar incidencia");
+            setAlert({
+              message: response.data.message || "Error al cargar incidencia",
+              type: "error",
+            });
             setFormData({ descripcion: "", estatus: "ABIERTO" });
           }
         } catch (err: any) {
-          console.error(
-            "Error fetching incidencia:",
-            err.response?.data || err.message
-          );
-        setAlert({ // <-- Cambiar aquí
-          message: err.response?.data?.message || 'Error de conexión al cargar incidencia',
-          type: 'error'
-        });
+          setAlert({
+            message:
+              err.response?.data?.message ||
+              "Error de conexión al cargar incidencia",
+            type: "error",
+          });
           setFormData({ descripcion: "", estatus: "ABIERTO" });
         } finally {
           setLoading(false);
@@ -217,12 +202,10 @@ const UpdateRecord = () => {
       };
       fetchIncidencia();
     } else if (id && !filters.incidencia) {
-      // Precarga desde URL si hay ID
       setFilters((prev) => ({ ...prev, incidencia: id }));
     }
   }, [filters.incidencia, id]);
 
-  // Manejar el envío del acuerdo
   const handleAgreementSubmit = async (data: {
     id_acuerdo?: string;
     descripcion: string;
@@ -264,24 +247,6 @@ const UpdateRecord = () => {
     }
   };
 
-  // Opciones para los selects
-  const gradeOptions = [
-    { value: "", label: "Seleccionar grado" },
-    { value: "1", label: "1°" },
-    { value: "2", label: "2°" },
-    { value: "3", label: "3°" },
-  ];
-
-  const groupOptions = [
-    { value: "", label: "Seleccionar grupo" },
-    { value: "A", label: "A" },
-    { value: "B", label: "B" },
-    { value: "C", label: "C" },
-    { value: "D", label: "D" },
-    { value: "E", label: "E" },
-    { value: "F", label: "F" },
-  ];
-
   const studentOptions = [
     {
       value: "",
@@ -321,14 +286,15 @@ const UpdateRecord = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={styles.mainContainer}>
+        className={styles.mainContainer}
+      >
         <Navbar
           title="Gestionar Expedientes"
           buttons={[
             { label: "Registrar", icon: "➕", path: "/CreateRecord" },
             { label: "Consultar", icon: "🔍", path: "/ViewRecord" },
             { label: "Actualizar", icon: "✏️", path: "/UpdateRecord" },
-            { label: "Exportar", icon: "✏️", path: "/ExportRecord" },
+            { label: "Exportar", icon: "📥", path: "/ExportRecord" },
           ]}
           className="tutor-navbar"
         />
@@ -338,7 +304,8 @@ const UpdateRecord = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className={styles.alertContainer}>
+            className={styles.alertContainer}
+          >
             <Alert
               message={alert.message}
               type={alert.type}
@@ -351,8 +318,9 @@ const UpdateRecord = () => {
           className={styles.formContainer}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}>
-          <h1 className={styles.formTitle}>Actualizar Incidencia</h1>
+          transition={{ delay: 0.2 }}
+        >
+          <h1 className={styles.formTitle}>Actualizar Expediente Único de Incidencias</h1>
 
           {loading && (
             <div className={styles.loading}>
@@ -361,56 +329,68 @@ const UpdateRecord = () => {
           )}
 
           <div className={styles.filterSection}>
-            <SelectField
-              value={filters.grade}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  grade: e.target.value,
-                  group: "",
-                  student: "",
-                  incidencia: "",
-                }))
-              }
-              options={gradeOptions}
-              required
-            />
-            <SelectField
-              value={filters.group}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  group: e.target.value,
-                  student: "",
-                  incidencia: "",
-                }))
-              }
-              options={groupOptions}
-              disabled={!filters.grade}
-              required
-            />
-            <SelectField
-              value={filters.student}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  student: e.target.value,
-                  incidencia: "",
-                }))
-              }
-              options={studentOptions}
-              disabled={!filters.grade || !filters.group || !students.length}
-              required
-            />
-            <SelectField
-              value={filters.incidencia}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, incidencia: e.target.value }))
-              }
-              options={incidenciaOptions}
-              disabled={!filters.student}
-              required
-            />
+            <div>
+              <label className={styles.filterLabel}>Grado</label>
+              <SelectField
+                value={filters.grade}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    grade: e.target.value,
+                    group: "",
+                    student: "",
+                    incidencia: "",
+                  }))
+                }
+                options={gradoOptions}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Grupo</label>
+              <SelectField
+                value={filters.group}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    group: e.target.value,
+                    student: "",
+                    incidencia: "",
+                  }))
+                }
+                options={grupoOptions}
+                disabled={!filters.grade}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Estudiante</label>
+              <SelectField
+                value={filters.student}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    student: e.target.value,
+                    incidencia: "",
+                  }))
+                }
+                options={studentOptions}
+                disabled={!filters.grade || !filters.group || !students.length}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.filterLabel}>Incidencia</label>
+              <SelectField
+                value={filters.incidencia}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, incidencia: e.target.value }))
+                }
+                options={incidenciaOptions}
+                disabled={!filters.student}
+                required
+              />
+            </div>
           </div>
 
           {filters.incidencia && (
@@ -425,6 +405,24 @@ const UpdateRecord = () => {
               onSubmit={handleAgreementSubmit}
             />
           )}
+
+          <div className={styles.formActions}>
+            <GoBackButton/>
+            <button
+              className={styles.submitButton}
+              onClick={() =>
+                handleAgreementSubmit({
+                  descripcion: formData.descripcion,
+                  estatus: formData.estatus,
+                  fecha_creacion: new Date().toISOString(),
+                  id_incidencia: filters.incidencia,
+                })
+              }
+              disabled={!filters.incidencia || loading}
+            >
+              Crear Acuerdo
+            </button>
+          </div>
         </motion.div>
       </motion.section>
     </ErrorBoundary>

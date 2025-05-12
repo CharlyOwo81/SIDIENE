@@ -25,14 +25,18 @@ interface Incident {
 }
 
 const severityLevels = ["leve", "severo", "grave"] as const;
-type SeverityLevel = typeof severityLevels[number];
+type SeverityLevel = (typeof severityLevels)[number];
 
 const ReadIncidents: React.FC = () => {
   const [incidents, setIncidents] = useState<Incident[]>([]);
-  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(
+    null
+  );
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSeverities, setSelectedSeverities] = useState<SeverityLevel[]>([]);
+  const [selectedSeverities, setSelectedSeverities] = useState<SeverityLevel[]>(
+    []
+  );
 
   const [alert, setAlert] = useState<{
     message: string;
@@ -42,9 +46,11 @@ const ReadIncidents: React.FC = () => {
   useEffect(() => {
     const fetchIncidents = async () => {
       try {
-        const response = await axios.get("http://localhost:3307/api/incidences");
+        const response = await axios.get(
+          "http://localhost:3307/api/incidences"
+        );
         const rawIncidents = response.data.data;
-        
+
         // Transformación corregida
         const transformedIncidents = rawIncidents.map((incident: any) => ({
           id_incidencia: String(incident.id_incidencia),
@@ -52,18 +58,19 @@ const ReadIncidents: React.FC = () => {
           nivel_severidad: incident.nivel_severidad,
           motivo: incident.motivo,
           descripcion: incident.descripcion,
-          nombre_estudiante: incident.nombre_estudiante || 'N/A', // <-- Cambio crucial aquí
-          grado: incident.grado ?? '',  // Usamos operador nullish coalescing
-          grupo: incident.grupo ?? '',
-          nombre_personal: incident.nombre_personal || 'N/A',     // <-- Y aquí
-          curp_estudiante: incident.curp_estudiante || ''
+          nombre_estudiante: incident.nombre_estudiante || "N/A", // <-- Cambio crucial aquí
+          grado: incident.grado ?? "", // Usamos operador nullish coalescing
+          grupo: incident.grupo ?? "",
+          nombre_personal: incident.nombre_personal || "N/A", // <-- Y aquí
+          curp_estudiante: incident.curp_estudiante || "",
         }));
-        
+
         setIncidents(transformedIncidents);
       } catch (error: any) {
         setAlert({
-          message: error.response?.data?.message || "Error al cargar las incidencias",
-          type: "error"
+          message:
+            error.response?.data?.message || "Error al cargar las incidencias",
+          type: "error",
         });
         console.error("Error fetching incidents:", error);
       }
@@ -105,7 +112,8 @@ const ReadIncidents: React.FC = () => {
     doc.addImage(sonoraLogo, "PNG", logoRightX, yPosition, logoRightWidth, 14);
 
     const textStartX = margin + logoLeftWidth + 5;
-    const textAvailableWidth = pageWidth - (2 * margin) - logoLeftWidth - logoRightWidth - 10;
+    const textAvailableWidth =
+      pageWidth - 2 * margin - logoLeftWidth - logoRightWidth - 10;
 
     doc.setFont("helvetica");
     doc.setFontSize(16);
@@ -121,7 +129,8 @@ const ReadIncidents: React.FC = () => {
     doc.text(schoolName, schoolX, yPosition + 18);
 
     doc.setFontSize(12);
-    const subtitleText = "Sistema de Digitalización de Expedientes e Incidencias para la Nueva Escuela";
+    const subtitleText =
+      "Sistema de Digitalización de Expedientes e Incidencias para la Nueva Escuela";
     const subtitleLines = doc.splitTextToSize(subtitleText, textAvailableWidth);
     const subtitleY = yPosition + 26;
     subtitleLines.forEach((line: string, index: number) => {
@@ -152,9 +161,16 @@ const ReadIncidents: React.FC = () => {
     const studentData = [
       ["Nombre:", incident.nombre_estudiante || "N/A"],
       ["CURP:", incident.curp_estudiante || "N/A"],
-      ["Grado y grupo:", 
-       `${incident.grado ? `${incident.grado}°` : ''} ${incident.grupo || ''}`.trim() || "N/A"],
-      ["Fecha de la incidencia:", new Date(incident.fecha).toLocaleDateString('es-MX')],
+      [
+        "Grado y grupo:",
+        `${incident.grado ? `${incident.grado}°` : ""} ${
+          incident.grupo || ""
+        }`.trim() || "N/A",
+      ],
+      [
+        "Fecha de la incidencia:",
+        new Date(incident.fecha).toLocaleDateString("es-MX"),
+      ],
     ];
 
     studentData.forEach(([label, value]) => {
@@ -190,7 +206,12 @@ const ReadIncidents: React.FC = () => {
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...hexToRgb(colors.deepPink));
     doc.text("Nivel de severidad:", margin, yPosition);
-    doc.setFillColor(...hexToRgb(severityColors[incident.nivel_severidad.toLowerCase()] || colors.deepPink));
+    doc.setFillColor(
+      ...hexToRgb(
+        severityColors[incident.nivel_severidad.toLowerCase()] ||
+          colors.deepPink
+      )
+    );
     doc.circle(margin + 50, yPosition - 2, 3, "F");
     doc.setFont("helvetica", "normal");
     doc.setTextColor(0, 0, 0);
@@ -276,15 +297,17 @@ const ReadIncidents: React.FC = () => {
 
   const filteredIncidents = incidents.filter((incident) => {
     const matchesSearch =
-      incident.nombre_estudiante.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      incident.nombre_estudiante
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       incident.motivo.toLowerCase().includes(searchQuery.toLowerCase()) ||
       incident.descripcion.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesSeverity =
       selectedSeverities.length === 0 ||
-      selectedSeverities.includes(incident.nivel_severidad.toLowerCase() as SeverityLevel);
-
-    const incidentDate = new Date(incident.fecha);
+      selectedSeverities.includes(
+        incident.nivel_severidad.toLowerCase() as SeverityLevel
+      );
     return matchesSearch && matchesSeverity;
   });
 
@@ -292,13 +315,16 @@ const ReadIncidents: React.FC = () => {
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={styles.mainContainer}
-    >
+      className={styles.mainContainer}>
       <Navbar />
       <h1 className={styles.title}>Historial de Incidencias</h1>
 
       {alert && (
-        <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
       )}
 
       <div className={styles.searchContainer}>
@@ -323,27 +349,26 @@ const ReadIncidents: React.FC = () => {
               }`}
               onClick={() =>
                 setSelectedSeverities((prev) =>
-                  prev.includes(severity) ? prev.filter((s) => s !== severity) : [...prev, severity]
+                  prev.includes(severity)
+                    ? prev.filter((s) => s !== severity)
+                    : [...prev, severity]
                 )
               }
-              aria-pressed={selectedSeverities.includes(severity)}
-            >
+              aria-pressed={selectedSeverities.includes(severity)}>
               {severity.charAt(0).toUpperCase() + severity.slice(1)}
             </button>
           ))}
         </div>
       </div>
 
-                              {/* Buttons */}
-                              <div className={styles.buttonContainer}>
-          <GoBackButton />
-        </div>
+      {/* Buttons */}
+      <div className={styles.buttonContainer}>
+        <GoBackButton />
+      </div>
 
       <IncidentsTable incidents={filteredIncidents} onViewPDF={handleViewPDF} />
 
       <PDFModal isOpen={!!pdfUrl} onClose={handleClosePDF} pdfUrl={pdfUrl} />
-
-
     </motion.section>
   );
 };
