@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { ExpedienteService, Expediente } from '../../../backend/services/expedienteService';
+import { ExpedienteService } from '../../../backend/services/expedienteService';
 import SelectField from '../../assets/components/SelectField/SelectField';
-import Label from '../../assets/components/Label/Label';
 import Navbar from '../../assets/components/Navbar/Navbar';
 import Alert from '../../assets/components/Alert/Alert';
 import styles from './ManageExpedientes.module.css';
@@ -252,14 +251,12 @@ const ExportRecord = () => {
         <h1 className={styles.formTitle}>Exportar Expedientes a PDF</h1>
 
         <div className={styles.filterSection}>
-          <Label className={styles.label}>Grado</Label>
           <SelectField
             value={filters.grade}
             onChange={(e) => setFilters({ ...filters, grade: e.target.value, group: '' })}
             options={gradeOptions}
             required
           />
-          <Label className={styles.label}>Grupo</Label>
           <SelectField
             value={filters.group}
             onChange={(e) => setFilters({ ...filters, group: e.target.value })}

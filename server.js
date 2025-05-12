@@ -1,12 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './src/routes/authRoutes.js';
-import studentRoutes from './src/routes/studentRoutes.js';
-import staffRoutes from './src/routes/staffRoutes.js';
-import incidentRoutes from './src/routes/incidentsRoutes.js';
-import tutorRoutes from './src/routes/tutorsRoutes.js';
-import parentescoRoutes from './src/routes/parentescoRoutes.js';
+import authRoutes from './src/frontend/routes/authRoutes.js';
+import studentRoutes from './src/frontend/routes/studentRoutes.js';
+import staffRoutes from './src/frontend/routes/staffRoutes.js';
+import incidentRoutes from './src/frontend/routes/incidentsRoutes.js';
+import tutorRoutes from './src/frontend/routes/tutorsRoutes.js';
+import parentescoRoutes from './src/frontend/routes/parentescoRoutes.js';
+import expedienteRoutes from './src/frontend/routes/expedienteRoutes.js';
 
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/incidences', incidentRoutes);
 app.use('/api/tutor', tutorRoutes);
 app.use('/api/parentescos', parentescoRoutes);
+app.use('/api/expedientes', expedienteRoutes);
 
 // 404 Handler (after all routes)
 app.use('*', (req, res) => {

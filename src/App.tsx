@@ -1,30 +1,36 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Login from "./pages/Login/Login";
-import Footer from "./assets/components/Footer/Footer";
-import Header from "./assets/components/Header/Header";
-import RolActivities from "./pages/MiddlePage/RolActivities";
+import Login from "./frontend/pages/Login/Login";
+import Footer from "./frontend/assets/components/Footer/Footer";
+import Header from "./frontend/assets/components/Header/Header";
+import RolActivities from "./frontend/pages/MiddlePage/RolActivities";
 
 // STUDENTS PAGES
-import RegisterStudents from "./pages/ManageStudents/RegisterStudents";
-import QueryStudents from "./pages/ManageStudents/QueryStudents";
-import UpdateStudents from "./pages/ManageStudents/UpdateStudents";
+import RegisterStudents from "./frontend/pages/ManageStudents/RegisterStudents";
+import QueryStudents from "./frontend/pages/ManageStudents/QueryStudents";
+import UpdateStudents from "./frontend/pages/ManageStudents/UpdateStudents";
 
 // STAFF PAGES
-import RegisterStaff from "./pages/ManageStaff/RegisterStaff";
-import QueryStaff from "./pages/ManageStaff/QueryStaff";
-import UpdateStaff from "./pages/ManageStaff/UpdateStaff";
+import RegisterStaff from "./frontend/pages/ManageStaff/RegisterStaff";
+import QueryStaff from "./frontend/pages/ManageStaff/QueryStaff";
+import UpdateStaff from "./frontend/pages/ManageStaff/UpdateStaff";
 
-import ProtectedRoute from "./assets/components/ProtectedRoute/ProtectedRoute";
-import CreateIncidents from "./pages/ManageIncidents/CreateIncidents/CreateIncidents";
-import ReadIncidents from "./pages/ManageIncidents/ReadIncidents/ReadIncidents";
-import UpdateIncidents from "./pages/ManageIncidents/UpdateIncidents";
+import ProtectedRoute from "./frontend/assets/components/ProtectedRoute/ProtectedRoute";
+import CreateIncidents from "./frontend/pages/ManageIncidents/CreateIncidents/CreateIncidents";
+import ReadIncidents from "./frontend/pages/ManageIncidents/ReadIncidents/ReadIncidents";
+import UpdateIncidents from "./frontend/pages/ManageIncidents/UpdateIncidents";
 
 // TUTOR PAGES
-import RegisterTutor from "./pages/Tutors/RegisterTutor";
-import QueryTutors from "./pages/Tutors/QueryTutors";
-import UpdateTutor from "./pages/Tutors/UpdateTutor";
-import ExportTutors from "./pages/Tutors/ExportTutors";
+import RegisterTutor from "./frontend/pages/Tutors/RegisterTutor";
+import QueryTutors from "./frontend/pages/Tutors/QueryTutors";
+import UpdateTutor from "./frontend/pages/Tutors/UpdateTutor";
+import ExportTutors from "./frontend/pages/Tutors/ExportTutors";
+
+// RECORD PAGES
+import ViewRecord from "./frontend/pages/Records/ViewRecord";
+import UpdateRecord from "./frontend/pages/Records/UpdateRecord";
+import CreateRecord from "./frontend/pages/Records/CreateRecord";
+import ExportRecord from "./frontend/pages/Records/ExportRecord";
 
 function App() {
   return (
@@ -56,6 +62,11 @@ function App() {
             <Route path="/QueryTutors" element={<ProtectedRoute><QueryTutors /></ProtectedRoute>} />
             <Route path="/UpdateTutor" element={<ProtectedRoute><UpdateTutor /></ProtectedRoute>} />
             <Route path="/ExportTutors" element={<ProtectedRoute><ExportTutors /></ProtectedRoute>} />
+
+            <Route path="/CreateRecord" element={<ProtectedRoute><CreateRecord /></ProtectedRoute>} />
+            <Route path="/ViewRecord" element={<ProtectedRoute><ViewRecord /></ProtectedRoute>} />
+            <Route path="/UpdateRecord" element={<ProtectedRoute><UpdateRecord /></ProtectedRoute>} />
+            <Route path="/ExportRecord" element={<ProtectedRoute><ExportRecord /></ProtectedRoute>} />
           </Routes>
         </main>
         <Footer />
