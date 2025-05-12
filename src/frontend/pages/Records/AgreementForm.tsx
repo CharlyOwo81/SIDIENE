@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import styles from './ManageExpedientes.module.css';
 import SelectField from '../../assets/components/SelectField/SelectField';
- 
+
 const estatusOptions = [
-  { value: "ABIERTO", label: "ABIERTO" },
-  { value: "EN PROCESO", label: "EN PROCESO" },
-  { value: "CERRADO", label: "CERRADO" },
+  { value: 'ABIERTO', label: 'Abierto' },
+  { value: 'EN PROCESO', label: 'En Proceso' },
+  { value: 'COMPLETADO', label: 'Completado' },
 ];
+
 type Agreement = {
   id_acuerdo?: string;
   descripcion: string;
@@ -23,13 +24,21 @@ type Props = {
 const AgreementForm = ({ initialData, onSubmit }: Props) => {
   const [formData, setFormData] = useState({
     descripcion: initialData?.descripcion || '',
-    estatus: initialData?.estatus || 'ABIERTO',
+    estatus: initialData?.estatus && estatusOptions.some(opt => opt.value === initialData.estatus) 
+      ? initialData.estatus 
+      : 'ABIERTO',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Validar que estatus sea uno de los valores permitidos
+    const validEstatus = estatusOptions.some(opt => opt.value === formData.estatus)
+      ? formData.estatus
+      : 'ABIERTO';
+    
     onSubmit({
       ...formData,
+      estatus: validEstatus,
       id_acuerdo: initialData?.id_acuerdo || '',
       fecha_creacion: new Date().toISOString(),
       id_incidencia: initialData?.id_incidencia || '',
@@ -59,6 +68,9 @@ const AgreementForm = ({ initialData, onSubmit }: Props) => {
         />
       </div>
       <div className={styles.formActions}>
+        <button type="submit" className={styles.submitButton}>
+          Guardar Acuerdo
+        </button>
       </div>
     </form>
   );

@@ -1,5 +1,3 @@
-
-//models/expedienteModel.js
 import db from "../config/db.js";
 
 class Expediente {
@@ -48,7 +46,7 @@ class Expediente {
       const [rows] = await db.query(
         `
         SELECT e.id_expediente, e.fecha_creacion, e.id_estudiante,
-               i.id_incidencia, i.motivo, i.fecha, i.descripcion, i.nivel_severidad,
+               i.id_incidencia, i.motivo, i.fecha, i.descripcion, i.nivel_severidad, i.estado,
                a.id_acuerdo, a.descripcion AS acuerdo_desc, a.estatus, a.fecha_creacion AS acuerdo_fecha,
                s.curp, s.nombres, s.apellido_paterno, s.apellido_materno, s.grado, s.grupo
         FROM expediente e
@@ -72,10 +70,10 @@ class Expediente {
         `
         SELECT DISTINCT s.curp, s.nombres, s.apellido_paterno, s.apellido_materno, s.grado, s.grupo,
                COUNT(e.id_expediente) as expediente_count
-        FROM estudiantes s
-        LEFT JOIN expediente e ON s.id_estudiante = e.id_estudiante
+        FROM estudiante s
+        LEFT JOIN expediente e ON s.curp = e.id_estudiante
         WHERE s.grado = ? AND s.grupo = ?
-        GROUP BY s.id_estudiante, s.curp, s.nombres, s.apellido_paterno, s.apellido_materno, s.grado, s.grupo
+        GROUP BY s.curp, s.nombres, s.apellido_paterno, s.apellido_materno, s.grado, s.grupo
         `,
         [grado, grupo]
       );
@@ -87,6 +85,12 @@ class Expediente {
 
   static async addAcuerdo(idIncidencia, acuerdoData) {
     try {
+      // Validar que estatus sea un valor permitido
+      const validEstatus = ['ABIERTO', 'EN PROCESO', 'COMPLETADO'];
+      if (!validEstatus.includes(acuerdoData.estatus)) {
+        throw new Error('Estatus inválido para el acuerdo');
+      }
+
       const [acuerdo] = await db.query(
         `INSERT INTO acuerdo 
         (descripcion, estatus, fecha_creacion, id_incidencia) 

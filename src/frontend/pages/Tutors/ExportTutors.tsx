@@ -7,6 +7,7 @@ import Button from "../../assets/components/Button/Button";
 import styles from "./ManageTutors.module.css";
 import navbarStyles from "../../assets/components/Navbar/Navbar.module.css";
 import Navbar from "../../assets/components/Navbar/TutorNavbar";
+import GoBackButton from "../../assets/components/Button/GoBackButton";
 
 const ExportTutors: React.FC = () => {
   const [filters, setFilters] = useState({
@@ -220,6 +221,7 @@ const ExportTutors: React.FC = () => {
           transition={{ delay: 0.5 }}
           className={styles.formActions}
         >
+          <GoBackButton/>
           <Button
             onClick={handleExport}
             disabled={isExporting || !filters.studentCurp}

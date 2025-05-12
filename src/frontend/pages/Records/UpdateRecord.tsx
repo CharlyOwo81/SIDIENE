@@ -10,6 +10,7 @@ import Alert from "../../assets/components/Alert/Alert";
 import { ReactNode } from "react";
 import GoBackButton from "../../assets/components/Button/GoBackButton";
 import { gradoOptions, grupoOptions } from "../../../backend/constants/filtersOptions";
+
 class ErrorBoundary extends Component<{ children: ReactNode }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
@@ -121,7 +122,7 @@ const UpdateRecord = () => {
                   id_incidencia: item.id_incidencia,
                   motivo: item.motivo,
                   descripcion: item.descripcion || "",
-                  estatus: item.estado || "ABIERTO",
+                  estatus: item.estado || "PENDIENTE",
                   fecha: new Date(item.fecha).toISOString(),
                   nivel_severidad: item.nivel_severidad || "LEVE",
                 }))
@@ -178,8 +179,8 @@ const UpdateRecord = () => {
           );
           if (response.data.success) {
             setFormData({
-              descripcion: response.data.data.descripcion || "",
-              estatus: response.data.data.estado || "ABIERTO",
+              descripcion: "", // No reutilizar la descripción de la incidencia
+              estatus: "ABIERTO",
             });
           } else {
             setAlert({
@@ -221,12 +222,13 @@ const UpdateRecord = () => {
         {
           descripcion: data.descripcion,
           estatus: data.estatus,
+          fecha_creacion: data.fecha_creacion,
         }
       );
 
       if (response.data.success) {
         setAlert({
-          message: "¡Acuerdo actualizado correctamente!",
+          message: "¡Acuerdo creado correctamente!",
           type: "success",
         });
         setTimeout(() => navigate(`/ViewRecord`), 1500);
@@ -294,7 +296,7 @@ const UpdateRecord = () => {
             { label: "Registrar", icon: "➕", path: "/CreateRecord" },
             { label: "Consultar", icon: "🔍", path: "/ViewRecord" },
             { label: "Actualizar", icon: "✏️", path: "/UpdateRecord" },
-            { label: "Exportar", icon: "📥", path: "/ExportRecord" },
+            { label: "Exportar", icon: "📒", path: "/ExportRecord" },
           ]}
           className="tutor-navbar"
         />
@@ -396,8 +398,8 @@ const UpdateRecord = () => {
           {filters.incidencia && (
             <AgreementForm
               initialData={{
-                descripcion: formData.descripcion,
-                estatus: formData.estatus,
+                descripcion: "",
+                estatus: "ABIERTO",
                 id_acuerdo: "",
                 fecha_creacion: new Date().toISOString(),
                 id_incidencia: filters.incidencia,
@@ -407,21 +409,7 @@ const UpdateRecord = () => {
           )}
 
           <div className={styles.formActions}>
-            <GoBackButton/>
-            <button
-              className={styles.submitButton}
-              onClick={() =>
-                handleAgreementSubmit({
-                  descripcion: formData.descripcion,
-                  estatus: formData.estatus,
-                  fecha_creacion: new Date().toISOString(),
-                  id_incidencia: filters.incidencia,
-                })
-              }
-              disabled={!filters.incidencia || loading}
-            >
-              Crear Acuerdo
-            </button>
+            <GoBackButton />
           </div>
         </motion.div>
       </motion.section>
