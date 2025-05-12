@@ -54,13 +54,60 @@ export const createExpediente = async (req, res) => {
 export const getExpedientesByStudent = async (req, res) => {
   try {
     const { idEstudiante } = req.params;
-    const expedientes = await Expediente.getByStudent(idEstudiante);
-    if (!expedientes || expedientes.length === 0) {
+    const rows = await Expediente.getByStudent(idEstudiante);
+
+    if (!rows || rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Estudiante no encontrado o sin expediente',
       });
     }
+
+    // Transform flat rows into nested structure
+    const expedientesMap = new Map();
+    rows.forEach(row => {
+      const expedienteId = row.id_expediente;
+
+      if (!expedientesMap.has(expedienteId)) {
+        expedientesMap.set(expedienteId, {
+          id_expediente: row.id_expediente,
+          id_estudiante: row.id_estudiante,
+          fecha_creacion: row.fecha_creacion,
+          incidencias: [],
+        });
+      }
+
+      const expediente = expedientesMap.get(expedienteId);
+
+      // Find or create the incident
+      let incidencia = expediente.incidencias.find(
+        inc => inc.id_incidencia === row.id_incidencia
+      );
+      if (!incidencia && row.id_incidencia) {
+        incidencia = {
+          id_incidencia: row.id_incidencia,
+          motivo: row.motivo,
+          fecha: row.fecha,
+          descripcion: row.descripcion,
+          nivel_severidad: row.nivel_severidad,
+          acuerdos: [],
+        };
+        expediente.incidencias.push(incidencia);
+      }
+
+      // Add agreement if exists
+      if (row.id_acuerdo) {
+        incidencia.acuerdos.push({
+          id_acuerdo: row.id_acuerdo,
+          descripcion: row.acuerdo_desc,
+          estatus: row.estatus,
+          fecha_creacion: row.acuerdo_fecha,
+        });
+      }
+    });
+
+    const expedientes = Array.from(expedientesMap.values());
+
     res.json({
       success: true,
       data: expedientes,

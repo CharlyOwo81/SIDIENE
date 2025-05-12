@@ -4,7 +4,7 @@ import {
   createExpediente,
   getExpedientesByStudent,
   addAcuerdo
-} from "../controllers/expedienteController.js";
+} from "../../backend/controllers/expedienteController.js";
 
 const router = express.Router();
 

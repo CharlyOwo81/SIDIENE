@@ -1,3 +1,4 @@
+// src/services/expedienteService.ts
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3307/api';
@@ -36,7 +37,7 @@ export const ExpedienteService = {
   async getByStudent(curp: string): Promise<ApiResponse<Expediente[]>> {
     try {
       const response = await axios.get(`${API_URL}/expedientes/student/${curp}`);
-      console.log('Raw response:', response.data);
+      console.log('Raw API response:', response.data);
 
       if (!response.data.success) {
         return {
@@ -45,26 +46,9 @@ export const ExpedienteService = {
         };
       }
 
-      const incidents = response.data.data || [];
-
-      // Construir un expediente simple
-      const expediente: Expediente = {
-        id_expediente: 1, // Valor ficticio, ya que el endpoint no proporciona id_expediente
-        id_estudiante: curp,
-        fecha_creacion: new Date().toISOString(), // Fecha actual como fallback
-        incidencias: incidents.map((incident: any) => ({
-          id_incidencia: incident.id_incidencia,
-          motivo: incident.motivo,
-          fecha: incident.fecha,
-          nivel_severidad: incident.nivel_severidad || 'LEVE',
-          descripcion: incident.descripcion || '',
-          acuerdos: incident.acuerdos || [],
-        })),
-      };
-
       return {
         success: true,
-        data: [expediente],
+        data: response.data.data || [],
       };
     } catch (error) {
       return this.handleError(error, 'Error al obtener expedientes');
