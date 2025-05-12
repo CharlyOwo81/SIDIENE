@@ -11,11 +11,15 @@ import SelectField from "../../assets/components/SelectField/SelectField";
 import Navbar from "../../assets/components/Navbar/Navbar";
 import Alert from "../../assets/components/Alert/Alert";
 import styles from "./ManageExpedientes.module.css";
+import tecnica56Logo from "../../../../public/tecnica56logo.png";
+import sonoraLogo from "../../../../public/sonoraLogo.png";
 
 const ExportRecord = () => {
   const [filters, setFilters] = useState({ grade: "", group: "" });
   const [students, setStudents] = useState<
     Array<{
+      grupo: string;
+      grado: any;
       curp: string;
       nombres: string;
       apellido_paterno: string;
@@ -41,7 +45,13 @@ const ExportRecord = () => {
           );
           console.log("Students response:", response);
           if (response.success) {
-            setStudents(response.data || []);
+            setStudents(
+              (response.data || []).map((student) => ({
+                ...student,
+                grupo: student.grupo || "",
+                grado: student.grado || "",
+              }))
+            );
             setSelectedStudents([]);
           } else {
             setAlert({
@@ -51,6 +61,7 @@ const ExportRecord = () => {
             setStudents([]);
           }
         } catch (error) {
+          console.error("Error fetching students:", error);
           setAlert({
             message: "Error de conexión al cargar estudiantes",
             type: "error",
@@ -88,133 +99,352 @@ const ExportRecord = () => {
 
     const safeDate = (dateString: string) => {
       try {
-        return new Date(dateString).toLocaleDateString("es-MX");
+        const date = new Date(dateString);
+        return isNaN(date.getTime()) ? "Sin fecha registrada" : date.toLocaleDateString("es-MX");
       } catch {
         return "Sin fecha registrada";
       }
     };
 
+    const hexToRgb = (hex: string): [number, number, number] => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return [r, g, b];
+    };
+
+    const colors = {
+      yellow: "#F3C44D",
+      orange: "#E5823E",
+      redOrange: "#C26444",
+      deepPink: "#891547",
+    };
+
+    const severityColors: { [key: string]: string } = {
+      leve: colors.yellow,
+      severo: colors.orange,
+      grave: colors.deepPink,
+    };
+
+    const addHeader = (yPosition: number) => {
+      const margin = 15;
+      const pageWidth = 210;
+      const logoLeftWidth = 28;
+      const logoRightWidth = 28;
+
+      try {
+        doc.addImage(tecnica56Logo, "PNG", margin, yPosition, logoLeftWidth, 18);
+        const logoRightX = pageWidth - margin - logoRightWidth;
+        doc.addImage(sonoraLogo, "PNG", logoRightX, yPosition, logoRightWidth, 14);
+      } catch (error) {
+        console.error("Error loading logos:", error);
+        throw new Error("Failed to load logo images");
+      }
+
+      const textStartX = margin + logoLeftWidth + 5;
+      const textAvailableWidth = pageWidth - (2 * margin) - logoLeftWidth - logoRightWidth - 10;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      const titleText = "ESCUELA SECUNDARIA TÉCNICA NO. 56";
+      const titleWidth = doc.getTextWidth(titleText);
+      const titleX = textStartX + (textAvailableWidth - titleWidth) / 2;
+      doc.text(titleText, titleX, yPosition + 10);
+
+      doc.setFontSize(14);
+      const schoolName = "'JOSÉ LUIS OSUNA VILLA'";
+      const schoolWidth = doc.getTextWidth(schoolName);
+      const schoolX = textStartX + (textAvailableWidth - schoolWidth) / 2;
+      doc.text(schoolName, schoolX, yPosition + 18);
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      const subtitleText = "Sistema de Digitalización de Expedientes e Incidencias para la Nueva Escuela";
+      const subtitleLines = doc.splitTextToSize(subtitleText, textAvailableWidth);
+      const subtitleY = yPosition + 26;
+      subtitleLines.forEach((line, index) => {
+        const lineWidth = doc.getTextWidth(line);
+        const lineX = textStartX + (textAvailableWidth - lineWidth) / 2;
+        doc.text(line, lineX, subtitleY + index * 7);
+      });
+
+      const dateY = subtitleY + subtitleLines.length * 7 + 6;
+      const dateText = `PDF generado: ${new Date().toLocaleDateString("es-MX")}`;
+      const dateWidth = doc.getTextWidth(dateText);
+      const dateX = textStartX + (textAvailableWidth - dateWidth) / 2;
+      doc.text(dateText, dateX, dateY);
+
+      return dateY + 6 - yPosition; // Return header height
+    };
+
+    const addFooter = () => {
+      const footerY = 297 - 20;
+      doc.setFillColor(...hexToRgb(colors.yellow));
+      doc.rect(0, footerY, 210, 5, "F");
+      doc.setFillColor(...hexToRgb(colors.orange));
+      doc.rect(0, footerY + 5, 210, 5, "F");
+      doc.setFillColor(...hexToRgb(colors.redOrange));
+      doc.rect(0, footerY + 10, 210, 5, "F");
+      doc.setFillColor(...hexToRgb(colors.deepPink));
+      doc.rect(0, footerY + 15, 210, 5, "F");
+    };
+
     try {
-      for (const [index, curp] of selectedStudents.entries()) {
+      for (const [studentIndex, curp] of selectedStudents.entries()) {
         try {
-          if (index > 0) {
+          if (studentIndex > 0) {
             doc.addPage();
           }
 
           const response = await ExpedienteService.getByStudent(curp);
-          console.log("Expediente response for", curp, ":", response);
+          console.log(`Expediente response for ${curp}:`, JSON.stringify(response, null, 2));
           const expediente = response.data?.[0];
           const student = students.find((s) => s.curp === curp);
 
           if (!student || !expediente) {
-            console.warn(`Estudiante ${curp} no encontrado`);
+            console.warn(`Estudiante ${curp} no encontrado o sin expediente`);
+            setAlert({
+              message: `No se encontró expediente para ${curp}`,
+              type: "warning",
+            });
             continue;
           }
 
-          if (
-            !expediente.incidencias ||
-            !Array.isArray(expediente.incidencias)
-          ) {
+          if (!expediente.incidencias || !Array.isArray(expediente.incidencias)) {
             console.error("Estructura de incidencias inválida:", expediente);
+            setAlert({
+              message: `Estructura de incidencias inválida para ${curp}`,
+              type: "error",
+            });
             continue;
           }
 
           let yPosition = 15;
-          const colors = {
-            primary: "#2c3e50",
-            secondary: "#3498db",
-            accent: "#e74c3c",
-          };
+          const margin = 15;
+          const pageWidth = 210;
 
-          // Header
+          // Student Section (once per student)
+          const headerHeight = addHeader(yPosition);
+          yPosition += headerHeight + 10;
+
+          doc.setFillColor(...hexToRgb(colors.orange));
+          doc.rect(margin, yPosition, 180, 10, "F");
+          doc.setFontSize(14);
           doc.setFont("helvetica", "bold");
-          doc.setFontSize(16);
-          doc.setTextColor(colors.primary);
-          doc.text(
-            `Expediente de ${student.nombres} ${student.apellido_paterno} ${
-              student.apellido_materno || ""
-            }`,
-            15,
-            yPosition
-          );
+          doc.setTextColor(255, 255, 255);
+          doc.text("DATOS DEL ESTUDIANTE", margin + 5, yPosition + 7);
+
+          yPosition += 20;
+          doc.setTextColor(0, 0, 0);
+
+          const studentName = `${student.nombres} ${student.apellido_paterno} ${student.apellido_materno || ""}`.trim();
+          console.log(`Student data for ${curp}:`, { grado: student.grado, grupo: student.grupo });
+          const gradeGroup = student.grado && student.grupo ? `${student.grado}° ${student.grupo}` : "N/A";
+          const studentData = [
+            ["Nombre:", studentName || "N/A"],
+            ["CURP:", curp || "N/A"],
+            ["Grado y grupo:", gradeGroup],
+          ];
+
+          studentData.forEach(([label, value]) => {
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text(label, margin, yPosition);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text(value, margin + 55, yPosition);
+            yPosition += 8;
+          });
+
           yPosition += 10;
 
           // Incidents
           for (const [idx, incidencia] of expediente.incidencias.entries()) {
-            // Incident Header
+            if (yPosition > 230) {
+              doc.addPage();
+              yPosition = 15;
+              addHeader(yPosition);
+              yPosition += headerHeight + 10;
+            }
+
+            // Incident Section Header
+            doc.setFillColor(...hexToRgb(colors.redOrange));
+            doc.rect(margin, yPosition, 180, 10, "F");
+            doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(colors.secondary);
-            doc.text(
-              `Incidencia #${idx + 1}: ${incidencia.motivo}`,
-              15,
-              yPosition
-            );
-            yPosition += 6;
+            doc.setTextColor(255, 255, 255);
+            doc.text("DETALLES DE LA INCIDENCIA", margin + 5, yPosition + 7);
+
+            yPosition += 20;
+            doc.setTextColor(0, 0, 0);
 
             // Incident Details
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text("Fecha:", margin, yPosition);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(colors.primary);
-            doc.text(`Severidad: ${incidencia.nivel_severidad}`, 15, yPosition);
-            yPosition += 5;
-            doc.text(`Fecha: ${safeDate(incidencia.fecha)}`, 15, yPosition);
-            yPosition += 5;
-            doc.text(
-              `Descripción: ${incidencia.descripcion || "Sin descripción"}`,
-              15,
-              yPosition
-            );
-            yPosition += 8;
+            doc.setTextColor(0, 0, 0);
+            doc.text(safeDate(incidencia.fecha), margin + 55, yPosition);
+            yPosition += 10;
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text("Nivel de severidad:", margin, yPosition);
+            doc.setFillColor(...hexToRgb(severityColors[incidencia.nivel_severidad?.toLowerCase()] || colors.deepPink));
+            doc.circle(margin + 50, yPosition - 2, 3, "F");
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text(incidencia.nivel_severidad || "Sin severidad", margin + 60, yPosition);
+            yPosition += 10;
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text("Motivo:", margin, yPosition);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            const motivoLines = doc.splitTextToSize(incidencia.motivo || "Sin motivo", 170);
+            doc.text(motivoLines, margin + 20, yPosition);
+            yPosition += Math.max(motivoLines.length * 7, 10);
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text("Descripción:", margin, yPosition);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            const description = incidencia.descripcion || "Sin descripción";
+            const descriptionLines = doc.splitTextToSize(description, 170);
+            doc.text(descriptionLines, margin, yPosition + 5);
+            yPosition += descriptionLines.length * 7 + 10;
 
             // Agreements
-            console.log(
-              `Acuerdos for incidencia ${incidencia.id_incidencia}:`,
-              incidencia.acuerdos
-            );
+            console.log(`Acuerdos for incidencia ${incidencia.id_incidencia}:`, incidencia.acuerdos);
             if (incidencia.acuerdos?.length > 0) {
+              if (yPosition > 230) {
+                doc.addPage();
+                yPosition = 15;
+                addHeader(yPosition);
+                yPosition += headerHeight + 10;
+              }
+
               doc.setFont("helvetica", "bold");
-              doc.setFontSize(12);
-              doc.setTextColor(colors.accent);
-              doc.text("Acuerdos establecidos:", 15, yPosition);
-              yPosition += 6;
-
-              const agreementData = incidencia.acuerdos.map(
-                (acuerdo: Acuerdo) => {
-                  console.log("Processing acuerdo:", acuerdo);
-                  return [
-                    safeDate(acuerdo.fecha_creacion),
-                    acuerdo.descripcion || "Sin descripción",
-                    acuerdo.estatus || "Sin estatus",
-                  ];
-                }
-              );
-
-              (doc as any).autoTable({
-                startY: yPosition,
-                head: [["Fecha", "Descripción", "Estatus"]],
-                body: agreementData,
-                theme: "grid",
-                styles: { fontSize: 10, cellPadding: 3 },
-                headStyles: { fillColor: colors.secondary, textColor: 255 },
-                columnStyles: {
-                  0: { cellWidth: 30 },
-                  1: { cellWidth: 100 },
-                  2: { cellWidth: 40 },
-                },
-              });
-
-              yPosition = (doc as any).lastAutoTable.finalY + 10;
-            } else {
-              doc.setFont("helvetica", "normal");
-              doc.setFontSize(10);
-              doc.setTextColor(colors.primary);
-              doc.text("No hay acuerdos establecidos.", 15, yPosition);
+              doc.setTextColor(...hexToRgb(colors.deepPink));
+              doc.text("Acuerdos establecidos:", margin, yPosition);
               yPosition += 8;
+
+              for (const acuerdo of incidencia.acuerdos) {
+                if (yPosition > 230) {
+                  doc.addPage();
+                  yPosition = 15;
+                  addHeader(yPosition);
+                  yPosition += headerHeight + 10;
+                  doc.setFont("helvetica", "bold");
+                  doc.setTextColor(...hexToRgb(colors.deepPink));
+                  doc.text("Acuerdos establecidos:", margin, yPosition);
+                  yPosition += 8;
+                }
+
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(...hexToRgb(colors.deepPink));
+                doc.text("Estatus:", margin + 10, yPosition);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(0, 0, 0);
+                doc.text(acuerdo.estatus || "Sin estatus", margin + 30, yPosition);
+                yPosition += 8;
+
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(...hexToRgb(colors.deepPink));
+                doc.text("Descripción:", margin + 10, yPosition);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(0, 0, 0);
+                const acuerdoDesc = acuerdo.descripcion || "Sin descripción";
+                const acuerdoLines = doc.splitTextToSize(acuerdoDesc, 160);
+                doc.text(acuerdoLines, margin + 30, yPosition);
+                yPosition += acuerdoLines.length * 7;
+
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(...hexToRgb(colors.deepPink));
+                doc.text("Creado el:", margin + 10, yPosition);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(0, 0, 0);
+                doc.text(safeDate(acuerdo.fecha_creacion), margin + 30, yPosition);
+                yPosition += 10;
+              }
+            } else {
+              if (yPosition > 230) {
+                doc.addPage();
+                yPosition = 15;
+                addHeader(yPosition);
+                yPosition += headerHeight + 10;
+              }
+
+              doc.setFont("helvetica", "bold");
+              doc.setTextColor(...hexToRgb(colors.deepPink));
+              doc.text("Acuerdos establecidos:", margin, yPosition);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(0, 0, 0);
+              doc.text("No hay acuerdos establecidos.", margin + 10, yPosition + 7);
+              yPosition += 14;
             }
+
+            // Signature Section
+            if (yPosition > 230) {
+              doc.addPage();
+              yPosition = 15;
+              addHeader(yPosition);
+              yPosition += headerHeight + 10;
+            }
+
+            const text1 = "Incidencia registrada por:";
+            const text1Width = doc.getTextWidth(text1);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text(text1, (pageWidth - text1Width) / 2, yPosition);
+
+            const text2 = "N/A"; // No nombre_personal in expediente.incidencias
+            const text2Width = doc.getTextWidth(text2);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text(text2, (pageWidth - text2Width) / 2, yPosition + 7);
+
+            const lineLength = 85;
+            doc.setLineWidth(0.3);
+            doc.line(
+              (pageWidth - lineLength) / 2,
+              yPosition + 20,
+              (pageWidth + lineLength) / 2,
+              yPosition + 20
+            );
+
+            const text3 = "Firma y sello de la Institución";
+            const text3Width = doc.getTextWidth(text3);
+            doc.setTextColor(...hexToRgb(colors.deepPink));
+            doc.text(text3, (pageWidth - text3Width) / 2, yPosition + 28);
+
+            yPosition += 35;
+
+            // Add footer
+            addFooter();
+          }
+
+          if (expediente.incidencias.length === 0) {
+            console.warn(`No hay incidencias para el estudiante ${curp}`);
+            setAlert({
+              message: `No hay incidencias para ${studentName}`,
+              type: "warning",
+            });
+            continue;
           }
         } catch (error) {
           console.error(`Error procesando estudiante ${curp}:`, error);
+          setAlert({
+            message: `Error al procesar el expediente de ${curp}: ${
+              error instanceof Error ? error.message : "Error desconocido"
+            }`,
+            type: "error",
+          });
           continue;
         }
       }
@@ -223,7 +453,10 @@ const ExportRecord = () => {
       setAlert({ message: "PDF generado exitosamente", type: "success" });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      setAlert({ message: "Error al generar el PDF", type: "error" });
+      setAlert({
+        message: `Error al generar el PDF: ${error instanceof Error ? error.message : "Error desconocido"}`,
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -251,7 +484,8 @@ const ExportRecord = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className={styles.mainContainer}>
+      className={styles.mainContainer}
+    >
       <Navbar
         title="Exportar Expedientes"
         buttons={[
@@ -265,7 +499,8 @@ const ExportRecord = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={styles.alertContainer}>
+          className={styles.alertContainer}
+        >
           <Alert {...alert} onClose={() => setAlert(null)} />
         </motion.div>
       )}
@@ -297,14 +532,11 @@ const ExportRecord = () => {
           </div>
         )}
 
-        {!loading &&
-          students.length === 0 &&
-          filters.grade &&
-          filters.group && (
-            <div className={styles.emptyState}>
-              No hay estudiantes en este grado y grupo.
-            </div>
-          )}
+        {!loading && students.length === 0 && filters.grade && filters.group && (
+          <div className={styles.emptyState}>
+            No hay estudiantes en este grado y grupo.
+          </div>
+        )}
 
         {!loading && students.length > 0 && (
           <div className={styles.studentList}>
@@ -316,10 +548,7 @@ const ExportRecord = () => {
                     checked={selectedStudents.includes(student.curp)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setSelectedStudents([
-                          ...selectedStudents,
-                          student.curp,
-                        ]);
+                        setSelectedStudents([...selectedStudents, student.curp]);
                       } else {
                         setSelectedStudents(
                           selectedStudents.filter((c) => c !== student.curp)
@@ -340,7 +569,8 @@ const ExportRecord = () => {
         <button
           className={styles.exportButton}
           onClick={generatePDF}
-          disabled={selectedStudents.length === 0 || loading}>
+          disabled={selectedStudents.length === 0 || loading}
+        >
           {loading ? "Generando PDF..." : "Exportar Selección"}
         </button>
       </div>
