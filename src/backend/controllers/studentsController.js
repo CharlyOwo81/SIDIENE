@@ -5,40 +5,40 @@ import pdf from "pdf-parse";
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 const preprocessPDFText = (text) => {
   let cleanedText = text
-    .replace(/\r?\n+/g, '\n')
-    .replace(/\s{2,}/g, ' ')
+    .replace(/\r?\n+/g, "\n")
+    .replace(/\s{2,}/g, " ")
     .trim();
 
   // Fix concatenated headers
   cleanedText = cleanedText.replace(
     /curpnombresapellido_paternoapellido_maternogradogrupoanio_ingresoanio_egresoestatus/gi,
-    'curp|nombres|apellido_paterno|apellido_materno|grado|grupo|anio_ingreso|anio_egreso|estatus'
+    "curp|nombres|apellido_paterno|apellido_materno|grado|grupo|anio_ingreso|anio_egreso|estatus"
   );
 
   const processNames = (namePart) => {
     let processed = namePart
-      .replace(/([a-zñáéíóú])([A-ZÑÁÉÍÓÚ])/g, '$1 $2')
-      .replace(/\s+/g, ' ')
+      .replace(/([a-zñáéíóú])([A-ZÑÁÉÍÓÚ])/g, "$1 $2")
+      .replace(/\s+/g, " ")
       .trim();
 
-    const nameParts = processed.split(' ');
-    
-    let nombres = '';
-    let apellido_paterno = '';
-    let apellido_materno = '';
+    const nameParts = processed.split(" ");
+
+    let nombres = "";
+    let apellido_paterno = "";
+    let apellido_materno = "";
 
     if (nameParts.length >= 4) {
-      nombres = nameParts.slice(0, 2).join(' ');
-      apellido_paterno = nameParts.slice(2, -1).join(' ');
+      nombres = nameParts.slice(0, 2).join(" ");
+      apellido_paterno = nameParts.slice(2, -1).join(" ");
       apellido_materno = nameParts[nameParts.length - 1];
     } else if (nameParts.length === 3) {
       nombres = nameParts[0];
-      apellido_paterno = nameParts.slice(1).join(' ');
+      apellido_paterno = nameParts.slice(1).join(" ");
     } else if (nameParts.length === 2) {
       nombres = nameParts[0];
       apellido_paterno = nameParts[1];
@@ -49,36 +49,38 @@ const preprocessPDFText = (text) => {
     return { nombres, apellido_paterno, apellido_materno };
   };
 
-  const lines = cleanedText.split('\n').map(line => {
-    if (!line.trim() || line === 'SO') return null;
+  const lines = cleanedText.split("\n").map((line) => {
+    if (!line.trim() || line === "SO") return null;
 
     // Enhanced academic field detection
-    const academicRegex = /(\d{1,2})[\s|]*([A-Z])[\s|]*(\d{4})[\s|]*(\d{4})?[\s|]*([A-ZÁÉÍÓÚ\s]+)$/i;
+    const academicRegex =
+      /(\d{1,2})[\s|]*([A-Z])[\s|]*(\d{4})[\s|]*(\d{4})?[\s|]*([A-ZÁÉÍÓÚ\s]+)$/i;
     const academicMatch = line.match(academicRegex);
 
-    let grado = '';
-    let grupo = '';
-    let anio_ingreso = '';
-    let anio_egreso = '';
-    let estatus = '';
+    let grado = "";
+    let grupo = "";
+    let anio_ingreso = "";
+    let anio_egreso = "";
+    let estatus = "";
     let namePart = line;
 
     if (academicMatch) {
       [, grado, grupo, anio_ingreso, anio_egreso, estatus] = academicMatch;
-      namePart = line.replace(academicRegex, '').trim();
+      namePart = line.replace(academicRegex, "").trim();
     }
 
     // Extract CURP
     const curpRegex = /^([A-Z0-9]{18})[|\s]*/i;
     const curpMatch = namePart.match(curpRegex);
-    let curp = '';
+    let curp = "";
     if (curpMatch) {
       curp = curpMatch[1];
       namePart = namePart.slice(curpMatch[0].length).trim();
     }
 
     // Process names
-    const { nombres, apellido_paterno, apellido_materno } = processNames(namePart);
+    const { nombres, apellido_paterno, apellido_materno } =
+      processNames(namePart);
 
     return [
       curp,
@@ -87,57 +89,57 @@ const preprocessPDFText = (text) => {
       apellido_materno,
       grado,
       grupo,
-      anio_ingreso || '-',
-      anio_egreso || '-',
-      estatus.replace('BAJA ADMINISTRATIVA', 'EGRESADO').trim() || 'ACTIVO'
-    ].join('|');
+      anio_ingreso || "-",
+      anio_egreso || "-",
+      estatus.replace("BAJA ADMINISTRATIVA", "EGRESADO").trim() || "ACTIVO",
+    ].join("|");
   });
 
   return {
-    cleanedText: lines.filter(line => line).join('\n'),
-    detectedDelimiter: '|'
+    cleanedText: lines.filter((line) => line).join("\n"),
+    detectedDelimiter: "|",
   };
 };
 
 // Preprocesamiento mejorado
 const detectPDFStructure = (cleanedText) => {
-  const lines = cleanedText.split('\n').filter(line => line.trim());
+  const lines = cleanedText.split("\n").filter((line) => line.trim());
   if (!lines.length) {
-    return { structure: 'unknown', headers: [], delimiter: '|' };
+    return { structure: "unknown", headers: [], delimiter: "|" };
   }
 
   // Usar encabezados esperados
   const expectedHeaders = [
-    'curp',
-    'nombres',
-    'apellido_paterno',
-    'apellido_materno',
-    'grado',
-    'grupo',
-    'anio_ingreso',
-    'anio_egreso',
-    'estatus'
+    "curp",
+    "nombres",
+    "apellido_paterno",
+    "apellido_materno",
+    "grado",
+    "grupo",
+    "anio_ingreso",
+    "anio_egreso",
+    "estatus",
   ];
 
   // Verificar si la primera línea contiene los encabezados esperados
   const firstLine = lines[0];
-  const headers = firstLine.split('|').map(h => h.trim().toLowerCase());
-  const isTable = expectedHeaders.some(header => headers.includes(header));
+  const headers = firstLine.split("|").map((h) => h.trim().toLowerCase());
+  const isTable = expectedHeaders.some((header) => headers.includes(header));
 
   return {
-    structure: isTable ? 'table' : 'list',
+    structure: isTable ? "table" : "list",
     headers: expectedHeaders,
-    delimiter: '|'
+    delimiter: "|",
   };
 };
 
 // Expresión regular optimizada
 const parseStudents = (cleanedText, structureInfo) => {
-  const lines = cleanedText.split('\n').filter(line => line.trim());
+  const lines = cleanedText.split("\n").filter((line) => line.trim());
   const students = [];
 
   lines.forEach((line, index) => {
-    const fields = line.split('|').map(f => f.trim());
+    const fields = line.split("|").map((f) => f.trim());
     if (fields.length < 5) return;
 
     const student = {
@@ -147,9 +149,9 @@ const parseStudents = (cleanedText, structureInfo) => {
       apellido_materno: fields[3],
       grado: fields[4],
       grupo: fields[5],
-      anio_ingreso: fields[6] === '-' ? null : fields[6],
-      anio_egreso: fields[7] === '-' ? null : fields[7],
-      estatus: fields[8] || 'ACTIVO'
+      anio_ingreso: fields[6] === "-" ? null : fields[6],
+      anio_egreso: fields[7] === "-" ? null : fields[7],
+      estatus: fields[8] || "ACTIVO",
     };
 
     students.push(student);
@@ -163,7 +165,7 @@ const validateStudent = (student, lineIndex) => {
   const errors = [];
 
   // Validar CURP
-  const cleanCurp = student.curp?.replace(/\s/g, '');
+  const cleanCurp = student.curp?.replace(/\s/g, "");
   if (!cleanCurp || !/^[A-Z0-9]{18}$/.test(cleanCurp)) {
     errors.push(`Línea ${lineIndex + 1}: CURP inválida: ${student.curp}`);
   } else {
@@ -176,32 +178,53 @@ const validateStudent = (student, lineIndex) => {
   }
 
   // Validar apellido_paterno (opcional)
-  if (student.apellido_paterno && !/^[A-Za-zÁ-ú\s-]+$/.test(student.apellido_paterno)) {
-    errors.push(`Línea ${lineIndex + 1}: Apellido paterno inválido: ${student.apellido_paterno}`);
+  if (
+    student.apellido_paterno &&
+    !/^[A-Za-zÁ-ú\s-]+$/.test(student.apellido_paterno)
+  ) {
+    errors.push(
+      `Línea ${lineIndex + 1}: Apellido paterno inválido: ${
+        student.apellido_paterno
+      }`
+    );
   }
 
   // Validar apellido_materno (opcional)
-  if (student.apellido_materno && !/^[A-Za-zÁ-ú\s-]+$/.test(student.apellido_materno)) {
-    errors.push(`Línea ${lineIndex + 1}: Apellido materno inválido: ${student.apellido_materno}`);
+  if (
+    student.apellido_materno &&
+    !/^[A-Za-zÁ-ú\s-]+$/.test(student.apellido_materno)
+  ) {
+    errors.push(
+      `Línea ${lineIndex + 1}: Apellido materno inválido: ${
+        student.apellido_materno
+      }`
+    );
   }
 
-  if (!['1', '2', '3'].includes(student.grado)) {
+  if (!["1", "2", "3"].includes(student.grado)) {
     errors.push(`Línea ${lineIndex + 1}: Grado inválido: ${student.grado}`);
   }
 
   if (student.anio_ingreso && !/^\d{4}$/.test(student.anio_ingreso)) {
-    errors.push(`Línea ${lineIndex + 1}: Año ingreso inválido: ${student.anio_ingreso}`);
+    errors.push(
+      `Línea ${lineIndex + 1}: Año ingreso inválido: ${student.anio_ingreso}`
+    );
   }
 
   if (student.anio_egreso && !/^\d{4}$/.test(student.anio_egreso)) {
-    errors.push(`Línea ${lineIndex + 1}: Año egreso inválido: ${student.anio_egreso}`);
+    errors.push(
+      `Línea ${lineIndex + 1}: Año egreso inválido: ${student.anio_egreso}`
+    );
   }
 
-  if (student.grupo && !['A', 'B', 'C', 'D', 'E', 'F'].includes(student.grupo)) {
+  if (
+    student.grupo &&
+    !["A", "B", "C", "D", "E", "F"].includes(student.grupo)
+  ) {
     errors.push(`Línea ${lineIndex + 1}: Grupo inválido: ${student.grupo}`);
   }
 
-  if (student.estatus && !['ACTIVO', 'EGRESADO'].includes(student.estatus)) {
+  if (student.estatus && !["ACTIVO", "EGRESADO"].includes(student.estatus)) {
     errors.push(`Línea ${lineIndex + 1}: Estatus inválido: ${student.estatus}`);
   }
 
@@ -215,15 +238,22 @@ export const uploadStudents = [
     try {
       if (!req.file) {
         console.log("No file received in request");
-        return res.status(400).json({ success: false, message: "No se subió ningún archivo" });
+        return res
+          .status(400)
+          .json({ success: false, message: "No se subió ningún archivo" });
       }
 
-      console.log('Received file:', req.file.originalname, req.file.size, req.file.mimetype);
+      console.log(
+        "Received file:",
+        req.file.originalname,
+        req.file.size,
+        req.file.mimetype
+      );
 
       // Procesar PDF
       const { text } = await pdf(req.file.buffer);
-      console.log('Extracted PDF text:', text.substring(0, 300));
-      if (!text || text.trim() === '') {
+      console.log("Extracted PDF text:", text.substring(0, 300));
+      if (!text || text.trim() === "") {
         return res.status(400).json({
           success: false,
           message: "El PDF está vacío o no contiene texto extraíble",
@@ -231,8 +261,8 @@ export const uploadStudents = [
       }
 
       const { cleanedText, detectedDelimiter } = preprocessPDFText(text);
-      console.log('Cleaned text:', cleanedText.substring(0, 300));
-      if (!cleanedText || cleanedText.trim() === '') {
+      console.log("Cleaned text:", cleanedText.substring(0, 300));
+      if (!cleanedText || cleanedText.trim() === "") {
         return res.status(400).json({
           success: false,
           message: "No se pudo extraer contenido válido del PDF",
@@ -241,12 +271,14 @@ export const uploadStudents = [
       }
 
       const structureInfo = detectPDFStructure(cleanedText);
-      console.log('Detected structure:', structureInfo);
+      console.log("Detected structure:", structureInfo);
       const rawStudents = parseStudents(cleanedText, structureInfo);
-      console.log('Parsed students:', rawStudents);
+      console.log("Parsed students:", rawStudents);
 
       // Validar estudiantes
-      const validationResults = rawStudents.map((student, index) => validateStudent(student, index));
+      const validationResults = rawStudents.map((student, index) =>
+        validateStudent(student, index)
+      );
       const validStudents = [];
       const errors = [];
 
@@ -259,7 +291,7 @@ export const uploadStudents = [
       });
 
       if (validStudents.length === 0) {
-        console.log('Validation errors:', errors);
+        console.log("Validation errors:", errors);
         return res.status(400).json({
           success: false,
           message: "No se encontraron estudiantes válidos",
@@ -303,296 +335,324 @@ export const uploadStudents = [
 
 // Resto de controladores...
 
-  // Resto de controladores (getAllStudents, createStudent, etc.) se mantienen similares
-  // con mejoras en manejo de errores y validaciones
+// Resto de controladores (getAllStudents, createStudent, etc.) se mantienen similares
+// con mejoras en manejo de errores y validaciones
 
-  export const createStudent = async (req, res) => {
-    try {
-      const {
+// Hypothetical backend: controllers/studentsController.js
+export const createStudent = async (req, res) => {
+  try {
+    const {
+      curp,
+      nombres,
+      apellido_paterno,
+      apellido_materno,
+      grado,
+      grupo,
+      anio_ingreso,
+      estatus,
+    } = req.body;
+
+    // Validation
+    const requiredFields = [
+      "curp",
+      "nombres",
+      "apellido_paterno",
+      "grado",
+      "grupo",
+      "anio_ingreso",
+    ];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Faltan campos requeridos: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Check for duplicate CURP
+    const [existingStudent] = await db.query(
+      "SELECT curp FROM estudiante WHERE curp = ?",
+      [curp]
+    );
+    if (existingStudent.length) {
+      return res.status(400).json({
+        success: false,
+        message: "El CURP ya está registrado",
+      });
+    }
+
+    // Insert student
+    await db.query(
+      "INSERT INTO estudiante (curp, nombres, apellido_paterno, apellido_materno, grado, grupo, anio_ingreso, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [
         curp,
         nombres,
-        apellidoPaterno,
-        apellidoMaterno,
+        apellido_paterno,
+        apellido_materno,
         grado,
         grupo,
         anio_ingreso,
-      } = req.body;
+        estatus || "ACTIVO",
+      ]
+    );
 
-      if (
-        !curp ||
-        !nombres ||
-        !apellidoPaterno ||
-        !apellidoMaterno ||
-        !grado ||
-        !grupo ||
-        !anio_ingreso
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Todos los campos son requeridos." });
-      }
+    res.status(201).json({
+      success: true,
+      message: "Estudiante registrado exitosamente",
+      data: { curp },
+    });
+  } catch (error) {
+    console.error("Error creating student:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al registrar estudiante",
+      error: error.message,
+    });
+  }
+};
 
-      // Validar que el grado sea uno de los permitidos
-      const validGrados = ["1", "2", "3"];
-      if (!validGrados.includes(grado)) {
-        return res.status(400).json({
-          error: `Invalid grado value: ${grado}. Allowed values are 1, 2, 3.`,
-        });
-      }
+export const getAllStudents = async (req, res) => {
+  try {
+    const { searchQuery, grado, grupo } = req.query;
 
-      // Insertar el estudiante en la base de datos
-      const studentId = await Student.create(req.body);
-      res
-        .status(201)
-        .json({ id: studentId, message: "Estudiante creado de manera exitosa." });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    // Validate empty filters
+    const hasFilters = searchQuery || grado || grupo;
+    if (!hasFilters) {
+      return res.status(200).json({
+        success: true,
+        warning: "Por favor aplique al menos un filtro para ver los resultados",
+        data: [],
+      });
     }
-  };
-  export const getAllStudents = async (req, res) => {
-    try {
-      const { searchQuery, grado, grupo } = req.query;
 
-      // Validate empty filters
-      const hasFilters = searchQuery || grado || grupo;
-      if (!hasFilters) {
-        return res.status(200).json({
-          success: true,
-          warning: "Por favor aplique al menos un filtro para ver los resultados",
-          data: []
-        });
-      }
-
-      let query = `
+    let query = `
         SELECT nombres, apellido_paterno, apellido_materno, grado, grupo, curp
         FROM estudiante
         WHERE 1=1
       `;
-      const values = [];
+    const values = [];
 
-      // Search query handling
-      if (searchQuery) {
-        query += ` AND (
+    // Search query handling
+    if (searchQuery) {
+      query += ` AND (
           nombres LIKE ? OR 
           apellido_paterno LIKE ? OR 
           apellido_materno LIKE ? OR 
           curp LIKE ? OR 
           anio_ingreso LIKE ?
         )`;
-        const searchTerm = `%${searchQuery}%`;
-        values.push(
-          searchTerm,
-          searchTerm,
-          searchTerm,
-          searchTerm,
-          searchTerm
-        );
-      }
-
-      // Exact match for grado
-      if (grado) {
-        query += ` AND grado IN (?)`;
-        values.push(grado.split(','));
-      }
-
-      // Exact match for grupo
-      if (grupo) {
-        query += ` AND grupo IN (?)`;
-        values.push(grupo.split(','));
-      }
-
-      console.log("Final query:", query);
-      console.log("Query values:", values);
-
-      const [rows] = await db.query(query, values);
-
-      // Format response
-      const formattedRows = rows.map(student => ({
-        nombres: student.nombres || "",
-        apellidoPaterno: student.apellido_paterno || "",
-        apellidoMaterno: student.apellido_materno || "",
-        grado: student.grado || "",
-        grupo: student.grupo || "",
-        curp: student.curp || "",
-      }));
-
-      res.status(200).json({
-        success: true,
-        data: formattedRows,
-        count: formattedRows.length
-      });
-
-    } catch (error) {
-      console.error("Database error:", error);
-      res.status(500).json({
-        success: false,
-        message: error.message || "Error del servidor"
-      });
+      const searchTerm = `%${searchQuery}%`;
+      values.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
     }
-  };
 
-  // Get students by grado and grupo
-  export const getStudentsByGradeGroup = async (req, res) => {
-    try {
-      const { grado, grupo } = req.query;
-      if (!grado || !grupo) {
-        return res.status(400).json({ success: false, message: 'Faltan grado o grupo' });
-      }
+    // Exact match for grado
+    if (grado) {
+      query += ` AND grado IN (?)`;
+      values.push(grado.split(","));
+    }
 
-      const [results] = await db.query(`
+    // Exact match for grupo
+    if (grupo) {
+      query += ` AND grupo IN (?)`;
+      values.push(grupo.split(","));
+    }
+
+    console.log("Final query:", query);
+    console.log("Query values:", values);
+
+    const [rows] = await db.query(query, values);
+
+    // Format response
+    const formattedRows = rows.map((student) => ({
+      nombres: student.nombres || "",
+      apellidoPaterno: student.apellido_paterno || "",
+      apellidoMaterno: student.apellido_materno || "",
+      grado: student.grado || "",
+      grupo: student.grupo || "",
+      curp: student.curp || "",
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedRows,
+      count: formattedRows.length,
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error del servidor",
+    });
+  }
+};
+
+// Get students by grado and grupo
+export const getStudentsByGradeGroup = async (req, res) => {
+  try {
+    const { grado, grupo } = req.query;
+    if (!grado || !grupo) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Faltan grado o grupo" });
+    }
+
+    const [results] = await db.query(
+      `
         SELECT curp, CONCAT(nombres, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, '')) AS nombre_completo
         FROM estudiante
         WHERE grado = ? AND grupo = ?
-      `, [grado, grupo]);
+      `,
+      [grado, grupo]
+    );
 
-      res.json({
-        success: true,
-        data: results,
-        count: results.length,
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
-  };
+    res.json({
+      success: true,
+      data: results,
+      count: results.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-  export const getStudentByCurp = async (req, res) => {
-    try {
-      const { curp } = req.params;
+export const getStudentByCurp = async (req, res) => {
+  try {
+    const { curp } = req.params;
 
-      if (!curp || curp.trim() === "") {
-        return res.status(400).json({
-          success: false,
-          message: "La CURP no puede ser vacía.",
-        });
-      }
-
-      const student = await Student.getById(curp);
-
-      if (!student) {
-        return res.status(404).json({
-          success: false,
-          message: "Estudiante no encontrado.",
-        });
-      }
-
-      // Formatear la respuesta con nombres de campos consistentes
-      const formattedStudent = {
-        curp: student.curp,
-        nombres: student.nombres,
-        apellidoPaterno: student.apellido_paterno || student.apellidoPaterno,
-        apellidoMaterno: student.apellido_materno || student.apellidoMaterno,
-        grado: student.grado,
-        grupo: student.grupo,
-        anio_ingreso: student.anio_ingreso,
-        anio_egreso: student.anio_egreso,
-        estatus: student.estatus,
-      };
-
-      res.status(200).json({
-        success: true,
-        data: formattedStudent,
-      });
-    } catch (error) {
-      console.error("Error fetching student:", error);
-      res.status(500).json({
+    if (!curp || curp.trim() === "") {
+      return res.status(400).json({
         success: false,
-        message: "Error al obtener el estudiante",
-        error: error.message,
+        message: "La CURP no puede ser vacía.",
       });
     }
-  };
 
-  export const getStudentsWithExpediente = async (req, res) => {
+    const student = await Student.getById(curp);
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Estudiante no encontrado.",
+      });
+    }
+
+    // Formatear la respuesta con nombres de campos consistentes
+    const formattedStudent = {
+      curp: student.curp,
+      nombres: student.nombres,
+      apellidoPaterno: student.apellido_paterno || student.apellidoPaterno,
+      apellidoMaterno: student.apellido_materno || student.apellidoMaterno,
+      grado: student.grado,
+      grupo: student.grupo,
+      anio_ingreso: student.anio_ingreso,
+      anio_egreso: student.anio_egreso,
+      estatus: student.estatus,
+    };
+
+    res.status(200).json({
+      success: true,
+      data: formattedStudent,
+    });
+  } catch (error) {
+    console.error("Error fetching student:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener el estudiante",
+      error: error.message,
+    });
+  }
+};
+
+export const getStudentsWithExpediente = async (req, res) => {
   try {
     const { grado, grupo } = req.query;
 
     if (!grado || !grupo) {
       return res.status(400).json({
         success: false,
-        message: 'Grado y grupo son requeridos',
+        message: "Grado y grupo son requeridos",
       });
     }
 
     const students = await Student.getStudentsWithExpediente(grado, grupo);
-    
+
     res.json({
       success: true,
       data: students,
       count: students.length,
     });
   } catch (error) {
-    console.error('Error fetching students with expediente:', error);
+    console.error("Error fetching students with expediente:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener estudiantes',
+      message: "Error al obtener estudiantes",
       error: error.message,
     });
   }
 };
 
-  // In your studentsController.js
-  export const updateStudent = async (req, res) => {
-    try {
-      const { curp } = req.params;
-      const {
-        nombres,
-        apellidoPaterno,
-        apellidoMaterno,
-        grado,
-        grupo,
-        anio_ingreso,
-        estatus,
-      } = req.body;
+// In your studentsController.js
+export const updateStudent = async (req, res) => {
+  try {
+    const { curp } = req.params;
+    const {
+      nombres,
+      apellidoPaterno,
+      apellidoMaterno,
+      grado,
+      grupo,
+      anio_ingreso,
+      estatus,
+    } = req.body;
 
-      console.log("Updating student with CURP:", curp);
-      console.log("Update data:", req.body);
+    console.log("Updating student with CURP:", curp);
+    console.log("Update data:", req.body);
 
-      const result = await Student.updateById(curp, {
-        nombres,
-        apellido_paterno: apellidoPaterno,
-        apellido_materno: apellidoMaterno,
-        grado,
-        grupo,
-        anio_ingreso,
-        estatus,
-      });
+    const result = await Student.updateById(curp, {
+      nombres,
+      apellido_paterno: apellidoPaterno,
+      apellido_materno: apellidoMaterno,
+      grado,
+      grupo,
+      anio_ingreso,
+      estatus,
+    });
 
-      if (!result) {
-        return res.status(404).json({
-          success: false,
-          message: "Estudiante no encontrado.",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Estudiante actualizado con éxito.",
-        data: {
-          curp: result.curp,
-          nombres: result.nombres,
-          apellidoPaterno: result.apellido_paterno,
-          apellidoMaterno: result.apellido_materno,
-          grado: result.grado,
-          grupo: result.grupo,
-          anio_ingreso: result.anio_ingreso,
-          estatus: result.estatus,
-        },
-      });
-    } catch (error) {
-      console.error("Update error:", error);
-      res.status(500).json({
+    if (!result) {
+      return res.status(404).json({
         success: false,
-        message: "Error al actualizar el estudiante",
-        error: error.message,
+        message: "Estudiante no encontrado.",
       });
     }
-  };
 
-  export const deleteStudent = async (req, res) => {
-    try {
-      await Student.delete(req.params.id);
-      res.status(200).json({ message: "Student deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      message: "Estudiante actualizado con éxito.",
+      data: {
+        curp: result.curp,
+        nombres: result.nombres,
+        apellidoPaterno: result.apellido_paterno,
+        apellidoMaterno: result.apellido_materno,
+        grado: result.grado,
+        grupo: result.grupo,
+        anio_ingreso: result.anio_ingreso,
+        estatus: result.estatus,
+      },
+    });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al actualizar el estudiante",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteStudent = async (req, res) => {
+  try {
+    await Student.delete(req.params.id);
+    res.status(200).json({ message: "Student deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
