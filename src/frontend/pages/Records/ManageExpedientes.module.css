@@ -1,0 +1,866 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.container {
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  background: linear-gradient(135deg, #fff0f6 0%, #f3e5f5 50%, #fefce8 100%);
+  font-family: 'Inter', sans-serif;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(137, 21, 71, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.1), transparent);
+  z-index: -1;
+}
+
+.formTitle {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #831843;
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.formTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #db2777);
+  border-radius: 2px;
+}
+
+
+
+.formContainer {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(137, 21, 71, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(10px);
+  margin: 0 auto;
+}
+
+.filterSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto 2.5rem;
+}
+
+.formActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.submitButton {
+  background: linear-gradient(90deg, #f59e0b, #db2777);
+  color: #fff;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.submitButton:disabled {
+  background: linear-gradient(90deg, #a8a29e, #78716c);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.submitButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.4s ease;
+}
+
+.submitButton:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(90deg, #db2777, #f59e0b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(219, 39, 119, 0.5);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.studentCardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto 2.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.studentCard {
+  background: linear-gradient(135deg, #ffffff, #fefce8);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.studentCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, #fff0f6, #fefce8);
+}
+
+.studentCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.studentCard:hover::before {
+  left: 100%;
+}
+
+.selectedCard {
+  background: linear-gradient(135deg, #f59e0b, #db2777);
+  border-color: #831843;
+  box-shadow: 0 8px 20px rgba(219, 39, 119, 0.4);
+  transform: scale(1.03);
+}
+
+.studentName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #831843;
+  margin: 0;
+  line-height: 1.4;
+  text-transform: capitalize;
+}
+
+.selectedCard .studentName {
+  color: #fff;
+}
+
+.expedienteSection {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  margin: 2rem auto;
+  max-width: 1000px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expedienteTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #831843;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #f59e0b;
+  text-align: center;
+}
+
+.incidentList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.incidentList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.incidentList::-webkit-scrollbar-track {
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 4px;
+}
+
+.incidentList::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b, #db2777);
+  border-radius: 4px;
+}
+
+.incidentList::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #db2777, #f59e0b);
+}
+
+.incidentItem {
+  background: linear-gradient(90deg, #ffffff, rgba(245, 158, 11, 0.05));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.incidentItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
+}
+
+.incidentInfo p {
+  margin: 0.6rem 0;
+  font-size: 1rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.incidentInfo strong {
+  color: #831843;
+  font-weight: 600;
+}
+
+.acuerdoInfo {
+  margin-top: 1rem;
+  padding: 1rem 1rem 1rem 1.5rem;
+  border-left: 4px solid #f59e0b;
+  background: rgba(254, 243, 199, 0.3);
+  border-radius: 8px;
+}
+
+.acuerdoItem {
+  background: rgba(255, 251, 235, 0.8);
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-top: 0.8rem;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.acuerdoItem p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #831843;
+  animation: pulse 1.5s infinite;
+}
+
+.spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 4px solid #f59e0b;
+  border-top-color: #db2777;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.errorState {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: #b91c1c;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 1.5rem auto;
+  max-width: 800px;
+  border: 1px solid #fecaca;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2.5rem;
+  color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  margin: 1.5rem auto;
+  max-width: 800px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    padding: 2rem 1rem;
+  }
+
+  .studentCardContainer {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+
+  .formContainer {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .formTitle {
+    font-size: 2.2rem;
+  }
+
+  .filterSection {
+    grid-template-columns: 1fr;
+    max-width: 90%;
+  }
+
+  .studentCardContainer {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .expedienteSection {
+    padding: 2rem;
+  }
+
+  .expedienteTitle {
+    font-size: 1.6rem;
+  }
+
+  .submitButton {
+    width: 100%;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .formTitle {
+    font-size: 1.8rem;
+  }
+
+  .formContainer {
+    padding: 1.5rem;
+  }
+
+  .studentCard {
+    padding: 1rem;
+  }
+
+  .studentName {
+    font-size: 1rem;
+  }
+
+  .incidentItem {
+    padding: 1rem;
+  }
+
+  .loading {
+    font-size: 1rem;
+  }
+
+  .spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.formContainer {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.formTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #831843;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filterSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #db2777;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.errorState {
+  background: #ffe6e6;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+}
+
+.spinner {
+  border: 4px solid #f59e0b;
+  border-top: 4px solid #db2777;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.emptyState {
+  text-align: center;
+  color: #831843;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  font-weight: 500;
+}
+
+.incidentList {
+  display: grid;
+  gap: 1rem;
+}
+
+.incidentItem {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.incidentItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.selectedCard {
+  border-color: #db2777;
+  background: rgba(219, 39, 119, 0.1);
+  box-shadow: 0 0 15px rgba(219, 39, 119, 0.3);
+}
+
+.incidentItem p {
+  margin: 0.5rem 0;
+  color: #831843;
+  font-size: 1rem;
+}
+
+.incidentItem p strong {
+  color: #db2777;
+}
+
+.formSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid #f59e0b;
+}
+
+.expedienteTitle {
+  font-size: 1.8rem;
+  color: #831843;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.submitButton {
+  background: linear-gradient(45deg, #f59e0b, #db2777);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  display: block;
+  width: 200px;
+  text-align: center;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
+}
+
+.submitButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.studentList {
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.studentItem {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.studentItem label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.exportButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.exportButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.exportButton:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* Contenedor del formulario */
+.formContainer {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Título del formulario */
+.formTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #831843;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sección de filtros */
+.filterSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Etiquetas */
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #db2777;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Estado de error */
+.errorState {
+  background: #ffe6e6;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Estado de carga */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+}
+
+.spinner {
+  border: 4px solid #f59e0b;
+  border-top: 4px solid #db2777;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estado vacío */
+.emptyState {
+  text-align: center;
+  color: #831843;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  font-weight: 500;
+}
+
+/* Lista de incidencias */
+.incidentList {
+  display: grid;
+  gap: 1rem;
+}
+
+.incidentItem {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.incidentItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.selectedCard {
+  border-color: #db2777;
+  background: rgba(219, 39, 119, 0.1);
+  box-shadow: 0 0 15px rgba(219, 39, 119, 0.3);
+}
+
+.incidentItem p {
+  margin: 0.5rem 0;
+  color: #831843;
+  font-size: 1rem;
+}
+
+.incidentItem p strong {
+  color: #db2777;
+}
+
+/* Sección del formulario */
+.formSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid #f59e0b;
+}
+
+/* Título del expediente */
+.expedienteTitle {
+  font-size: 1.8rem;
+  color: #831843;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Campos del formulario (AgreementForm) */
+.formField {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #db2777;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #831843;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  resize: vertical;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #db2777;
+  box-shadow: 0 0 8px rgba(219, 39, 119, 0.3);
+}
+
+.formInput::placeholder {
+  color: #a1a1aa;
+}
+
+.formSelect select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #831843;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  appearance: none;
+  cursor: pointer;
+}
+
+.formSelect select:focus {
+  outline: none;
+  border-color: #db2777;
+  box-shadow: 0 0 8px rgba(219, 39, 119, 0.3);
+}
+
+/* Acciones del formulario */
+.formActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+/* Botón de enviar */
+.submitButton {
+  background: linear-gradient(45deg, #f59e0b, #db2777);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
+}
+
+.submitButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}

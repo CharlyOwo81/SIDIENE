@@ -1,0 +1,18 @@
+.label {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547; /* Deep pink */
+  margin-bottom: 0.5rem;
+}
+
+.inputWrapper:focus-within .label {
+  color: #F3C44D; /* Yellow on focus */
+}
+
+@media (max-width: 480px) {
+  .label {
+    font-size: 0.9rem;
+  }
+}

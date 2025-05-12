@@ -1,0 +1,28 @@
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedIncident) return;
+
+    setIsSubmitting(true);
+    try {
+      await axios.put(`/api/incidents/${selectedIncident.id_incidencia}`, {
+        fecha: selectedIncident.fecha,
+        nivel_severidad: selectedIncident.nivel_severidad,
+        motivo: selectedIncident.motivo,
+        descripcion: selectedIncident.descripcion
+      });
+      
+      // Actualizar lista de incidentes
+      const updatedIncidents = incidents.map(inc => 
+        inc.id_incidencia === selectedIncident.id_incidencia ? selectedIncident : inc
+      );
+      setIncidents(updatedIncidents);
+      
+      alert('Incidencia actualizada exitosamente!');
+    } catch (error) {
+      console.error('Error updating incident:', error);
+      alert('Error actualizando la incidencia');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+

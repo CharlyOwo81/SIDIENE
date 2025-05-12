@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* Modal Content */
+.modalContent {
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+  padding: 2.5rem;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(229, 130, 62, 0.2);
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+}
+
+/* Modal Header */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Close Button */
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #891547;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.closeButton:hover {
+  color: #E5823E;
+  transform: rotate(90deg);
+}
+
+/* Filter Container */
+.filterContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Filter Group */
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Label Styling */
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Select Fields */
+.select {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23891547" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 14px;
+  appearance: none;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.select:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.select:hover:not(:focus):not(:disabled) {
+  border-color: #E5823E;
+}
+
+.select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Search Container */
+.searchContainer {
+  grid-column: span 1;
+}
+
+.searchInput {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.searchInput::placeholder {
+  color: #bbb;
+  font-weight: 400;
+}
+
+.searchInput:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.searchInput:hover:not(:focus) {
+  border-color: #E5823E;
+}
+
+/* Student List */
+.studentList {
+  max-height: 50vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Styling */
+.studentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.studentTable th,
+.studentTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.studentTable th {
+  background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+  font-weight: 600;
+  color: #891547;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 1rem;
+}
+
+.studentTable td {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.studentRow {
+  transition: all 0.3s ease;
+}
+
+.studentRow:hover {
+  background-color: #fef6f2;
+  cursor: pointer;
+}
+
+/* Checkbox Styling */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #E5823E;
+  cursor: pointer;
+}
+
+.checkbox:hover {
+  transform: scale(1.1);
+}
+
+/* No Results */
+.noResults {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Modal Footer */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+/* Confirm Button */
+.confirmButton {
+  background: linear-gradient(135deg, #E5823E 0%, #C26444 100%);
+  color: white;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(229, 130, 62, 0.3);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.confirmButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(229, 130, 62, 0.5);
+  background: linear-gradient(135deg, #F3C44D 0%, #E5823E 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 2rem;
+    width: 95%;
+  }
+
+  .modalHeader h2 {
+    font-size: 1.6rem;
+  }
+
+  .filterContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .studentTable th,
+  .studentTable td {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .confirmButton {
+    padding: 0.7rem 1.8rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalContent {
+    padding: 1.5rem;
+  }
+
+  .modalHeader h2 {
+    font-size: 1.4rem;
+  }
+
+  .searchInput,
+  .select {
+    height: 46px;
+    font-size: 0.95rem;
+  }
+
+  .studentTable th,
+  .studentTable td {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .confirmButton {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
