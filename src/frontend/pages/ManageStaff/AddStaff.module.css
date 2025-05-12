@@ -1,0 +1,480 @@
+/* ManageStudents.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+.mainContainer {
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+}
+
+.alertContainer {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 600px;
+}
+
+/* Form Container */
+.formContainer {
+  max-width: 900px; /* Slightly wider to accommodate two columns */
+  margin: 0 auto;
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(229, 130, 62, 0.2);
+}
+
+/* Title */
+.formTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Form Grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 2rem; /* Increased gap for separation */
+  margin-bottom: 2rem;
+}
+
+/* Column Containers */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Spacing between fields in each column */
+}
+
+/* Column Titles */
+.columnTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #891547;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #E5823E;
+  padding-bottom: 0.3rem;
+}
+
+/* Label Styling */
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Input Fields */
+.input {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.input::placeholder {
+  color: #bbb;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: #E5823E;
+}
+
+.input:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.input.error {
+  border-color: #e63946;
+  box-shadow: 0 0 6px rgba(230, 57, 70, 0.3);
+}
+
+/* Select Fields */
+.select {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23891547" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 14px;
+  appearance: none;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.select:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.select:hover:not(:focus):not(:disabled) {
+  border-color: #E5823E;
+}
+
+.select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.select.error {
+  border-color: #e63946;
+  box-shadow: 0 0 6px rgba(230, 57, 70, 0.3);
+}
+
+/* File Input */
+.fileInput {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px dashed #C26444;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #666;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: #E5823E;
+  background-color: #fef6f2;
+}
+
+.fileInput:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+/* Button */
+.button {
+  background: linear-gradient(135deg, #E5823E 0%, #C26444 100%);
+  color: white;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(229, 130, 62, 0.3);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(229, 130, 62, 0.5);
+  background: linear-gradient(135deg, #F3C44D 0%, #E5823E 100%);
+}
+
+.button:disabled {
+  background: #d0d0d0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 2rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+  }
+
+  .fullWidth {
+    grid-column: span 1;
+  }
+
+  .formTitle {
+    font-size: 2rem;
+  }
+
+  .button {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .formContainer {
+    padding: 1.5rem;
+  }
+
+  .formTitle {
+    font-size: 1.8rem;
+  }
+
+  .input,
+  .select {
+    height: 46px;
+    font-size: 0.95rem;
+  }
+
+  .button {
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+  }
+
+  .columnTitle {
+    font-size: 1.2rem;
+  }
+}
+
+/* src/components/AddStaff.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+.mainContainer {
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+}
+
+.alertContainer {
+  position: fixed;
+  top: 80px; /* Adjusted for Navbar height */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 600px;
+}
+
+.formContainer {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(229, 130, 62, 0.2);
+}
+
+.formTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.input::placeholder {
+  color: #bbb;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: #E5823E;
+}
+
+.input:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.input.error {
+  border-color: #e63946;
+  box-shadow: 0 0 6px rgba(230, 57, 70, 0.3);
+}
+
+.select {
+  width: 100%;
+  height: 50px;
+  padding: 0 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23891547" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 14px;
+  appearance: none;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.select:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.select:hover:not(:focus):not(:disabled) {
+  border-color: #E5823E;
+}
+
+.select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.button {
+  background: linear-gradient(135deg, #E5823E 0%, #C26444 100%);
+  color: white;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(229, 130, 62, 0.3);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(229, 130, 62, 0.5);
+  background: linear-gradient(135deg, #F3C44D 0%, #E5823E 100%);
+}
+
+.button:disabled {
+  background: #d0d0d0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 2rem;
+    margin: 1.5rem auto;
+  }
+
+  .formTitle {
+    font-size: 2rem;
+  }
+
+  .button {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .formContainer {
+    padding: 1.5rem;
+  }
+
+  .formTitle {
+    font-size: 1.8rem;
+  }
+
+  .input,
+  .select {
+    height: 46px;
+    font-size: 0.95rem;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .button {
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+  }
+}

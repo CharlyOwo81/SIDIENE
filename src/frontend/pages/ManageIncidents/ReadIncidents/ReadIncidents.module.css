@@ -1,0 +1,208 @@
+/* src/components/ReadIncidents.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+.mainContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #891547;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.tableContainer {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.incidentsTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.incidentsTable th,
+.incidentsTable td {
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.incidentsTable th {
+  background: linear-gradient(135deg, #E5823E 0%, #C26444 100%);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
+.incidentsTable td {
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+  font-weight: 500;
+}
+
+.severityCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.severityCircle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.leve {
+  background-color: #F3C44D;
+}
+
+.severo {
+  background-color: #E5823E;
+}
+
+.grave {
+  background-color:  #891547;
+}
+
+.pdfButton {
+  background: #891547;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pdfButton:hover {
+  background: #E5823E;
+}
+
+.searchContainer {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #F3C44D;
+  box-shadow: 0 0 8px rgba(243, 196, 77, 0.4);
+  outline: none;
+}
+
+.filtersContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filtersContainer span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #891547;
+  align-self: center;
+}
+
+.severityFilter {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.severityFilter:hover {
+  border-color: #E5823E;
+}
+
+.severityFilter.active {
+  background: #E5823E;
+  color: white;
+  border-color: #E5823E;
+}
+
+.calendarContainer {
+  width: 200px;
+}
+
+@media (max-width: 768px) {
+  .incidentsTable th,
+  .incidentsTable td {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pdfButton {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableContainer {
+    padding: 0;
+  }
+
+  .incidentsTable {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .incidentsTable th,
+  .incidentsTable td {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .searchInput {
+    font-size: 0.9rem;
+  }
+
+  .filtersContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+}
